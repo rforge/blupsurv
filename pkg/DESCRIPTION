@@ -1,0 +1,11 @@
+Package: blupsurv
+Version: 0.1-7
+Title: Recurrent events with BLUPs
+Author: Emmanuel Sharef <ess28@cornell.edu>
+Maintainer: Emmanuel Sharef <ess28@cornell.edu>
+Depends: R (>= 2.5.0), MASS, survival
+Description: Tools for fitting proportional hazards models to clustered
+ recurrent events data. Nested frailties are modeled by their
+ best linear unbiased predictors under an auxiliary Poisson model.
+ Univariate and bivariate recurrent events processes are permitted.
+License: GPL (>= 2)

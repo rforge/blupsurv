@@ -1,0 +1,206 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+% \VignetteIndexEntry{Example for bivrec method in package blupsurv}
+\setlength{\marginparwidth}{0pt}
+\setlength{\topmargin}{.5in}
+\setlength{\textheight}{8.75in}
+\setlength{\textwidth}{6in}
+\setlength{\oddsidemargin}{.25in}
+\setlength{\evensidemargin}{0in}
+\setlength{\voffset}{-.75in}
+
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\brak}[1]{\left(#1\right)}
+\newcommand{\E}[1]{\mathbb{E}\left[#1\right]}
+\newcommand{\Var}{\mathrm{Var}\,}
+\newcommand{\Cov}{\mathrm{Cov}\,}
+
+
+\begin{document}
+\setkeys{Gin}{width=0.9\textwidth}
+
+<<foo,include=FALSE,echo=FALSE>>=
+options(keep.source = TRUE, width = 90)
+foo <- packageDescription("blupsurv")
+@
+
+\title{blupsurv Package Example (Version \Sexpr{foo$Version})}
+\author{Emmanuel Sharef}
+\maketitle
+
+\section{Introduction}\label{sec:intro}
+
+Here we demonstrate the use of the \verb=blupsurv= package for analyzing a clustered bivariate data set using the \verb=bivrec= method. Because we are not aware of any real-world data sets that can be freely distributed, we use a simulated data set for illustration.
+
+In section~\ref{sec:model}, we give a short overview of the model structure. Section~\ref{sec:example} demonstrates the analysis of the example data set.
+
+\section{Model overview}\label{sec:model}
+
+The model assumes that observed data consists of $m$ independent clusters of $J_i$ subjects, $i=1,\ldots,m$. Each subject $(i,j)$, experiences $N^{(d)}_{ij}$ observed recurrent events of type $d\in\set{0,1}$, occurring at times $0<S^{(d)}_{ij1}<\ldots<S^{(d)}_{ijN^{(d)}_{ij}}$, prior to a censoring time $C_{ij}$. Denote the recurrent event counting process for each subject as $N^{(d)}_{ij}(t)$, so that $N^{(d)}_{ij}=N^{(d)}_{ij}(C_{ij})$. Subjects may have time-dependent covariates $Z_{ij}(t)$ and may be stratified into $p$ levels by a stratum indicator $L_{ij}(t)$. 
+
+Correlations between subjects within the same cluster and between event times are captured by nested frailties. Specifically, cluster frailties for each event type $U^{(d)}_*=\brak{U^{(d)}_1,\ldots,U^{(d)}_m}$ are assumed to be positive and independent, with
+\begin{equation}
+\E{U^{(d)}_i}=1\;,\qquad\Var(U^{(d)}_i)=\sigma^2_{(d)}\;.\label{eq:covstruct1}
+\end{equation}
+Subject-level frailties are assumed to be positive and independent conditional on the cluster-level frailties, with 
+\begin{eqnarray}
+\E{U^{(d)}_{ij}|U^{(d)}_*=u^{(d)}_*}&=&u^{(d)}_i \label{eq:covstruct2}\\
+\Var(U^{(d)}_{ij}|U^{(d)}_*=u^{(d)}_*)&=&u_i\nu^2_{(d)}\\
+\Cov(U^{(0)}_{ij},U^{(1)}_{ij}|U^{(*)}_*=u^{(*)}_*)&=&\theta\;,\label{eq:covstruct4}
+\end{eqnarray}
+ for all $i=1,\ldots,m, j=1,\ldots,J_i$.
+
+Note that this implies that the marginal correlation between frailties for the two recurrent event types is given by
+\begin{equation}\rho=\mathrm{Cor}(U^{(0)}_{ij},U^{(1)}_{ij})=\theta\prod_{d\in\set{0,1}}\brak{\sigma^2_{(d)}+\nu^2_{(d)}}^{-\frac{1}{2}}\;.\end{equation}
+
+Conditional on the frailties, the intensities for the recurrent event processes may be modeled as
+\begin{equation}
+\lambda^{(d)}_{ij}(t)=\lambda^{(d)}_{0L_{ij}(t)}\brak{t-S^{(d)}_{ijN^{(d)}_{ij}(t)}}\cdot U^{(d)}_{ij}e^{\beta^{(d)}Z_{ij}(t)}\,,
+\end{equation}
+where $\beta^{(d)}$ are regression coefficients, $\lambda^{(d)}_{0r}$ are stratum-specific baseline hazards for strata $r=1,\ldots,p$, and $U^{(d)}_{ij}$ are frailties with the given moment structure. Denote the cumulative hazard as $\Lambda_{ij}^{(d)}(t)=\int_0^t\lambda_{ij}^{(d)}(u)du$. Note that the recurrent event intensity is specified in terms of the gap times.
+
+In order to avoid numerical instabilities and allow for faster fitting, we allow a discretization to be imposed, by making the additional assumption that the baseline hazards for each stratum are constant and finite during $K^{(d)}_r$ time intervals ($r=1,\ldots,p$). Breakpoints in the hazard may be chosen a priori, or based on observed data. Denote the breakpoints in the baseline hazards as $0<a^{(d)}_{r1}<\ldots<a^{(d)}_{rK^{(d)}_r}$, so that the baseline hazards have value
+\begin{equation}
+\lambda^{(d)}_{0r}(t)=\sum_{s=1}^{K^{(d)}_{r}}\alpha^{(d)}_{rs}I(t\in[a^{(d)}_{rs-1},a^{(d)}_{rs}))\;,\label{eq:dischazard}
+\end{equation}
+
+Estimation of regression and frailty dispersion parameters takes the form of a three-step Expectation-Maximization (EM) algorithm. Fixing the regression and dispersion parameters allows the frailties to be estimated by their orthodox best linear unbiased predictors under an auxiliary Poisson model. Updated dispersion parameters are then computed by bias-corrected Pearson estimators using the frailty estimates. Conditionally on the estimated frailties, the regression parameters can be obtained by maximizing the conditional profile likelihood. 
+
+For further detail on the model-fitting procedure, consult the accompanying technical report.
+
+\section{Example data analysis}\label{sec:example}
+
+We now analyze the included simulated data set \verb=vigndata=. Begin by loading the package and data:
+
+<<load-package>>=
+library(blupsurv)
+data(vigndata)
+@
+
+As noted in the introduction, this is a simulated data set. However, for purposes of illustration, we have given the clusters and covariates real-world names. The data consist of \Sexpr{length(unique(paste(vigndata$state,vigndata$patientID,sep=".")))} patients in \Sexpr{length(unique(vigndata$state))} clusters corresponding to the states of the U.S., who were observed during a 10-year study for episodes of severe pain or fever. The following shows the first 20 rows of the data:
+
+<<show-data>>=
+vigndata[1:20,]
+@
+
+The data contains \Sexpr{sum(vigndata$pain)} pain events, and \Sexpr{sum(vigndata$fever)} fever events. We omit further descriptive analysis of the data, since it lies outside the scope of this package. 
+
+We can obtain a ``quick'' fit of the data by using a very coarse discretization, only allowing the baseline hazards to change 10 times during the study period\footnote{This vignette ``cheats'' a little: since these fits are quite computationally expensive, their results are already included in the package, so they don't need to be run at build-time.}:
+
+<<quickfit,eval=FALSE>>=
+vigndata.quickfit <- bivrec( Surv2(start,stop,pain,fever) ~ age + sex + cluster(state) + id(patientID), data=vigndata, K1=10, K2=10, verbose=0)
+@
+
+Note the features of the above call. The response is a bivariate survival (\verb=Surv2=) object, with event indicators \verb=pain= and \verb=fever=. In addition to the covariates \verb=age= and \verb=sex=, we also have to specify the cluster and subject identifiers, with the \verb=cluster()= and \verb=id()= terms. The options \verb=K1= and \verb=K2= control the discretization for the pain and fever hazards.
+
+Here is a summary of the fit results:
+
+<<quickfit-summary>>=
+summary(vigndata.quickfit)
+@
+
+The summary shows that age is significant for fever, but not for pain, and that sex is significant for both processes. Furthermore, we see that both cluster- and subject-level frailty variances are not negligible, with variances for fever generally higher than those for pain. The two processes are also somewhat correlated.
+
+Keep in mind that this fit was done with very coarse discretization, and simulation studies have shown that regression coefficients and frailty dispersion parameters are generally underestimated with coarse discretization, so the effect may be quite a bit larger!
+
+Figure~\ref{fig:fitplot} shows the plot of survivor functions, produced by the following R statement:
+<<fitplottoo, include=FALSE>>=
+plot(vigndata.quickfit)
+@
+\begin{figure}
+\begin{center}
+<<fitplot, fig=TRUE, echo=FALSE, width=10, height=6>>=
+plot(vigndata.quickfit)
+@
+\end{center}
+\caption{Plot of the ``quick'' fit results, with very coarse discretization.}
+\label{fig:fitplot}
+\end{figure}
+
+Note the evident discretization in the baseline hazard. 
+
+While the results using coarse discretizations may not be very precise, they are adequate for model selection. Based on the summary above, we conclude that excluding the age covariate for the fever process may be appropriate. We run another ``quick'' fit, applying the exclusion:
+
+<<quickfit2,eval=FALSE>>=
+vigndata.quickfit2 <- bivrec(Surv2(start,stop,pain,fever) ~ age + sex + cluster(state) + id(patientID), K1=10, K2=10, excludevars1="age", data=vigndata, verbose=0)
+@
+<<quickfit2sum>>=
+summary(vigndata.quickfit2)
+@
+
+The fitted values are quite similar, unsurprisingly. Lastly, we fit a model using the finest possible discretization. Rather than explicitly giving the number of desired breakpoints in the baseline hazard, setting \verb@K1=1, K2=1@ signals that the maximum number of breakpoints is desired:
+
+<<finalfit,eval=FALSE>>=
+vigndata.fit <- bivrec(Surv2(start,stop,pain,fever) ~ age + sex + cluster(state) + id(patientID), K1=1, K2=1, excludevars1="age", data=vigndata, verbose=0)
+@
+<<finalfitsum>>=
+summary(vigndata.fit)
+@
+
+Note that almost all the parameter estimates are larger than the ``quick'' fit earlier, especially the estimates of the frailty dispersion parameters. Figure~\ref{fig:finalfitplot} shows the plot of survivor functions, produced by the following R statement:
+<<fitfullplottoo, include=FALSE>>=
+plot(vigndata.fit)
+@
+\begin{figure}
+\begin{center}
+<<fitfullplot, fig=TRUE, echo=FALSE, width=10, height=6>>=
+plot(vigndata.fit)
+@
+\end{center}
+\caption{Plot of the final model fit results, with fine discretization.}
+\label{fig:finalfitplot}
+\end{figure}
+
+At fine levels of discretization, the survivor function is smooth, and in fact has the Weibull shape used in generating the simulated data. We can also examine the estimated frailty structure. Figure~\ref{fig:boxplot} shows a boxplot of the estimated subject-level frailties in each cluster:
+
+<<boxplottoo, include=FALSE>>=
+Ji<-table(substr(names(vigndata.fit$frailty$subj1),1,2))
+groups=rep(names(Ji),Ji)
+par(mfrow=c(2,1))
+title<-"Subject-level frailties, by cluster"
+p<-boxplot(vigndata.fit$frailty$subj1 ~ groups, 
+main=paste(title,"(pain)"), cex.main=2)
+mtext(side = 1, p$names, at= 1:50, line = 1,cex=1)
+p<-boxplot(vigndata.fit$frailty$subj2 ~ groups, 
+main=paste(title,"(fever)"), cex.main=2)
+mtext(side = 1, p$names, at= 1:50, line = 1,cex=1)
+@
+\begin{figure}
+\begin{center}
+<<boxplot, fig=TRUE, echo=FALSE, width=15, height=10>>=
+Ji<-table(substr(names(vigndata.fit$frailty$subj1),1,2))
+groups=rep(names(Ji),Ji)
+par(mfrow=c(2,1))
+p<-boxplot(vigndata.fit$frailty$subj1 ~ groups, main="Subject-level frailties, by cluster (pain)", cex.main=2)
+mtext(side = 1, p$names, at= 1:50, line = 1,cex=1)
+p<-boxplot(vigndata.fit$frailty$subj2 ~ groups, main="Subject-level frailties, by cluster (fever)", cex.main=2)
+mtext(side = 1, p$names, at= 1:50, line = 1,cex=1)
+@
+\end{center}
+\caption{Boxplot of subject-level frailties in each cluster. The cluster-level frailty is the mean of the subject-level frailties.}
+\label{fig:boxplot}
+\end{figure}
+
+Figure~\ref{fig:frailtycorr} shows the estimated subject frailties for pain and fever plotted against each other, to demonstrate the correlation.
+
+\setkeys{Gin}{width=0.5\textwidth}
+
+
+<<frailplottoo, include=FALSE>>=
+plot(vigndata.fit$frailty$subj1,vigndata.fit$frailty$subj2,xlab="pain",ylab="fever",main="Subject-level frailties",pch=19, asp=1,xlim=c(0,3),ylim=c(0,3) )
+@
+\begin{figure}
+\begin{center}
+<<frailplot, fig=TRUE, echo=FALSE>>=
+plot(vigndata.fit$frailty$subj1,vigndata.fit$frailty$subj2,xlab="pain",ylab="fever",main="Subject-level frailties",pch=19, asp=1,xlim=c(0,3),ylim=c(0,3) )
+@
+\end{center}
+\caption{Subject-level frailties for the two processes, showing the correlation.}
+\label{fig:frailtycorr}
+\end{figure}
+
+This concludes the demonstration of the \verb=blupsurv= package for analysis of bivariate recurrent event processes. Use of the \verb=unirec= method for analysis of univariate recurrent event processes is analogous.
+\end{document}
