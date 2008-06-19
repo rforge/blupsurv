@@ -1,0 +1,149 @@
+digraph callgraph {
+"Rbivrec.data.frame" [label="bivrec.data.frame"];
+"Rbivrec.formula" [label="bivrec.formula"];
+"RSurv2" [label="Surv2"];
+"Ris.Surv2" [label="is.Surv2"];
+"Rcleanbivrecoutput" [label="cleanbivrecoutput"];
+"Rprint.bivrec" [label="print.bivrec"];
+"Rsummary.bivrec" [label="summary.bivrec"];
+"Rprint.summary.bivrec" [label="print.summary.bivrec"];
+"Rplot.bivrec" [label="plot.bivrec"];
+"Rplotsurvivor" [label="plotsurvivor"];
+"Rcheckinput.bivrec" [label="checkinput.bivrec"];
+"RmakeUijframe" [label="makeUijframe"];
+"Rmakedatamat" [label="makedatamat"];
+"Rmakealphars2" [label="makealphars2"];
+"Rfmakealphars2" [label="fmakealphars2"];
+"Rsmoothalpha" [label="smoothalpha"];
+"Rmakeas" [label="makeas"];
+"RA" [label="A"];
+"Rfupdatefrailties3" [label="fupdatefrailties3"];
+"Rfupdatefrailties4" [label="fupdatefrailties4"];
+"Rupdatedisppears" [label="updatedisppears"];
+"Rupdatedispohls" [label="updatedispohls"];
+"Rupdatedispmarg2" [label="updatedispmarg2"];
+"Rgetdispmarg3" [label="getdispmarg3"];
+"RSmuij" [label="Smuij"];
+"RSmud2" [label="Smud2"];
+"Rab2g" [label="ab2g"];
+"Rg2ab" [label="g2ab"];
+"Rmakemrs" [label="makemrs"];
+"Rfmakemrs" [label="fmakemrs"];
+"Rmkproflik" [label="mkproflik"];
+"Rfmkproflik" [label="fmkproflik"];
+"Rfmkproflik2" [label="fmkproflik2"];
+"Rmkprofgr" [label="mkprofgr"];
+"Rfmkprofgr" [label="fmkprofgr"];
+"Rfmkprofgr2" [label="fmkprofgr2"];
+"Rupdateregprof" [label="updateregprof"];
+"RmakeSens2" [label="makeSens2"];
+"RfmakeSens2" [label="fmakeSens2"];
+"Rfmkstderr" [label="fmkstderr"];
+"Rbivrec.agdata" [label="bivrec.agdata"];
+"Rbivrecsim" [label="bivrecsim"];
+"Rinitsetup" [label="initsetup"];
+"RL" [label="L"];
+"Rgen2AG" [label="gen2AG"];
+"Rgeneratefrailty" [label="generatefrailty"];
+"Rgenlognormal" [label="genlognormal"];
+"Rcorrelate" [label="correlate"];
+"Rsorttop" [label="sorttop"];
+"Rgeneratecovariate" [label="generatecovariate"];
+"Rgeneraterecurrent" [label="generaterecurrent"];
+"Rgeneratecensoring" [label="generatecensoring"];
+"Runirec" [label="unirec"];
+"Runirec.data.frame" [label="unirec.data.frame"];
+"Runirec.formula" [label="unirec.formula"];
+"Rcleanunirecoutput" [label="cleanunirecoutput"];
+"Rprint.unirec" [label="print.unirec"];
+"Rsummary.unirec" [label="summary.unirec"];
+"Rprint.summary.unirec" [label="print.summary.unirec"];
+"Rplot.unirec" [label="plot.unirec"];
+"Rbivrec.data.frame" -> "Rbivrec.agdata";
+"Rbivrec.formula" -> "RSurv2";
+"Rbivrec.formula" -> "Ris.Surv2";
+"Rbivrec.formula" -> "Rcleanbivrecoutput";
+"Rbivrec.formula" -> "Rcheckinput.bivrec";
+"Rplot.bivrec" -> "Rplotsurvivor";
+"Rmakealphars2" -> "RA";
+"Rfmakealphars2" -> "Rsmoothalpha";
+node [shape=box, style=filled]
+"Rfmakealphars2" -> "fmkalpha2" [style=bold];
+"Rfupdatefrailties3" -> "RmakeUijframe";
+node [shape=box, style=filled]
+"Rfupdatefrailties3" -> "fsmuij" [style=bold];
+node [shape=box, style=filled]
+"Rfupdatefrailties3" -> "fsmuij" [style=bold];
+"Rfupdatefrailties4" -> "RmakeUijframe";
+node [shape=box, style=filled]
+"Rfupdatefrailties4" -> "fmkfrail" [style=bold];
+node [shape=box, style=filled]
+"Rupdatedispohls" -> "fsmuij" [style=bold];
+node [shape=box, style=filled]
+"Rupdatedispohls" -> "fsmuij" [style=bold];
+"Rupdatedispmarg2" -> "Rgetdispmarg3";
+node [shape=box, style=filled]
+"Rgetdispmarg3" -> "fsmuij" [style=bold];
+node [shape=box, style=filled]
+"Rgetdispmarg3" -> "fsmuij" [style=bold];
+node [shape=box, style=filled]
+"Rgetdispmarg3" -> "fsmud2" [style=bold];
+"Rmakemrs" -> "RA";
+node [shape=box, style=filled]
+"Rfmakemrs" -> "fmkmrs" [style=bold];
+"Rmkproflik" -> "Rmakemrs";
+node [shape=box, style=filled]
+"Rfmkproflik" -> "fproflik" [style=bold];
+node [shape=box, style=filled]
+"Rfmkproflik2" -> "fproflik" [style=bold];
+"Rmkprofgr" -> "Rmakemrs";
+node [shape=box, style=filled]
+"Rfmkprofgr" -> "fprofgr" [style=bold];
+node [shape=box, style=filled]
+"Rfmkprofgr2" -> "fprofgr" [style=bold];
+"Rupdateregprof" -> "Rmakealphars2";
+"Rupdateregprof" -> "Rfmakealphars2";
+"RmakeSens2" -> "RA";
+node [shape=box, style=filled]
+"RfmakeSens2" -> "fmksens2full" [style=bold];
+node [shape=box, style=filled]
+"RfmakeSens2" -> "fmksens2" [style=bold];
+node [shape=box, style=filled]
+"Rfmkstderr" -> "fmkstderr" [style=bold];
+"Rbivrec.agdata" -> "RmakeUijframe";
+"Rbivrec.agdata" -> "Rmakedatamat";
+"Rbivrec.agdata" -> "Rmakealphars2";
+"Rbivrec.agdata" -> "Rfmakealphars2";
+"Rbivrec.agdata" -> "Rmakeas";
+"Rbivrec.agdata" -> "Rfupdatefrailties4";
+"Rbivrec.agdata" -> "Rupdatedisppears";
+"Rbivrec.agdata" -> "Rupdatedispohls";
+"Rbivrec.agdata" -> "Rupdatedispmarg2";
+"Rbivrec.agdata" -> "Rupdateregprof";
+"Rbivrec.agdata" -> "RmakeSens2";
+"Rbivrec.agdata" -> "RfmakeSens2";
+"Rbivrec.agdata" -> "Rfmkstderr";
+"Rbivrecsim" -> "Rinitsetup";
+"Rbivrecsim" -> "Rgen2AG";
+"Rbivrecsim" -> "Rgeneratefrailty";
+"Rbivrecsim" -> "Rgeneratecovariate";
+"Rbivrecsim" -> "Rgeneraterecurrent";
+"Rbivrecsim" -> "Rgeneratecensoring";
+"Rgen2AG" -> "RL";
+"Rgeneratefrailty" -> "Rgenlognormal";
+"Rgeneratefrailty" -> "Rcorrelate";
+"Rgeneratefrailty" -> "Rsorttop";
+"Rcorrelate" -> "Rsorttop";
+"Runirec.data.frame" -> "Rbivrec.agdata";
+"Runirec.formula" -> "Runirec";
+"Runirec.formula" -> "Rcleanunirecoutput";
+"Rplot.unirec" -> "Rplotsurvivor";
+ 
+Rupdateregprof -> Rfmkproflik2
+Rupdateregprof -> Rfmkprofgr2
+fmkfrail -> fsmuij
+fmkstderr -> fmksens2full
+fprofgr -> fmkmrs
+fproflik -> fmkmrs
+
+}

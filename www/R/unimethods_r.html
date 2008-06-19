@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./blupsurv/R/unimethods.r</title>
+<!-- Source: ./blupsurv/R/unimethods.r -->
+<!-- Generated with ROBODoc Version 4.99.36 (Jun 19 2008) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">blupsurv</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="../toc_index.html#top">Table of Contents</a>
+<a class="menuitem" href="../robo_sourcefiles.html#top">Sourcefiles</a>
+<a class="menuitem" href="../masterindex.html#top">Index</a>
+<a class="menuitem" href="../robo_functions.html#top">Functions</a>
+<a class="menuitem" href="../robo_modules.html#top">Modules</a>
+<a class="menuitem" href="../robo_methods.html#top">Methods</a>
+</div> <!-- navigation -->
+<div id="content">
+<h3>TABLE OF CONTENTS</h3>
+<ul>
+<li>1. <a href="#robo4">/methodsUni</a></li>
+<ul>
+<li>1.1. <a href="#robo51">methodsUni/cleanunirecoutput</a></li>
+<li>1.2. <a href="#robo52">methodsUni/plot.unirec</a></li>
+<li>1.3. <a href="#robo53">methodsUni/print.summary.unirec</a></li>
+<li>1.4. <a href="#robo54">methodsUni/print.unirec</a></li>
+<li>1.5. <a href="#robo55">methodsUni/summary.unirec</a></li>
+<li>1.6. <a href="#robo56">methodsUni/unirec</a></li>
+<li>1.7. <a href="#robo57">methodsUni/unirec.data.frame</a></li>
+<li>1.8. <a href="#robo58">methodsUni/unirec.formula</a></li>
+</ul>
+</ul>
+<hr />
+<a name="2fmethodsUni"></a>
+<a name="robo4"></a><h2>/methodsUni [ Modules ]</h2>
+
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="../robo_modules.html#robo_top_of_doc">Modules</a> ]</p>
+<p class="item_name">NAME</p>
+<pre>    <strong>methodsUni</strong> --- methods for univariate recurrent event processes
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>    S3 methods for univariate recurrent events
+</p>
+
+<hr />
+<a name="methodsUni2fcleanunirecoutput"></a>
+<a name="robo51"></a><h2>methodsUni/cleanunirecoutput [ Functions ]</h2>
+
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo4">methodsUni</a> ] [ <a href="../robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
+<p class="item_name">NAME</p>
+<pre>    <strong>cleanunirecoutput</strong> --- clean output of <a href="#robo56">unirec</a>.agdata
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>    Construct the <a href="#robo56">unirec</a> object and 
+    restore the original stratum, process, cluster and subject names that
+    were stripped by <a href="#robo58">unirec.formula</a>
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">185 </span><strong>cleanunirecoutput</strong> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">function</span><span class="sign">(</span>fit<span class="sign">,</span> clusternames<span class="sign">,</span> subjnames<span class="sign">,</span> stratnames<span class="sign">,</span> processname<span class="sign">)</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>    fit            a fit returned by <a href="#robo56">unirec</a>.agdata
+    clusternames   vector of original cluster IDs
+    subjnames      vector of original subject IDs
+    stratnames     vector of original stratum IDs
+    processnames   vector of original process IDs
+</pre>
+<p class="item_name">OUTPUTS</p>
+<pre>    an object of class <a href="#robo56">unirec</a>, with properly named components
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">188 </span><span class="sign">{</span>
+<span class="line_number">189 </span>    out <span class="sign">&lt;</span><span class="sign">-</span> NULL
+<span class="line_number">190 </span>    out<span class="sign">$</span><span class="keyword">call</span> <span class="sign">&lt;</span><span class="sign">-</span> fit<span class="sign">$</span><span class="keyword">call</span>
+<span class="line_number">191 </span>    <span class="comment"># regression</span>
+<span class="line_number">192 </span>    out<span class="sign">$</span>regression <span class="sign">=</span> <span class="keyword">list</span><span class="sign">(</span>coefficients <span class="sign">=</span> fit<span class="sign">$</span>regressionoutput<span class="sign">$</span>betahat<span class="sign">,</span>
+<span class="line_number">193 </span>                        loglik <span class="sign">=</span> fit<span class="sign">$</span>regressionoutput<span class="sign">$</span>loglik1<span class="sign">)</span>
+<span class="line_number">194 </span>    <span class="comment"># frailties</span>
+<span class="line_number">195 </span>    clust <span class="sign">&lt;</span><span class="sign">-</span> fit<span class="sign">$</span>frailtyoutput<span class="sign">$</span>Uihat
+<span class="line_number">196 </span>    subj <span class="sign">&lt;</span><span class="sign">-</span> fit<span class="sign">$</span>frailtyoutput<span class="sign">$</span>Uijhat
+<span class="line_number">197 </span>    names<span class="sign">(</span>clust<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> clusternames
+<span class="line_number">198 </span>    names<span class="sign">(</span>subj<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> subjnames
+<span class="line_number">199 </span>    out<span class="sign">$</span>frailty <span class="sign">=</span> <span class="keyword">list</span><span class="sign">(</span>clust <span class="sign">=</span> clust<span class="sign">,</span> subj <span class="sign">=</span> subj<span class="sign">)</span>
+<span class="line_number">200 </span>    <span class="comment"># dispersion</span>
+<span class="line_number">201 </span>    disp <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">list</span><span class="sign">(</span>clust <span class="sign">=</span> fit<span class="sign">$</span>dispparams<span class="sign">$</span>sigma2hat<span class="sign">,</span> subj <span class="sign">=</span> fit<span class="sign">$</span>dispparams<span class="sign">$</span>nu2hat<span class="sign">)</span>
+<span class="line_number">202 </span>    out<span class="sign">$</span>dispersion <span class="sign">&lt;</span><span class="sign">-</span> disp
+<span class="line_number">203 </span>    <span class="comment"># baseline</span>
+<span class="line_number">204 </span>    breaks <span class="sign">&lt;</span><span class="sign">-</span> fit<span class="sign">$</span>regressionoutput<span class="sign">$</span>as
+<span class="line_number">205 </span>    basehaz <span class="sign">&lt;</span><span class="sign">-</span> fit<span class="sign">$</span>regressionoutput<span class="sign">$</span>alphars
+<span class="line_number">206 </span>    <span class="keyword">rownames</span><span class="sign">(</span>breaks<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">rownames</span><span class="sign">(</span>basehaz<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> stratnames
+<span class="line_number">207 </span>    out<span class="sign">$</span>hazard <span class="sign">=</span> <span class="keyword">list</span><span class="sign">(</span>breaks <span class="sign">=</span> breaks<span class="sign">,</span> hazard <span class="sign">=</span> basehaz<span class="sign">)</span>
+<span class="line_number">208 </span>    <span class="comment"># summaries</span>
+<span class="line_number">209 </span>    summary<span class="sign">.</span>reg <span class="sign">&lt;</span><span class="sign">-</span> fit<span class="sign">$</span>summary<span class="sign">.</span>reg<span class="sign">[</span><span class="sign">,</span> 1<span class="sign">:</span>3<span class="sign">]</span>
+<span class="line_number">210 </span>    <span class="keyword">colnames</span><span class="sign">(</span>summary<span class="sign">.</span>reg<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span><span class="quote">"coef"</span><span class="sign">,</span> <span class="quote">"sd"</span><span class="sign">,</span> <span class="quote">"pval"</span><span class="sign">)</span>
+<span class="line_number">211 </span>    summary<span class="sign">.</span>disp <span class="sign">&lt;</span><span class="sign">-</span> fit<span class="sign">$</span>summary<span class="sign">.</span>disp<span class="sign">[</span>c<span class="sign">(</span>1<span class="sign">,</span> 3<span class="sign">)</span><span class="sign">]</span>
+<span class="line_number">212 </span>    names<span class="sign">(</span>summary<span class="sign">.</span>disp<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span><span class="quote">"clust"</span><span class="sign">,</span> <span class="quote">"subj"</span><span class="sign">)</span>
+<span class="line_number">213 </span>    out<span class="sign">$</span>summaries <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">list</span><span class="sign">(</span>regression <span class="sign">=</span> summary<span class="sign">.</span>reg<span class="sign">,</span> dispersion <span class="sign">=</span> summary<span class="sign">.</span>disp<span class="sign">)</span>
+<span class="line_number">214 </span>    attr<span class="sign">(</span>out<span class="sign">,</span> <span class="quote">"processname"</span><span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> processname
+<span class="line_number">215 </span>    class<span class="sign">(</span>out<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="quote">"<a href="#robo56">unirec</a>"</span>
+<span class="line_number">216 </span>    <span class="keyword">return</span><span class="sign">(</span>out<span class="sign">)</span>
+<span class="line_number">217 </span><span class="sign">}</span>
+</pre>
+
+<hr />
+<a name="methodsUni2fplot2eunirec"></a>
+<a name="robo52"></a><h2>methodsUni/plot.unirec [ Functions ]</h2>
+
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo4">methodsUni</a> ] [ <a href="../robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
+<p class="item_name">NAME</p>
+<pre>    <strong>plot.unirec</strong> --- S3 plot method for <a href="#robo56">unirec</a> objects
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>    User-facing plotting function to plot survivor functions
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">311 </span><strong>plot.unirec</strong> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">function</span><span class="sign">(</span>x<span class="sign">,</span> main <span class="sign">=</span> NULL<span class="sign">,</span> xscale <span class="sign">=</span> 1<span class="sign">,</span> hazscale <span class="sign">=</span> 1<span class="sign">,</span> add <span class="sign">=</span> FALSE<span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>    see package documentation
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">314 </span><span class="sign">{</span>
+<span class="line_number">315 </span>    processname <span class="sign">&lt;</span><span class="sign">-</span> attr<span class="sign">(</span>x<span class="sign">,</span> <span class="quote">"processname"</span><span class="sign">)</span>
+<span class="line_number">316 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="comment">!is.null(main)) processname &lt;- main</span>
+<span class="line_number">317 </span>    <a href="./bivmethods_r.html#robo46">plotsurvivor</a><span class="sign">(</span>x<span class="sign">$</span>hazard<span class="sign">$</span>breaks <span class="sign">*</span> xscale<span class="sign">,</span> x<span class="sign">$</span>hazard<span class="sign">$</span>hazard <span class="sign">/</span> xscale <span class="sign">*</span> hazscale<span class="sign">,</span> main <span class="sign">=</span> processname<span class="sign">,</span> add <span class="sign">=</span> add<span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">318 </span>    invisible<span class="sign">(</span>x<span class="sign">)</span>
+<span class="line_number">319 </span><span class="sign">}</span>
+</pre>
+
+<hr />
+<a name="methodsUni2fprint2esummary2eunirec"></a>
+<a name="robo53"></a><h2>methodsUni/print.summary.unirec [ Functions ]</h2>
+
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo4">methodsUni</a> ] [ <a href="../robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
+<p class="item_name">NAME</p>
+<pre>    <strong>print.summary.unirec</strong> -- S3 method to print <a href="#robo55">summary.unirec</a> objects
+</pre>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">277 </span><strong>print.summary.unirec</strong> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">function</span><span class="sign">(</span>x<span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>    x      an objet of class <a href="#robo55">summary.unirec</a>
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">280 </span><span class="sign">{</span>
+<span class="line_number">281 </span>    processname <span class="sign">&lt;</span><span class="sign">-</span> attr<span class="sign">(</span>x<span class="sign">,</span> <span class="quote">"processname"</span><span class="sign">)</span>
+<span class="line_number">282 </span>    dots <span class="sign">&lt;</span><span class="sign">-</span> x<span class="sign">$</span>dots
+<span class="line_number">283 </span>    sreg <span class="sign">&lt;</span><span class="sign">-</span> x<span class="sign">$</span>summary<span class="sign">.</span>reg
+<span class="line_number">284 </span>    sdisp <span class="sign">&lt;</span><span class="sign">-</span> x<span class="sign">$</span>summary<span class="sign">.</span>disp
+<span class="line_number">285 </span>    <span class="keyword">colnames</span><span class="sign">(</span>sreg<span class="sign">)</span><span class="sign">[</span>1<span class="sign">:</span>3<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> paste<span class="sign">(</span>processname<span class="sign">,</span> c<span class="sign">(</span><span class="quote">"coef"</span><span class="sign">,</span> <span class="quote">"sd"</span><span class="sign">,</span> <span class="quote">"pval"</span><span class="sign">)</span><span class="sign">,</span> sep <span class="sign">=</span> <span class="quote">"."</span><span class="sign">)</span>
+<span class="line_number">286 </span>    <span class="keyword">cat</span><span class="sign">(</span><span class="quote">"\nSummary of regression coefficients: \n"</span><span class="sign">)</span>
+<span class="line_number">287 </span>    sreg <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">cbind</span><span class="sign">(</span>sreg<span class="sign">,</span> <span class="quote">""</span><span class="sign">)</span>
+<span class="line_number">288 </span>    <span class="keyword">colnames</span><span class="sign">(</span>sreg<span class="sign">)</span><span class="sign">[</span>4<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="quote">" "</span>
+<span class="line_number">289 </span>    pval1 <span class="sign">&lt;</span><span class="sign">-</span> as<span class="sign">.</span>numeric<span class="sign">(</span>sreg<span class="sign">[</span><span class="sign">,</span> 3<span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">290 </span>    sreg<span class="sign">[</span><span class="sign">,</span> 4<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> paste<span class="sign">(</span>ifelse<span class="sign">(</span>pval1<span class="sign">&lt;</span><span class="sign">.</span>1<span class="sign">,</span> <span class="quote">"*"</span><span class="sign">,</span> <span class="quote">""</span><span class="sign">)</span><span class="sign">,</span> ifelse<span class="sign">(</span>pval1<span class="sign">&lt;</span><span class="sign">.</span>05<span class="sign">,</span> <span class="quote">"*"</span><span class="sign">,</span> <span class="quote">""</span><span class="sign">)</span><span class="sign">,</span> ifelse<span class="sign">(</span>pval1<span class="sign">&lt;</span><span class="sign">.</span>01<span class="sign">,</span> <span class="quote">"*"</span><span class="sign">,</span> <span class="quote">""</span><span class="sign">)</span><span class="sign">,</span> sep <span class="sign">=</span> <span class="quote">""</span><span class="sign">)</span>
+<span class="line_number">291 </span>    sreg<span class="sign">[</span>pval1 <span class="sign">&lt;</span> 1e<span class="sign">-</span>4<span class="sign">,</span> 3<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="quote">"&lt;1e-4"</span>
+<span class="line_number">292 </span>    print<span class="sign">(</span>sreg<span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">293 </span>    <span class="keyword">cat</span><span class="sign">(</span><span class="quote">"\nSummary of dispersion coefficients: \n"</span><span class="sign">)</span>
+<span class="line_number">294 </span>    sdisp <span class="sign">&lt;</span><span class="sign">-</span> data<span class="sign">.</span>frame<span class="sign">(</span>sdisp<span class="sign">)</span><span class="sign">;</span><span class="keyword">colnames</span><span class="sign">(</span>sdisp<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="quote">" "</span>
+<span class="line_number">295 </span>    <span class="keyword">rownames</span><span class="sign">(</span>sdisp<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> paste<span class="sign">(</span><span class="quote">"var"</span><span class="sign">,</span> processname<span class="sign">,</span> c<span class="sign">(</span><span class="quote">"clust"</span><span class="sign">,</span> <span class="quote">"subj"</span><span class="sign">)</span><span class="sign">,</span> sep <span class="sign">=</span> <span class="quote">"."</span><span class="sign">)</span>
+<span class="line_number">296 </span>    print<span class="sign">(</span>sdisp<span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">297 </span>    invisible<span class="sign">(</span>x<span class="sign">)</span>
+<span class="line_number">298 </span><span class="sign">}</span>
+</pre>
+
+<hr />
+<a name="methodsUni2fprint2eunirec"></a>
+<a name="robo54"></a><h2>methodsUni/print.unirec [ Functions ]</h2>
+
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo4">methodsUni</a> ] [ <a href="../robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
+<p class="item_name">NAME</p>
+<pre>    <strong>print.unirec</strong>  --- S3 print method
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>    Prints <a href="#robo56">unirec</a> objects
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">230 </span><strong>print.unirec</strong> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">function</span><span class="sign">(</span>x<span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>    x      object of class <a href="#robo56">unirec</a>
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">233 </span><span class="sign">{</span>
+<span class="line_number">234 </span>    processname <span class="sign">&lt;</span><span class="sign">-</span> attr<span class="sign">(</span>x<span class="sign">,</span> <span class="quote">"processname"</span><span class="sign">)</span>
+<span class="line_number">235 </span>    <span class="keyword">cat</span><span class="sign">(</span><span class="quote">"Process "</span><span class="sign">,</span> processname<span class="sign">,</span> <span class="quote">":\n"</span><span class="sign">,</span> sep <span class="sign">=</span> <span class="quote">""</span><span class="sign">)</span>
+<span class="line_number">236 </span>    print<span class="sign">(</span>x<span class="sign">$</span>regression<span class="sign">$</span>coefficients<span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">237 </span>    invisible<span class="sign">(</span>x<span class="sign">)</span>
+<span class="line_number">238 </span><span class="sign">}</span>
+</pre>
+
+<hr />
+<a name="methodsUni2fsummary2eunirec"></a>
+<a name="robo55"></a><h2>methodsUni/summary.unirec [ Functions ]</h2>
+
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo4">methodsUni</a> ] [ <a href="../robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
+<p class="item_name">NAME</p>
+<pre>    <strong>summary.unirec</strong> --- S3 summary method
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>    Computes a summary for the <a href="#robo56">unirec</a> class
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">253 </span><strong>summary.unirec</strong> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">function</span><span class="sign">(</span>object<span class="sign">,</span> digits <span class="sign">=</span> 4<span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>    object     an object of class <a href="#robo56">unirec</a>
+    digits     precision to print the output
+</pre>
+<p class="item_name">OUTPUTS</p>
+<pre>    an object of class <strong>summary.unirec</strong>
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">256 </span><span class="sign">{</span>
+<span class="line_number">257 </span>    x <span class="sign">&lt;</span><span class="sign">-</span> object
+<span class="line_number">258 </span>    out <span class="sign">&lt;</span><span class="sign">-</span> NULL
+<span class="line_number">259 </span>    dots <span class="sign">&lt;</span><span class="sign">-</span> as<span class="sign">.</span><span class="keyword">list</span><span class="sign">(</span>substitute<span class="sign">(</span><span class="keyword">list</span><span class="sign">(</span><span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span><span class="sign">)</span><span class="sign">)</span><span class="sign">[</span> <span class="sign">-</span> 1<span class="sign">]</span>
+<span class="line_number">260 </span>    sreg <span class="sign">&lt;</span><span class="sign">-</span> format<span class="sign">(</span>x<span class="sign">$</span>summaries<span class="sign">$</span>regression<span class="sign">,</span> digits <span class="sign">=</span> digits<span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">261 </span>    sdisp <span class="sign">&lt;</span><span class="sign">-</span> format<span class="sign">(</span>x<span class="sign">$</span>summaries<span class="sign">$</span>dispersion<span class="sign">,</span> digits <span class="sign">=</span> digits<span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">262 </span>    out <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">list</span><span class="sign">(</span><span class="keyword">call</span> <span class="sign">=</span> x<span class="sign">$</span><span class="keyword">call</span><span class="sign">,</span> summary<span class="sign">.</span>reg <span class="sign">=</span> sreg<span class="sign">,</span> summary<span class="sign">.</span>disp <span class="sign">=</span> sdisp<span class="sign">)</span>
+<span class="line_number">263 </span>    processname <span class="sign">&lt;</span><span class="sign">-</span> attr<span class="sign">(</span>x<span class="sign">,</span> <span class="quote">"processname"</span><span class="sign">)</span>
+<span class="line_number">264 </span>    attr<span class="sign">(</span>out<span class="sign">,</span> <span class="quote">"processname"</span><span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> processname
+<span class="line_number">265 </span>    class<span class="sign">(</span>out<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="quote">"<strong>summary.unirec</strong>"</span>   
+<span class="line_number">266 </span>    <span class="keyword">return</span><span class="sign">(</span>out<span class="sign">)</span>
+<span class="line_number">267 </span><span class="sign">}</span>
+</pre>
+
+<hr />
+<a name="methodsUni2funirec"></a>
+<a name="robo56"></a><h2>methodsUni/unirec [ Functions ]</h2>
+
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo4">methodsUni</a> ] [ <a href="../robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
+<p class="item_name">NAME</p>
+<pre>    <strong>unirec</strong> --- S3 generic
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>    Dispatches to either <a href="#robo58">unirec.formula</a>, or <a href="#robo57">unirec.data.frame</a> 
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">14 </span><strong>unirec</strong> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">function</span><span class="sign">(</span>x<span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">15 </span><span class="sign">{</span>
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">18 </span>    UseMethod<span class="sign">(</span><span class="quote">"<strong>unirec</strong>"</span><span class="sign">)</span>
+<span class="line_number">19 </span><span class="sign">}</span>
+</pre>
+
+<hr />
+<a name="methodsUni2funirec2edata2eframe"></a>
+<a name="robo57"></a><h2>methodsUni/unirec.data.frame [ Functions ]</h2>
+
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo4">methodsUni</a> ] [ <a href="../robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
+<p class="item_name">NAME</p>
+<pre>    <strong>unirec.data.frame</strong> --- method for data frames 
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>    Method for data frames in in the required format, see <a href="./bivrec_r.html#robo11">bivrec.agdata</a> for detail.
+    It works by adding extra columns to the input and passing it into the bivariate
+    functions.
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">36 </span><span class="sign">{</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>    x      a data frame
+</pre>
+<p class="item_name">OUTPUTS</p>
+<pre>           an object of class <a href="#robo56">unirec</a>
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">39 </span>    <span class="keyword">call</span> <span class="sign">&lt;</span><span class="sign">-</span> match<span class="sign">.</span><span class="keyword">call</span><span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">40 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="keyword">dim</span><span class="sign">(</span>x<span class="sign">)</span><span class="sign">[</span>2<span class="sign">]</span> <span class="sign">&gt;</span> 7 <span class="sign">&amp;</span><span class="sign">&amp;</span> all<span class="sign">(</span><span class="keyword">colnames</span><span class="sign">(</span>x<span class="sign">)</span><span class="sign">[</span>1<span class="sign">:</span>7<span class="sign">]</span> <span class="sign">=</span><span class="sign">=</span> c<span class="sign">(</span><span class="quote">"i"</span><span class="sign">,</span> <span class="quote">"j"</span><span class="sign">,</span> <span class="quote">"k"</span><span class="sign">,</span> <span class="quote">"r"</span><span class="sign">,</span> <span class="quote">"start"</span><span class="sign">,</span>
+<span class="line_number">41 </span>        <span class="quote">"stop"</span><span class="sign">,</span> <span class="quote">"delta"</span><span class="sign">)</span><span class="sign">)</span><span class="sign">)</span> <span class="sign">{</span>
+<span class="line_number">42 </span>        x <span class="sign">&lt;</span><span class="sign">-</span> x<span class="sign">[</span>order<span class="sign">(</span>x<span class="sign">$</span>i<span class="sign">,</span> x<span class="sign">$</span>j<span class="sign">,</span> x<span class="sign">$</span>k<span class="sign">)</span><span class="sign">,</span> <span class="sign">]</span>
+<span class="line_number">43 </span>        varnames <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">colnames</span><span class="sign">(</span>x<span class="sign">)</span><span class="sign">[</span> <span class="sign">-</span> <span class="sign">(</span>1<span class="sign">:</span>7<span class="sign">)</span><span class="sign">]</span>
+<span class="line_number">44 </span>        <span class="comment"># Add some extra empty columns, so it can be passsed to <a href="./bivrec_r.html#robo11">bivrec.agdata</a></span>
+<span class="line_number">45 </span>        x <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">cbind</span><span class="sign">(</span>x<span class="sign">[</span><span class="sign">,</span> 1<span class="sign">:</span>7<span class="sign">]</span><span class="sign">,</span> 0<span class="sign">,</span> x<span class="sign">[</span><span class="sign">,</span> <span class="sign">-</span><span class="sign">(</span>1<span class="sign">:</span>7<span class="sign">)</span><span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">46 </span>        <span class="keyword">colnames</span><span class="sign">(</span>x<span class="sign">)</span><span class="sign">[</span> <span class="sign">-</span> <span class="sign">(</span>1<span class="sign">:</span>7<span class="sign">)</span><span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span><span class="quote">"Delta"</span><span class="sign">,</span> varnames<span class="sign">)</span>
+<span class="line_number">47 </span>        out <span class="sign">&lt;</span><span class="sign">-</span> <a href="./bivrec_r.html#robo11">bivrec.agdata</a><span class="sign">(</span>x<span class="sign">,</span> fixzero <span class="sign">=</span> c<span class="sign">(</span><span class="quote">"clust2"</span><span class="sign">,</span> <span class="quote">"subj2"</span><span class="sign">,</span> <span class="quote">"cov"</span><span class="sign">)</span><span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">48 </span>        out<span class="sign">$</span><span class="keyword">call</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">call</span>
+<span class="line_number">49 </span>        <span class="keyword">return</span><span class="sign">(</span>out<span class="sign">)</span>
+<span class="line_number">50 </span>    <span class="sign">}</span> <span class="keyword">else</span> <span class="sign">{</span>
+<span class="line_number">51 </span>        stop<span class="sign">(</span><span class="quote">"input data frame needs to have colnames i, j, k, r, start, stop, delta"</span><span class="sign">)</span>
+<span class="line_number">52 </span>    <span class="sign">}</span>   
+<span class="line_number">53 </span><span class="sign">}</span>
+</pre>
+
+<hr />
+<a name="methodsUni2funirec2eformula"></a>
+<a name="robo58"></a><h2>methodsUni/unirec.formula [ Functions ]</h2>
+
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo4">methodsUni</a> ] [ <a href="../robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
+<p class="item_name">NAME</p>
+<pre>    <strong>unirec.formula</strong> --- method for formulas
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>    This is the main user-facing method of the package for univariate data
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">66 </span><strong>unirec.formula</strong> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">function</span><span class="sign">(</span>formula<span class="sign">,</span> data <span class="sign">=</span> parent<span class="sign">.</span>frame<span class="sign">(</span><span class="sign">)</span><span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">67 </span><span class="sign">{</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>    See package documentation
+</pre>
+<p class="item_name">OUTPUTS</p>
+<pre>    An object of class <a href="#robo56">unirec</a>. See package documentation
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number"> 70 </span>    <span class="comment"># in part based on coxph function</span>
+<span class="line_number"> 71 </span>    <span class="comment"># Some of the code here is duplicated from <a href="./bivmethods_r.html#robo40">bivrec.formula</a>, but I don't see</span>
+<span class="line_number"> 72 </span>    <span class="comment"># a good way around it</span>
+<span class="line_number"> 73 </span>    <span class="keyword">call</span> <span class="sign">&lt;</span><span class="sign">-</span> match<span class="sign">.</span><span class="keyword">call</span><span class="sign">(</span><span class="sign">)</span>
+<span class="line_number"> 74 </span>    m <span class="sign">&lt;</span><span class="sign">-</span> match<span class="sign">.</span><span class="keyword">call</span><span class="sign">(</span>expand<span class="sign">.</span>dots <span class="sign">=</span> FALSE<span class="sign">)</span>
+<span class="line_number"> 75 </span>    <span class="keyword">if</span><span class="sign">(</span>is<span class="sign">.</span>matrix<span class="sign">(</span>eval<span class="sign">(</span>m<span class="sign">$</span>data<span class="sign">,</span> sys<span class="sign">.</span>parent<span class="sign">(</span><span class="sign">)</span><span class="sign">)</span><span class="sign">)</span><span class="sign">)</span> m<span class="sign">$</span>data <span class="sign">&lt;</span><span class="sign">-</span> as<span class="sign">.</span>data<span class="sign">.</span>frame<span class="sign">(</span>data<span class="sign">)</span>
+<span class="line_number"> 76 </span>    m<span class="sign">$</span><span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">&lt;</span><span class="sign">-</span>NULL
+<span class="line_number"> 77 </span>    m<span class="sign">[</span><span class="sign">[</span>1<span class="sign">]</span><span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> as<span class="sign">.</span>name<span class="sign">(</span><span class="quote">"model.frame"</span><span class="sign">)</span>
+<span class="line_number"> 78 </span>    special <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span><span class="quote">"<a href="./bivmethods_r.html#robo43">id</a>"</span><span class="sign">,</span> <span class="quote">"cluster"</span><span class="sign">,</span> <span class="quote">"strata"</span><span class="sign">)</span>
+<span class="line_number"> 79 </span>    Terms <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">if</span> <span class="sign">(</span>missing<span class="sign">(</span>data<span class="sign">)</span><span class="sign">)</span> terms<span class="sign">(</span>formula<span class="sign">,</span> special<span class="sign">)</span> 
+<span class="line_number"> 80 </span>        <span class="keyword">else</span> terms<span class="sign">(</span>formula<span class="sign">,</span> special<span class="sign">,</span> data <span class="sign">=</span> data<span class="sign">)</span>    
+<span class="line_number"> 81 </span>    m<span class="sign">$</span>formula <span class="sign">&lt;</span><span class="sign">-</span> Terms
+<span class="line_number"> 82 </span>    m <span class="sign">&lt;</span><span class="sign">-</span> eval<span class="sign">(</span>m<span class="sign">,</span> sys<span class="sign">.</span>parent<span class="sign">(</span><span class="sign">)</span><span class="sign">)</span>
+<span class="line_number"> 83 </span>    n <span class="sign">&lt;</span><span class="sign">-</span> nrow<span class="sign">(</span>m<span class="sign">)</span>
+<span class="line_number"> 84 </span>    resp <span class="sign">&lt;</span><span class="sign">-</span> model<span class="sign">.</span>extract<span class="sign">(</span>m<span class="sign">,</span> <span class="quote">"response"</span><span class="sign">)</span>
+<span class="line_number"> 85 </span>    <span class="keyword">if</span> <span class="sign">(</span><span class="comment">!is.Surv(resp)) stop("model response must be a Surv object")</span>
+<span class="line_number"> 86 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="keyword">dim</span><span class="sign">(</span>resp<span class="sign">)</span><span class="sign">[</span>2<span class="sign">]</span> <span class="comment">!= 3) stop("response must be of type Surv(start, stop, status)")</span>
+<span class="line_number"> 87 </span>    start <span class="sign">&lt;</span><span class="sign">-</span> resp<span class="sign">[</span><span class="sign">,</span> 1<span class="sign">]</span>
+<span class="line_number"> 88 </span>    stop <span class="sign">&lt;</span><span class="sign">-</span> resp<span class="sign">[</span><span class="sign">,</span> 2<span class="sign">]</span>
+<span class="line_number"> 89 </span>    delta <span class="sign">&lt;</span><span class="sign">-</span> resp<span class="sign">[</span><span class="sign">,</span> 3<span class="sign">]</span>
+<span class="line_number"> 90 </span>    dropx <span class="sign">&lt;</span><span class="sign">-</span> NULL
+<span class="line_number"> 91 </span>    clusterind <span class="sign">&lt;</span><span class="sign">-</span> attr<span class="sign">(</span>Terms<span class="sign">,</span> <span class="quote">"specials"</span><span class="sign">)</span><span class="sign">$</span>cluster
+<span class="line_number"> 92 </span>
+<span class="line_number"> 93 </span>    <span class="comment"># Cluster handling</span>
+<span class="line_number"> 94 </span>    clusternames <span class="sign">&lt;</span><span class="sign">-</span> NULL
+<span class="line_number"> 95 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="keyword">length</span><span class="sign">(</span>clusterind<span class="sign">)</span> <span class="sign">&gt;</span> 0<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number"> 96 </span>        cluster <span class="sign">&lt;</span><span class="sign">-</span> m<span class="sign">[</span><span class="sign">,</span> clusterind<span class="sign">]</span>
+<span class="line_number"> 97 </span>        <span class="keyword">if</span><span class="sign">(</span>is<span class="sign">.</span>factor<span class="sign">(</span>cluster<span class="sign">)</span><span class="sign">)</span> clusternames <span class="sign">&lt;</span><span class="sign">-</span> levels<span class="sign">(</span>cluster<span class="sign">)</span>
+<span class="line_number"> 98 </span>        <span class="keyword">if</span><span class="sign">(</span>is<span class="sign">.</span>numeric<span class="sign">(</span>cluster<span class="sign">)</span><span class="sign">)</span> clusternames <span class="sign">&lt;</span><span class="sign">-</span> as<span class="sign">.</span>character<span class="sign">(</span><span class="keyword">unique</span><span class="sign">(</span>cluster<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number"> 99 </span>        i <span class="sign">&lt;</span><span class="sign">-</span> as<span class="sign">.</span>numeric<span class="sign">(</span>as<span class="sign">.</span>factor<span class="sign">(</span>cluster<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">100 </span>        tempc <span class="sign">&lt;</span><span class="sign">-</span> untangle<span class="sign">.</span>specials<span class="sign">(</span>Terms<span class="sign">,</span> <span class="quote">"cluster"</span><span class="sign">,</span> 1<span class="sign">:</span>10<span class="sign">)</span>
+<span class="line_number">101 </span>        ord <span class="sign">&lt;</span><span class="sign">-</span> attr<span class="sign">(</span>Terms<span class="sign">,</span> <span class="quote">"order"</span><span class="sign">)</span><span class="sign">[</span>tempc<span class="sign">$</span>terms<span class="sign">]</span>
+<span class="line_number">102 </span>        <span class="keyword">if</span> <span class="sign">(</span>any<span class="sign">(</span>ord <span class="sign">&gt;</span> 1<span class="sign">)</span><span class="sign">)</span> stop<span class="sign">(</span><span class="quote">"Cluster cannot be used in an interaction"</span><span class="sign">)</span>
+<span class="line_number">103 </span>        dropx <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span>dropx<span class="sign">,</span> tempc<span class="sign">$</span>terms<span class="sign">)</span>
+<span class="line_number">104 </span>    <span class="sign">}</span><span class="keyword">else</span><span class="sign">{</span>
+<span class="line_number">105 </span>        cluster <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">rep</span><span class="sign">(</span>1<span class="sign">,</span> n<span class="sign">)</span>
+<span class="line_number">106 </span>        i <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">rep</span><span class="sign">(</span>1<span class="sign">,</span> n<span class="sign">)</span>
+<span class="line_number">107 </span>    <span class="sign">}</span>
+<span class="line_number">108 </span>
+<span class="line_number">109 </span>    <span class="comment"># ID handling</span>
+<span class="line_number">110 </span>    idind <span class="sign">&lt;</span><span class="sign">-</span> attr<span class="sign">(</span>Terms<span class="sign">,</span> <span class="quote">"specials"</span><span class="sign">)</span><span class="sign">$</span><a href="./bivmethods_r.html#robo43">id</a>
+<span class="line_number">111 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="keyword">length</span><span class="sign">(</span>idind<span class="sign">)</span> <span class="sign">=</span><span class="sign">=</span> 0<span class="sign">)</span> stop<span class="sign">(</span><span class="quote">"a subject <a href="./bivmethods_r.html#robo43">id</a> (unique within clusters) is required"</span><span class="sign">)</span>
+<span class="line_number">112 </span>    <span class="keyword">else</span><span class="sign">{</span>
+<span class="line_number">113 </span>        <a href="./bivmethods_r.html#robo43">id</a> <span class="sign">&lt;</span><span class="sign">-</span> m<span class="sign">[</span><span class="sign">,</span> idind<span class="sign">]</span>
+<span class="line_number">114 </span>        subjnames <span class="sign">&lt;</span><span class="sign">-</span> paste<span class="sign">(</span>cluster<span class="sign">,</span> <a href="./bivmethods_r.html#robo43">id</a><span class="sign">,</span> sep <span class="sign">=</span> <span class="quote">"."</span><span class="sign">)</span>
+<span class="line_number">115 </span>        j <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">rep</span><span class="sign">(</span>0<span class="sign">,</span> n<span class="sign">)</span>
+<span class="line_number">116 </span>        <span class="keyword">for</span><span class="sign">(</span>ii in 1<span class="sign">:</span>max<span class="sign">(</span>i<span class="sign">)</span><span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">117 </span>            iids <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">unique</span><span class="sign">(</span><a href="./bivmethods_r.html#robo43">id</a><span class="sign">[</span>i <span class="sign">=</span><span class="sign">=</span> ii<span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">118 </span>            jj <span class="sign">&lt;</span><span class="sign">-</span> 1
+<span class="line_number">119 </span>            <span class="keyword">for</span><span class="sign">(</span>thisid in iids<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">120 </span>                j<span class="sign">[</span>i <span class="sign">=</span><span class="sign">=</span> ii <span class="sign">&amp;</span> <a href="./bivmethods_r.html#robo43">id</a> <span class="sign">=</span><span class="sign">=</span> thisid<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> jj
+<span class="line_number">121 </span>                jj <span class="sign">&lt;</span><span class="sign">-</span> jj <span class="sign">+</span> 1
+<span class="line_number">122 </span>            <span class="sign">}</span>
+<span class="line_number">123 </span>        <span class="sign">}</span>
+<span class="line_number">124 </span>        tempi <span class="sign">&lt;</span><span class="sign">-</span> untangle<span class="sign">.</span>specials<span class="sign">(</span>Terms<span class="sign">,</span> <span class="quote">"<a href="./bivmethods_r.html#robo43">id</a>"</span><span class="sign">,</span> 1<span class="sign">:</span>10<span class="sign">)</span>
+<span class="line_number">125 </span>        ord <span class="sign">&lt;</span><span class="sign">-</span> attr<span class="sign">(</span>Terms<span class="sign">,</span> <span class="quote">"order"</span><span class="sign">)</span><span class="sign">[</span>tempi<span class="sign">$</span>terms<span class="sign">]</span>
+<span class="line_number">126 </span>        <span class="keyword">if</span> <span class="sign">(</span>any<span class="sign">(</span>ord <span class="sign">&gt;</span> 1<span class="sign">)</span><span class="sign">)</span> stop<span class="sign">(</span><span class="quote">"<a href="./bivmethods_r.html#robo43">id</a> cannot be used in an interaction"</span><span class="sign">)</span>
+<span class="line_number">127 </span>        dropx <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span>dropx<span class="sign">,</span> tempi<span class="sign">$</span>terms<span class="sign">)</span>
+<span class="line_number">128 </span>    <span class="sign">}</span>
+<span class="line_number">129 </span>
+<span class="line_number">130 </span>    <span class="comment"># Stratum handling</span>
+<span class="line_number">131 </span>    stratind <span class="sign">&lt;</span><span class="sign">-</span> attr<span class="sign">(</span>Terms<span class="sign">,</span> <span class="quote">"specials"</span><span class="sign">)</span><span class="sign">$</span>strata
+<span class="line_number">132 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="keyword">length</span><span class="sign">(</span>stratind<span class="sign">)</span> <span class="sign">&gt;</span> 0<span class="sign">)</span> 
+<span class="line_number">133 </span>    <span class="sign">{</span>
+<span class="line_number">134 </span>        strat <span class="sign">&lt;</span><span class="sign">-</span> m<span class="sign">[</span><span class="sign">,</span> stratind<span class="sign">]</span>
+<span class="line_number">135 </span>        ustrat <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">unique</span><span class="sign">(</span>strat<span class="sign">)</span>
+<span class="line_number">136 </span>        stratnames <span class="sign">&lt;</span><span class="sign">-</span> as<span class="sign">.</span>character<span class="sign">(</span>ustrat<span class="sign">)</span>
+<span class="line_number">137 </span>        r <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">rep</span><span class="sign">(</span>0<span class="sign">,</span> n<span class="sign">)</span>
+<span class="line_number">138 </span>        <span class="keyword">for</span><span class="sign">(</span>rr in 1<span class="sign">:</span><span class="keyword">length</span><span class="sign">(</span>ustrat<span class="sign">)</span><span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">139 </span>            r<span class="sign">[</span>strat <span class="sign">=</span><span class="sign">=</span> ustrat<span class="sign">[</span>rr<span class="sign">]</span><span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> rr
+<span class="line_number">140 </span>        <span class="sign">}</span>
+<span class="line_number">141 </span>        tempr <span class="sign">&lt;</span><span class="sign">-</span> untangle<span class="sign">.</span>specials<span class="sign">(</span>Terms<span class="sign">,</span> <span class="quote">"strata"</span><span class="sign">,</span> 1<span class="sign">:</span>10<span class="sign">)</span>
+<span class="line_number">142 </span>        ord <span class="sign">&lt;</span><span class="sign">-</span> attr<span class="sign">(</span>Terms<span class="sign">,</span> <span class="quote">"order"</span><span class="sign">)</span><span class="sign">[</span>tempr<span class="sign">$</span>terms<span class="sign">]</span>
+<span class="line_number">143 </span>        <span class="keyword">if</span> <span class="sign">(</span>any<span class="sign">(</span>ord <span class="sign">&gt;</span> 1<span class="sign">)</span><span class="sign">)</span> stop<span class="sign">(</span><span class="quote">"strata cannot be used in an interaction"</span><span class="sign">)</span>
+<span class="line_number">144 </span>        dropx <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span>dropx<span class="sign">,</span> tempr<span class="sign">$</span>terms<span class="sign">)</span>
+<span class="line_number">145 </span>    <span class="sign">}</span><span class="keyword">else</span><span class="sign">{</span>
+<span class="line_number">146 </span>        r <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">rep</span><span class="sign">(</span>1<span class="sign">,</span> n<span class="sign">)</span>
+<span class="line_number">147 </span>        stratnames <span class="sign">&lt;</span><span class="sign">-</span> <span class="quote">"1"</span>
+<span class="line_number">148 </span>    <span class="sign">}</span>
+<span class="line_number">149 </span>    
+<span class="line_number">150 </span>    <span class="comment"># Construct data frame to pass to <a href="#robo56">unirec</a>.agdata</span>
+<span class="line_number">151 </span>    Ki <span class="sign">&lt;</span><span class="sign">-</span> table<span class="sign">(</span>i <span class="sign">*</span> 1e6 <span class="sign">+</span> j<span class="sign">)</span>
+<span class="line_number">152 </span>    k <span class="sign">&lt;</span><span class="sign">-</span> unlist<span class="sign">(</span>as<span class="sign">.</span>vector<span class="sign">(</span>sapply<span class="sign">(</span>Ki<span class="sign">,</span> <span class="keyword">function</span><span class="sign">(</span>x<span class="sign">)</span> 1<span class="sign">:</span>x<span class="sign">)</span><span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">153 </span>    newTerms <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">if</span><span class="sign">(</span><span class="keyword">length</span><span class="sign">(</span>dropx<span class="sign">)</span><span class="sign">)</span>  Terms<span class="sign">[</span> <span class="sign">-</span> dropx<span class="sign">]</span> <span class="keyword">else</span> Terms
+<span class="line_number">154 </span>    X <span class="sign">&lt;</span><span class="sign">-</span> model<span class="sign">.</span>matrix<span class="sign">(</span>newTerms<span class="sign">,</span> m<span class="sign">)</span>
+<span class="line_number">155 </span>    X <span class="sign">&lt;</span><span class="sign">-</span> X<span class="sign">[</span><span class="sign">,</span> <span class="sign">-</span>1<span class="sign">,</span> drop <span class="sign">=</span> FALSE<span class="sign">]</span>
+<span class="line_number">156 </span>    agdata <span class="sign">&lt;</span><span class="sign">-</span> as<span class="sign">.</span>data<span class="sign">.</span>frame<span class="sign">(</span><span class="keyword">cbind</span><span class="sign">(</span>i<span class="sign">,</span> j<span class="sign">,</span> k<span class="sign">,</span> r<span class="sign">,</span> start<span class="sign">,</span> stop<span class="sign">,</span> delta<span class="sign">,</span> X<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">157 </span>    sortord <span class="sign">&lt;</span><span class="sign">-</span> order<span class="sign">(</span>agdata<span class="sign">$</span>i<span class="sign">,</span> agdata<span class="sign">$</span>j<span class="sign">)</span>
+<span class="line_number">158 </span>    agdata <span class="sign">&lt;</span><span class="sign">-</span> agdata<span class="sign">[</span>sortord<span class="sign">,</span> <span class="sign">]</span>
+<span class="line_number">159 </span>    subjnames <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">unique</span><span class="sign">(</span>subjnames<span class="sign">[</span>sortord<span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">160 </span>    processname <span class="sign">&lt;</span><span class="sign">-</span> as<span class="sign">.</span>character<span class="sign">(</span><span class="keyword">call</span><span class="sign">$</span>formula<span class="sign">[</span><span class="sign">[</span>2<span class="sign">]</span><span class="sign">]</span><span class="sign">[</span><span class="sign">[</span>4<span class="sign">]</span><span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">161 </span>    fit <span class="sign">&lt;</span><span class="sign">-</span> <a href="#robo56">unirec</a><span class="sign">(</span>agdata<span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">162 </span>    fit<span class="sign">$</span><span class="keyword">call</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">call</span>
+<span class="line_number">163 </span>    fit <span class="sign">&lt;</span><span class="sign">-</span> <a href="#robo51">cleanunirecoutput</a><span class="sign">(</span>fit<span class="sign">,</span> clusternames<span class="sign">,</span> subjnames<span class="sign">,</span> stratnames<span class="sign">,</span> processname<span class="sign">)</span>
+<span class="line_number">164 </span>    <span class="keyword">return</span><span class="sign">(</span>fit<span class="sign">)</span>
+<span class="line_number">165 </span><span class="sign">}</span>
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./blupsurv/R/unimethods.r with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.36 on Thu Jun 19 2008 17:25:39
+</p>
+</div> <!-- footer -->
+</body>
+</html>

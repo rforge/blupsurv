@@ -1,16 +1,47 @@
-########### Method dispatch (univariate)
+#****h* /methodsUni
+#  NAME
+#    methodsUni --- methods for univariate recurrent event processes
+#  FUNCTION
+#    S3 methods for univariate recurrent events
+#*******
 
+#****f* methodsUni/unirec
+#  NAME
+#    unirec --- S3 generic
+#  FUNCTION
+#    Dispatches to either unirec.formula, or unirec.data.frame 
+#  SYNOPSIS
 unirec <- function(x, ...)
 {
+#  SOURCE
+#
     UseMethod("unirec")
 }
 
+#************ unirec 
+
+#****f* methodsUni/unirec.data.frame
 unirec.data.frame <- function(x, ...)
+#  NAME
+#    unirec.data.frame --- method for data frames 
+#  FUNCTION
+#    Method for data frames in in the required format, see bivrec.agdata for detail.
+#    It works by adding extra columns to the input and passing it into the bivariate
+#    functions.
+#  INPUTS
+#    x      a data frame
+#  OUTPUTS
+#           an object of class unirec
+#  SYNOPSIS
 {
+#  SOURCE
+#
     call <- match.call()
-    if(dim(x)[2] > 7 && all(colnames(x)[1:7] == c("i", "j", "k", "r", "start", "stop", "delta"))) {
+    if(dim(x)[2] > 7 && all(colnames(x)[1:7] == c("i", "j", "k", "r", "start",
+        "stop", "delta"))) {
         x <- x[order(x$i, x$j, x$k), ]
         varnames <- colnames(x)[ - (1:7)]
+        # Add some extra empty columns, so it can be passsed to bivrec.agdata
         x <- cbind(x[, 1:7], 0, x[, -(1:7)])
         colnames(x)[ - (1:7)] <- c("Delta", varnames)
         out <- bivrec.agdata(x, fixzero = c("clust2", "subj2", "cov"), ...)
@@ -20,17 +51,33 @@ unirec.data.frame <- function(x, ...)
         stop("input data frame needs to have colnames i, j, k, r, start, stop, delta")
     }   
 }
+#************ unirec.data.frame 
 
+#****f* methodsUni/unirec.formula
+#  NAME
+#    unirec.formula --- method for formulas
+#  FUNCTION
+#    This is the main user-facing method of the package for univariate data
+#  INPUTS
+#    See package documentation
+#  OUTPUTS
+#    An object of class unirec. See package documentation
+#  SYNOPSIS
 unirec.formula <- function(formula, data = parent.frame(), ...)
 {
+#  SOURCE
+#
     # in part based on coxph function
+    # Some of the code here is duplicated from bivrec.formula, but I don't see
+    # a good way around it
     call <- match.call()
     m <- match.call(expand.dots = FALSE)
     if(is.matrix(eval(m$data, sys.parent()))) m$data <- as.data.frame(data)
     m$...<-NULL
     m[[1]] <- as.name("model.frame")
     special <- c("id", "cluster", "strata")
-    Terms <- if (missing(data)) terms(formula, special) else terms(formula, special, data = data)    
+    Terms <- if (missing(data)) terms(formula, special) 
+        else terms(formula, special, data = data)    
     m$formula <- Terms
     m <- eval(m, sys.parent())
     n <- nrow(m)
@@ -42,6 +89,7 @@ unirec.formula <- function(formula, data = parent.frame(), ...)
     delta <- resp[, 3]
     dropx <- NULL
     clusterind <- attr(Terms, "specials")$cluster
+
     # Cluster handling
     clusternames <- NULL
     if(length(clusterind) > 0){
@@ -57,6 +105,7 @@ unirec.formula <- function(formula, data = parent.frame(), ...)
         cluster <- rep(1, n)
         i <- rep(1, n)
     }
+
     # ID handling
     idind <- attr(Terms, "specials")$id
     if(length(idind) == 0) stop("a subject id (unique within clusters) is required")
@@ -77,6 +126,7 @@ unirec.formula <- function(formula, data = parent.frame(), ...)
         if (any(ord > 1)) stop("id cannot be used in an interaction")
         dropx <- c(dropx, tempi$terms)
     }
+
     # Stratum handling
     stratind <- attr(Terms, "specials")$strata
     if(length(stratind) > 0) 
@@ -97,6 +147,7 @@ unirec.formula <- function(formula, data = parent.frame(), ...)
         stratnames <- "1"
     }
     
+    # Construct data frame to pass to unirec.agdata
     Ki <- table(i * 1e6 + j)
     k <- unlist(as.vector(sapply(Ki, function(x) 1:x)))
     newTerms <- if(length(dropx))  Terms[ - dropx] else Terms
@@ -112,11 +163,28 @@ unirec.formula <- function(formula, data = parent.frame(), ...)
     fit <- cleanunirecoutput(fit, clusternames, subjnames, stratnames, processname)
     return(fit)
 }
+#************ unirec.formula 
 
-################# Output cleanup
 
-
+#****f* methodsUni/cleanunirecoutput
+#  NAME
+#    cleanunirecoutput --- clean output of unirec.agdata
+#  FUNCTION
+#    Construct the unirec object and 
+#    restore the original stratum, process, cluster and subject names that
+#    were stripped by unirec.formula
+#  INPUTS
+#    fit            a fit returned by unirec.agdata
+#    clusternames   vector of original cluster IDs
+#    subjnames      vector of original subject IDs
+#    stratnames     vector of original stratum IDs
+#    processnames   vector of original process IDs
+#  OUTPUTS
+#    an object of class unirec, with properly named components
+#  SYNOPSIS
 cleanunirecoutput <- function(fit, clusternames, subjnames, stratnames, processname)
+#  SOURCE
+#
 {
     out <- NULL
     out$call <- fit$call
@@ -147,17 +215,44 @@ cleanunirecoutput <- function(fit, clusternames, subjnames, stratnames, processn
     class(out) <- "unirec"
     return(out)
 }
+#************ cleanunirecoutput 
 
-################# Print and summary
+######### Print and summary methods
+
+#****f* methodsUni/print.unirec
+#  NAME
+#    print.unirec  --- S3 print method
+#  FUNCTION
+#    Prints unirec objects
+#  INPUTS
+#    x      object of class unirec
+#  SYNOPSIS
 print.unirec <- function(x, ...)
+#  SOURCE
+#
 {
     processname <- attr(x, "processname")
     cat("Process ", processname, ":\n", sep = "")
     print(x$regression$coefficients, ...)
     invisible(x)
 }
+#************ print.unirec 
 
+
+#****f* methodsUni/summary.unirec
+#  NAME
+#    summary.unirec --- S3 summary method
+#  FUNCTION
+#    Computes a summary for the unirec class
+#  INPUTS
+#    object     an object of class unirec
+#    digits     precision to print the output
+#  OUTPUTS
+#    an object of class summary.unirec
+#  SYNOPSIS
 summary.unirec <- function(object, digits = 4, ...)
+#  SOURCE
+#
 {
     x <- object
     out <- NULL
@@ -170,8 +265,18 @@ summary.unirec <- function(object, digits = 4, ...)
     class(out) <- "summary.unirec"   
     return(out)
 }
+#************ summary.unirec 
 
+
+#****f* methodsUni/print.summary.unirec
+#  NAME
+#    print.summary.unirec -- S3 method to print summary.unirec objects
+#  INPUTS
+#    x      an objet of class summary.unirec
+#  SYNOPSIS
 print.summary.unirec <- function(x, ...)
+#  SOURCE
+#
 {
     processname <- attr(x, "processname")
     dots <- x$dots
@@ -191,10 +296,21 @@ print.summary.unirec <- function(x, ...)
     print(sdisp, ...)
     invisible(x)
 }
+#************ print.summary.unirec 
 
 ################# Plot method
 
+#****f* methodsUni/plot.unirec
+#  NAME
+#    plot.unirec --- S3 plot method for unirec objects
+#  FUNCTION
+#    User-facing plotting function to plot survivor functions
+#  INPUTS
+#    see package documentation
+#  SYNOPSIS
 plot.unirec <- function(x, main = NULL, xscale = 1, hazscale = 1, add = FALSE, ...)
+#  SOURCE
+#
 {
     processname <- attr(x, "processname")
     if(!is.null(main)) processname <- main
@@ -202,3 +318,4 @@ plot.unirec <- function(x, main = NULL, xscale = 1, hazscale = 1, add = FALSE, .
     invisible(x)
 }
 
+#************ plot.unirec 
