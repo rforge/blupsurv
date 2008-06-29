@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./blupsurv/R/bivmethods.r</title>
+<!-- Source: ./blupsurv/R/bivmethods.r -->
+<!-- Generated with ROBODoc Version 4.99.36 (Jun 17 2008) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">blupsurv</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="./bivmethods_r2FmethodsBiv.html#robo3">methodsBiv</a><a class="menuitem" href="../robo_functions.html#robo_top_of_doc">Functions</a></div> <!-- navigation -->
+<div id="content">
+<h3>TABLE OF CONTENTS</h3>
+<ul>
+<li>1. <a href="#robo48">methodsBiv/print.summary.bivrec</a></li>
+</ul>
+<hr />
+<a name="methodsBiv2fprint2esummary2ebivrec"></a>
+<a name="robo48"></a><h2>methodsBiv/print.summary.bivrec [ Functions ]</h2>
+
+<p class="item_name">NAME</p>
+<pre>    <strong>print.summary.bivrec</strong> --- S3 method to print <a href="./bivmethods_rmethodsBiv2Fsummary2Ebivrec.html#robo49">summary.bivrec</a> objects
+</pre>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">383 </span><strong>print.summary.bivrec</strong> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">function</span><span class="sign">(</span>x<span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>    x      an objet of class <a href="./bivmethods_rmethodsBiv2Fsummary2Ebivrec.html#robo49">summary.bivrec</a>
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">386 </span><span class="sign">{</span>
+<span class="line_number">387 </span>    processnames <span class="sign">&lt;</span><span class="sign">-</span> attr<span class="sign">(</span>x<span class="sign">,</span> <span class="quote">"processnames"</span><span class="sign">)</span>
+<span class="line_number">388 </span>    dots <span class="sign">&lt;</span><span class="sign">-</span> x<span class="sign">$</span>dots
+<span class="line_number">389 </span>    sreg <span class="sign">&lt;</span><span class="sign">-</span> x<span class="sign">$</span>summary<span class="sign">.</span>reg
+<span class="line_number">390 </span>    sdisp <span class="sign">&lt;</span><span class="sign">-</span> x<span class="sign">$</span>summary<span class="sign">.</span>disp
+<span class="line_number">391 </span>    <span class="comment"># Print regression coefficients</span>
+<span class="line_number">392 </span>    <span class="keyword">colnames</span><span class="sign">(</span>sreg<span class="sign">)</span><span class="sign">[</span>1<span class="sign">:</span>3<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> paste<span class="sign">(</span>processnames<span class="sign">[</span>1<span class="sign">]</span><span class="sign">,</span> c<span class="sign">(</span><span class="quote">"coef"</span><span class="sign">,</span> <span class="quote">"sd"</span><span class="sign">,</span> <span class="quote">"pval"</span><span class="sign">)</span><span class="sign">,</span> sep <span class="sign">=</span> <span class="quote">"."</span><span class="sign">)</span>
+<span class="line_number">393 </span>    <span class="keyword">colnames</span><span class="sign">(</span>sreg<span class="sign">)</span><span class="sign">[</span>4<span class="sign">:</span>6<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> paste<span class="sign">(</span>processnames<span class="sign">[</span>2<span class="sign">]</span><span class="sign">,</span> c<span class="sign">(</span><span class="quote">"coef"</span><span class="sign">,</span> <span class="quote">"sd"</span><span class="sign">,</span> <span class="quote">"pval"</span><span class="sign">)</span><span class="sign">,</span> sep <span class="sign">=</span> <span class="quote">"."</span><span class="sign">)</span>
+<span class="line_number">394 </span>    <span class="keyword">cat</span><span class="sign">(</span><span class="quote">"\nSummary of regression coefficients: \n"</span><span class="sign">)</span>
+<span class="line_number">395 </span>    sreg <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">cbind</span><span class="sign">(</span>sreg<span class="sign">[</span>1<span class="sign">:</span>3<span class="sign">]</span><span class="sign">,</span> <span class="quote">""</span><span class="sign">,</span> sreg<span class="sign">[</span>4<span class="sign">:</span>6<span class="sign">]</span><span class="sign">,</span> <span class="quote">""</span><span class="sign">)</span>
+<span class="line_number">396 </span>    <span class="keyword">colnames</span><span class="sign">(</span>sreg<span class="sign">)</span><span class="sign">[</span>c<span class="sign">(</span>4<span class="sign">,</span> 8<span class="sign">)</span><span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="quote">" "</span>
+<span class="line_number">397 </span>    <span class="comment"># Construct asterisks for p-values</span>
+<span class="line_number">398 </span>    pval1 <span class="sign">&lt;</span><span class="sign">-</span> as<span class="sign">.</span>numeric<span class="sign">(</span>sreg<span class="sign">[</span><span class="sign">,</span> 3<span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">399 </span>    sreg<span class="sign">[</span><span class="sign">,</span> 4<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> paste<span class="sign">(</span>ifelse<span class="sign">(</span>pval1<span class="sign">&lt;</span><span class="sign">.</span>1<span class="sign">,</span> <span class="quote">"*"</span><span class="sign">,</span> <span class="quote">""</span><span class="sign">)</span><span class="sign">,</span> ifelse<span class="sign">(</span>pval1<span class="sign">&lt;</span><span class="sign">.</span>05<span class="sign">,</span> <span class="quote">"*"</span><span class="sign">,</span> <span class="quote">""</span><span class="sign">)</span><span class="sign">,</span>
+<span class="line_number">400 </span>        ifelse<span class="sign">(</span>pval1<span class="sign">&lt;</span><span class="sign">.</span>01<span class="sign">,</span> <span class="quote">"*"</span><span class="sign">,</span> <span class="quote">""</span><span class="sign">)</span><span class="sign">,</span> sep <span class="sign">=</span> <span class="quote">""</span><span class="sign">)</span>
+<span class="line_number">401 </span>    sreg<span class="sign">[</span><span class="comment">!is.na(pval1) &amp; pval1 &lt; 1e-4, 3] &lt;- "&lt;1e-4"</span>
+<span class="line_number">402 </span>    pval2 <span class="sign">&lt;</span><span class="sign">-</span> as<span class="sign">.</span>numeric<span class="sign">(</span>sreg<span class="sign">[</span><span class="sign">,</span> 7<span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">403 </span>    sreg<span class="sign">[</span><span class="sign">,</span> 8<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> paste<span class="sign">(</span>ifelse<span class="sign">(</span>pval2<span class="sign">&lt;</span><span class="sign">.</span>1<span class="sign">,</span> <span class="quote">"*"</span><span class="sign">,</span> <span class="quote">""</span><span class="sign">)</span><span class="sign">,</span> ifelse<span class="sign">(</span>pval2<span class="sign">&lt;</span><span class="sign">.</span>05<span class="sign">,</span> <span class="quote">"*"</span><span class="sign">,</span> <span class="quote">""</span><span class="sign">)</span><span class="sign">,</span>
+<span class="line_number">404 </span>        ifelse<span class="sign">(</span>pval2<span class="sign">&lt;</span><span class="sign">.</span>01<span class="sign">,</span> <span class="quote">"*"</span><span class="sign">,</span> <span class="quote">""</span><span class="sign">)</span><span class="sign">,</span> sep <span class="sign">=</span> <span class="quote">""</span><span class="sign">)</span>
+<span class="line_number">405 </span>    sreg<span class="sign">[</span><span class="comment">!is.na(pval2) &amp; pval2 &lt; 1e-4, 7] &lt;- "&lt;1e-4"</span>
+<span class="line_number">406 </span>    <span class="keyword">for</span><span class="sign">(</span>ind in 1<span class="sign">:</span><span class="keyword">dim</span><span class="sign">(</span>sreg<span class="sign">)</span><span class="sign">[</span>2<span class="sign">]</span><span class="sign">)</span> <span class="sign">{</span>
+<span class="line_number">407 </span>        fixrow <span class="sign">&lt;</span><span class="sign">-</span> grep<span class="sign">(</span><span class="quote">"NA"</span><span class="sign">,</span> sreg<span class="sign">[</span><span class="sign">,</span> ind<span class="sign">]</span><span class="sign">)</span><span class="sign">;</span> 
+<span class="line_number">408 </span>        <span class="keyword">if</span><span class="sign">(</span><span class="keyword">length</span><span class="sign">(</span>fixrow<span class="sign">)</span> <span class="sign">&gt;</span> 0<span class="sign">)</span> sreg<span class="sign">[</span>fixrow<span class="sign">,</span> ind<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="quote">""</span>
+<span class="line_number">409 </span>    <span class="sign">}</span>
+<span class="line_number">410 </span>    print<span class="sign">(</span>sreg<span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">411 </span>    <span class="comment"># Print dispersion coefficients</span>
+<span class="line_number">412 </span>    <span class="keyword">cat</span><span class="sign">(</span><span class="quote">"\nSummary of dispersion coefficients: \n"</span><span class="sign">)</span>
+<span class="line_number">413 </span>    sdisp <span class="sign">&lt;</span><span class="sign">-</span> data<span class="sign">.</span>frame<span class="sign">(</span>sdisp<span class="sign">)</span><span class="sign">;</span><span class="keyword">colnames</span><span class="sign">(</span>sdisp<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="quote">" "</span>
+<span class="line_number">414 </span>    <span class="keyword">rownames</span><span class="sign">(</span>sdisp<span class="sign">)</span><span class="sign">[</span>c<span class="sign">(</span>1<span class="sign">,</span> 3<span class="sign">)</span><span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> paste<span class="sign">(</span><span class="quote">"var"</span><span class="sign">,</span> processnames<span class="sign">[</span>1<span class="sign">]</span><span class="sign">,</span>
+<span class="line_number">415 </span>        c<span class="sign">(</span><span class="quote">"clust"</span><span class="sign">,</span> <span class="quote">"subj"</span><span class="sign">)</span><span class="sign">,</span> sep <span class="sign">=</span> <span class="quote">"."</span><span class="sign">)</span>
+<span class="line_number">416 </span>    <span class="keyword">rownames</span><span class="sign">(</span>sdisp<span class="sign">)</span><span class="sign">[</span>c<span class="sign">(</span>2<span class="sign">,</span> 4<span class="sign">)</span><span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> paste<span class="sign">(</span><span class="quote">"var"</span><span class="sign">,</span> processnames<span class="sign">[</span>2<span class="sign">]</span><span class="sign">,</span>
+<span class="line_number">417 </span>        c<span class="sign">(</span><span class="quote">"clust"</span><span class="sign">,</span> <span class="quote">"subj"</span><span class="sign">)</span><span class="sign">,</span> sep <span class="sign">=</span> <span class="quote">"."</span><span class="sign">)</span>
+<span class="line_number">418 </span>    <span class="keyword">rownames</span><span class="sign">(</span>sdisp<span class="sign">)</span><span class="sign">[</span>c<span class="sign">(</span>5<span class="sign">,</span> 6<span class="sign">)</span><span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span><span class="quote">"covariance"</span><span class="sign">,</span> <span class="quote">"correlation"</span><span class="sign">)</span>
+<span class="line_number">419 </span>    print<span class="sign">(</span>sdisp<span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">420 </span>    invisible<span class="sign">(</span>x<span class="sign">)</span>
+<span class="line_number">421 </span><span class="sign">}</span>
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./blupsurv/R/bivmethods.r with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.36 on Sun Jun 29 2008 13:34:50
+</p>
+</div> <!-- footer -->
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=3825293; 
+var sc_invisible=1; 
+var sc_partition=34; 
+var sc_click_stat=1; 
+var sc_security="2dd2334a"; 
+</script>
+
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div
+class="statcounter"><a href="http://www.statcounter.com/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/3825293/0/2dd2334a/1/" alt="free html hit
+counter" ></a></div></noscript>
+<!-- End of StatCounter Code -->
+</body>
+
+</html>

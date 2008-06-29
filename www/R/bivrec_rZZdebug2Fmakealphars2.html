@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./blupsurv/R/bivrec.r</title>
+<!-- Source: ./blupsurv/R/bivrec.r -->
+<!-- Generated with ROBODoc Version 4.99.36 (Jun 17 2008) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">blupsurv</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="./bivrec_rbivrecFit2FZZdebug.html#robo10">ZZdebug</a><a class="menuitem" href="../robo_functions.html#robo_top_of_doc">Functions</a></div> <!-- navigation -->
+<div id="content">
+<h3>TABLE OF CONTENTS</h3>
+<ul>
+<li>1. <a href="#robo75">ZZdebug/makealphars2</a></li>
+</ul>
+<hr />
+<a name="ZZdebug2fmakealphars2"></a>
+<a name="robo75"></a><h2>ZZdebug/makealphars2 [ Functions ]</h2>
+
+<p class="item_name">NAME</p>
+<pre>    <strong>makealphars2</strong> --- make baseline hazard
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>   Compute the MLEs for the baseline hazard parameters alphars, 
+   given estimates of regression parameters andf frailties, for
+   a single recurrent event process.
+</p>
+
+<p>   This is never called, and is for debugging purposes only. See
+   fmkalphars2 and the Fortran implementation.
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">273 </span><strong>makealphars2</strong> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">function</span><span class="sign">(</span>m<span class="sign">,</span> Ji<span class="sign">,</span> datamat<span class="sign">,</span> betahat<span class="sign">,</span> as<span class="sign">,</span> Uijmat<span class="sign">)</span>
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">276 </span><span class="sign">{</span>
+<span class="line_number">277 </span>    <span class="comment"># Allocate storage space</span>
+<span class="line_number">278 </span>    alphars <span class="sign">&lt;</span><span class="sign">-</span> matrix<span class="sign">(</span>0<span class="sign">,</span> <span class="keyword">dim</span><span class="sign">(</span>as<span class="sign">)</span><span class="sign">[</span>1<span class="sign">]</span><span class="sign">,</span> <span class="keyword">dim</span><span class="sign">(</span>as<span class="sign">)</span><span class="sign">[</span>2<span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">279 </span>    <span class="comment"># drs will contain the numerator, Srs the denominator</span>
+<span class="line_number">280 </span>    drs <span class="sign">&lt;</span><span class="sign">-</span> alphars
+<span class="line_number">281 </span>    Srs <span class="sign">&lt;</span><span class="sign">-</span> alphars
+<span class="line_number">282 </span>    
+<span class="line_number">283 </span>    <span class="keyword">for</span><span class="sign">(</span>ind in 1<span class="sign">:</span><span class="keyword">dim</span><span class="sign">(</span>datamat<span class="sign">)</span><span class="sign">[</span>1<span class="sign">]</span><span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">284 </span>        i <span class="sign">&lt;</span><span class="sign">-</span> datamat<span class="sign">[</span>ind<span class="sign">,</span> <span class="quote">"i"</span><span class="sign">]</span>
+<span class="line_number">285 </span>        j <span class="sign">&lt;</span><span class="sign">-</span> datamat<span class="sign">[</span>ind<span class="sign">,</span> <span class="quote">"j"</span><span class="sign">]</span>
+<span class="line_number">286 </span>        k <span class="sign">&lt;</span><span class="sign">-</span> datamat<span class="sign">[</span>ind<span class="sign">,</span> <span class="quote">"k"</span><span class="sign">]</span>
+<span class="line_number">287 </span>        smin <span class="sign">&lt;</span><span class="sign">-</span> datamat<span class="sign">[</span>ind<span class="sign">,</span> <span class="quote">"smin"</span><span class="sign">]</span>
+<span class="line_number">288 </span>        smax <span class="sign">&lt;</span><span class="sign">-</span> datamat<span class="sign">[</span>ind<span class="sign">,</span> <span class="quote">"smax"</span><span class="sign">]</span>
+<span class="line_number">289 </span>        r <span class="sign">&lt;</span><span class="sign">-</span> datamat<span class="sign">[</span>ind<span class="sign">,</span> <span class="quote">"r"</span><span class="sign">]</span>
+<span class="line_number">290 </span>        time <span class="sign">&lt;</span><span class="sign">-</span> datamat<span class="sign">[</span>ind<span class="sign">,</span> <span class="quote">"time"</span><span class="sign">]</span>
+<span class="line_number">291 </span>        Z <span class="sign">&lt;</span><span class="sign">-</span> datamat<span class="sign">[</span>ind<span class="sign">,</span> <span class="sign">-</span><span class="sign">(</span>1<span class="sign">:</span>8<span class="sign">)</span><span class="sign">]</span>
+<span class="line_number">292 </span>        <span class="comment"># the numerator is just the sum of the event indicators</span>
+<span class="line_number">293 </span>        drs<span class="sign">[</span>r<span class="sign">,</span> smax<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> drs<span class="sign">[</span>r<span class="sign">,</span> smax<span class="sign">]</span> <span class="sign">+</span> datamat<span class="sign">[</span>ind<span class="sign">,</span> <span class="quote">"delta"</span><span class="sign">]</span>
+<span class="line_number">294 </span>        <span class="comment"># Computing the denominator requires looping over all at - risk intervals</span>
+<span class="line_number">295 </span>        <span class="keyword">for</span><span class="sign">(</span>s in smin<span class="sign">:</span>smax<span class="sign">)</span> 
+<span class="line_number">296 </span>            Srs<span class="sign">[</span>r<span class="sign">,</span> s<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> Srs<span class="sign">[</span>r<span class="sign">,</span> s<span class="sign">]</span> <span class="sign">+</span> Uijmat<span class="sign">[</span>i<span class="sign">,</span> j<span class="sign">]</span> <span class="sign">*</span> 
+<span class="line_number">297 </span>            <span class="keyword">exp</span><span class="sign">(</span>as<span class="sign">.</span>matrix<span class="sign">(</span>Z<span class="sign">)</span><span class="sign">%</span><span class="sign">*</span><span class="sign">%</span>as<span class="sign">.</span>matrix<span class="sign">(</span>betahat<span class="sign">)</span><span class="sign">)</span> <span class="sign">*</span> <a href="../src/bivrec_ffortran2FA.html#robo20">A</a><span class="sign">(</span>time<span class="sign">,</span> as<span class="sign">,</span> r<span class="sign">,</span> s<span class="sign">)</span>
+<span class="line_number">298 </span>    <span class="sign">}</span>
+<span class="line_number">299 </span>    alphars <span class="sign">&lt;</span><span class="sign">-</span> drs <span class="sign">/</span> Srs
+<span class="line_number">300 </span>    alphars<span class="sign">[</span>is<span class="sign">.</span>nan<span class="sign">(</span>alphars<span class="sign">)</span><span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> 100 <span class="comment"># Not needed since bugs fixed!</span>
+<span class="line_number">301 </span>    <span class="keyword">return</span><span class="sign">(</span>alphars<span class="sign">)</span>  
+<span class="line_number">302 </span><span class="sign">}</span>
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./blupsurv/R/bivrec.r with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.36 on Sun Jun 29 2008 13:34:50
+</p>
+</div> <!-- footer -->
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=3825293; 
+var sc_invisible=1; 
+var sc_partition=34; 
+var sc_click_stat=1; 
+var sc_security="2dd2334a"; 
+</script>
+
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div
+class="statcounter"><a href="http://www.statcounter.com/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/3825293/0/2dd2334a/1/" alt="free html hit
+counter" ></a></div></noscript>
+<!-- End of StatCounter Code -->
+</body>
+
+</html>

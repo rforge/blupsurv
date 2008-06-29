@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./blupsurv/R/bivrec.r</title>
+<!-- Source: ./blupsurv/R/bivrec.r -->
+<!-- Generated with ROBODoc Version 4.99.36 (Jun 17 2008) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">blupsurv</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="./bivrec_rbivrecFit2Futility.html#robo9">utility</a><a class="menuitem" href="../robo_functions.html#robo_top_of_doc">Functions</a></div> <!-- navigation -->
+<div id="content">
+<h3>TABLE OF CONTENTS</h3>
+<ul>
+<li>1. <a href="#robo68">utility/ab2g</a></li>
+</ul>
+<hr />
+<a name="utility2fab2g"></a>
+<a name="robo68"></a><h2>utility/ab2g [ Functions ]</h2>
+
+<p class="item_name">NAME</p>
+<pre>    <strong>ab2g</strong> --- regression parameter conversion
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>    Convert alphas and betas into a single vector named gamma
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">1420 </span><strong>ab2g</strong> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">function</span><span class="sign">(</span>alphars<span class="sign">,</span> betahat<span class="sign">,</span> K<span class="sign">)</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>    alphars    matrix of baseline hazard parameters 
+    betahat    regression coefficient estimates 
+    K          number of discretization intervals
+</pre>
+<p class="item_name">OUTPUTS</p>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">1423 </span><span class="sign">{</span>
+<span class="line_number">1424 </span>    gamma <span class="sign">&lt;</span><span class="sign">-</span> NULL
+<span class="line_number">1425 </span>    <span class="keyword">for</span><span class="sign">(</span>r in 1<span class="sign">:</span><span class="keyword">length</span><span class="sign">(</span>K<span class="sign">)</span><span class="sign">)</span> gamma <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span>gamma<span class="sign">,</span> alphars<span class="sign">[</span>r<span class="sign">,</span> 1<span class="sign">:</span>K<span class="sign">[</span>r<span class="sign">]</span><span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">1426 </span>    gamma <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span>gamma<span class="sign">,</span> betahat<span class="sign">)</span>
+<span class="line_number">1427 </span>    <span class="keyword">return</span><span class="sign">(</span>gamma<span class="sign">)</span>
+<span class="line_number">1428 </span><span class="sign">}</span>
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./blupsurv/R/bivrec.r with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.36 on Sun Jun 29 2008 13:34:50
+</p>
+</div> <!-- footer -->
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=3825293; 
+var sc_invisible=1; 
+var sc_partition=34; 
+var sc_click_stat=1; 
+var sc_security="2dd2334a"; 
+</script>
+
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div
+class="statcounter"><a href="http://www.statcounter.com/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/3825293/0/2dd2334a/1/" alt="free html hit
+counter" ></a></div></noscript>
+<!-- End of StatCounter Code -->
+</body>
+
+</html>

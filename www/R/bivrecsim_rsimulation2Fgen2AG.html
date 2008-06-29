@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./blupsurv/R/bivrecsim.r</title>
+<!-- Source: ./blupsurv/R/bivrecsim.r -->
+<!-- Generated with ROBODoc Version 4.99.36 (Jun 17 2008) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">blupsurv</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="./bivrecsim_r2Fsimulation.html#robo5">simulation</a><a class="menuitem" href="../robo_functions.html#robo_top_of_doc">Functions</a></div> <!-- navigation -->
+<div id="content">
+<h3>TABLE OF CONTENTS</h3>
+<ul>
+<li>1. <a href="#robo60">simulation/gen2AG</a></li>
+</ul>
+<hr />
+<a name="simulation2fgen2AG"></a>
+<a name="robo60"></a><h2>simulation/gen2AG [ Functions ]</h2>
+
+<p class="item_name">NAME</p>
+<pre>    <strong>gen2AG</strong> --- create AG data frame
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>    Convert generated data into Anderson - Gill format
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">319 </span><strong>gen2AG</strong> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">function</span><span class="sign">(</span>m<span class="sign">,</span> Ji<span class="sign">,</span> Zij<span class="sign">,</span> Rij1<span class="sign">,</span> Rij2<span class="sign">,</span> Cij<span class="sign">,</span> alternating<span class="sign">,</span> timedep<span class="sign">)</span><span class="sign">{</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>    m      number of clusters
+    Ji     cluster size
+    Zij    list of generated covariates and times
+    Rij1   recurrent event gap times 1
+    Rij2   recurrent event gap times 2
+    Cij    censoring times
+    alternating  boolean epsisodic data indicator
+    timedep      time-dependent covariate indicator
+</pre>
+<p class="item_name">OUTPUTS</p>
+<pre>    data frame in format used by <a href="./bivrec_r00main2Fbivrec2Eagdata.html#robo11">bivrec.agdata</a>
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">322 </span>    <span class="keyword">if</span><span class="sign">(</span>timedep<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">323 </span>        Zij1 <span class="sign">&lt;</span><span class="sign">-</span> Zij<span class="sign">$</span>Zij1
+<span class="line_number">324 </span>        Zij1times <span class="sign">&lt;</span><span class="sign">-</span> Zij<span class="sign">$</span>Zij1times
+<span class="line_number">325 </span>        Zij2 <span class="sign">&lt;</span><span class="sign">-</span> matrix<span class="sign">(</span>0<span class="sign">,</span> <span class="keyword">dim</span><span class="sign">(</span>Zij1<span class="sign">)</span><span class="sign">[</span>1<span class="sign">]</span><span class="sign">,</span> 100<span class="sign">)</span>
+<span class="line_number">326 </span>    <span class="sign">}</span><span class="keyword">else</span><span class="sign">{</span>
+<span class="line_number">327 </span>        <span class="keyword">if</span><span class="sign">(</span><span class="comment">!is.matrix(Zij) &amp;&amp; !is.list(Zij)) {</span>
+<span class="line_number">328 </span>            Zij1 <span class="sign">&lt;</span><span class="sign">-</span> matrix<span class="sign">(</span><span class="keyword">rep</span><span class="sign">(</span>Zij<span class="sign">,</span> 100<span class="sign">)</span><span class="sign">,</span> <span class="keyword">length</span><span class="sign">(</span>Zij<span class="sign">)</span><span class="sign">,</span> 100<span class="sign">)</span>
+<span class="line_number">329 </span>            Zij2 <span class="sign">&lt;</span><span class="sign">-</span> matrix<span class="sign">(</span>0<span class="sign">,</span> <span class="keyword">dim</span><span class="sign">(</span>Zij1<span class="sign">)</span><span class="sign">[</span>1<span class="sign">]</span><span class="sign">,</span> 100<span class="sign">)</span>
+<span class="line_number">330 </span>        <span class="sign">}</span>
+<span class="line_number">331 </span>        <span class="keyword">if</span><span class="sign">(</span>is<span class="sign">.</span><span class="keyword">list</span><span class="sign">(</span>Zij<span class="sign">)</span><span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">332 </span>            Zij1 <span class="sign">&lt;</span><span class="sign">-</span> matrix<span class="sign">(</span><span class="keyword">rep</span><span class="sign">(</span>Zij<span class="sign">$</span>Zij1<span class="sign">,</span> 100<span class="sign">)</span><span class="sign">,</span> <span class="keyword">length</span><span class="sign">(</span>Zij<span class="sign">$</span>Zij1<span class="sign">)</span><span class="sign">,</span> 100<span class="sign">)</span>
+<span class="line_number">333 </span>            Zij2 <span class="sign">&lt;</span><span class="sign">-</span> matrix<span class="sign">(</span><span class="keyword">rep</span><span class="sign">(</span>Zij<span class="sign">$</span>Zij2<span class="sign">,</span> 100<span class="sign">)</span><span class="sign">,</span> <span class="keyword">length</span><span class="sign">(</span>Zij<span class="sign">$</span>Zij2<span class="sign">)</span><span class="sign">,</span> 100<span class="sign">)</span>
+<span class="line_number">334 </span>        <span class="sign">}</span>    
+<span class="line_number">335 </span>        Zij1times <span class="sign">&lt;</span><span class="sign">-</span> matrix<span class="sign">(</span>Inf<span class="sign">,</span> <span class="keyword">dim</span><span class="sign">(</span>Zij1<span class="sign">)</span><span class="sign">[</span>1<span class="sign">]</span><span class="sign">,</span> 100<span class="sign">)</span>
+<span class="line_number">336 </span>    <span class="sign">}</span>
+<span class="line_number">337 </span>        kmax <span class="sign">&lt;</span><span class="sign">-</span> 100 <span class="comment"># maximum number of events allowed before censoring</span>
+<span class="line_number">338 </span>    <span class="comment">## Compute the number of observed events for each individual</span>
+<span class="line_number">339 </span>        nevents1 <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">rep</span><span class="sign">(</span>0<span class="sign">,</span> <span class="keyword">sum</span><span class="sign">(</span>Ji<span class="sign">)</span><span class="sign">)</span>  
+<span class="line_number">340 </span>    <span class="comment">## Compute the number of observed events for each individual</span>
+<span class="line_number">341 </span>        nevents2 <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">rep</span><span class="sign">(</span>0<span class="sign">,</span> <span class="keyword">sum</span><span class="sign">(</span>Ji<span class="sign">)</span><span class="sign">)</span>  
+<span class="line_number">342 </span>        ncovchange <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">rep</span><span class="sign">(</span>0<span class="sign">,</span> <span class="keyword">sum</span><span class="sign">(</span>Ji<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">343 </span>    <span class="comment">## observed events</span>
+<span class="line_number">344 </span>        <span class="keyword">for</span><span class="sign">(</span>ij in 1<span class="sign">:</span><span class="keyword">sum</span><span class="sign">(</span>Ji<span class="sign">)</span><span class="sign">)</span> nevents1<span class="sign">[</span>ij<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">sum</span><span class="sign">(</span><span class="keyword">cumsum</span><span class="sign">(</span>Rij1<span class="sign">[</span>ij<span class="sign">,</span> <span class="sign">]</span><span class="sign">)</span> <span class="sign">&lt;</span> Cij<span class="sign">[</span>ij<span class="sign">]</span><span class="sign">)</span> 
+<span class="line_number">345 </span>        <span class="keyword">for</span><span class="sign">(</span>ij in 1<span class="sign">:</span><span class="keyword">sum</span><span class="sign">(</span>Ji<span class="sign">)</span><span class="sign">)</span> nevents2<span class="sign">[</span>ij<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">sum</span><span class="sign">(</span><span class="keyword">cumsum</span><span class="sign">(</span>Rij2<span class="sign">[</span>ij<span class="sign">,</span> <span class="sign">]</span><span class="sign">)</span> <span class="sign">&lt;</span> Cij<span class="sign">[</span>ij<span class="sign">]</span><span class="sign">)</span> 
+<span class="line_number">346 </span>    <span class="comment">## observed covariate changes</span>
+<span class="line_number">347 </span>        <span class="keyword">for</span><span class="sign">(</span>ij in 1<span class="sign">:</span><span class="keyword">sum</span><span class="sign">(</span>Ji<span class="sign">)</span><span class="sign">)</span> ncovchange<span class="sign">[</span>ij<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">sum</span><span class="sign">(</span><span class="keyword">cumsum</span><span class="sign">(</span>Zij1times<span class="sign">[</span>ij<span class="sign">,</span> <span class="sign">]</span><span class="sign">)</span> <span class="sign">&lt;</span> Cij<span class="sign">[</span>ij<span class="sign">]</span><span class="sign">)</span> 
+<span class="line_number">348 </span>        outdata<span class="sign">.</span>matrix <span class="sign">&lt;</span><span class="sign">-</span> matrix<span class="sign">(</span>0<span class="sign">,</span> <span class="keyword">sum</span><span class="sign">(</span>nevents1 <span class="sign">+</span> nevents2 <span class="sign">+</span> ncovchange <span class="sign">+</span> 1<span class="sign">)</span><span class="sign">,</span> 10<span class="sign">)</span>
+<span class="line_number">349 </span>        outrow <span class="sign">&lt;</span><span class="sign">-</span> 1
+<span class="line_number">350 </span>        <span class="comment"># Loop runs over all individuals and generates an Anderson - Gill line</span>
+<span class="line_number">351 </span>        <span class="comment"># for each event time that is less than the follow - up time</span>
+<span class="line_number">352 </span>        <span class="comment"># Columns: i: Cluster, j: Individual, k: At risk for which event</span>
+<span class="line_number">353 </span>    <span class="comment">#   start / stop: Cumulative times, Z: Covariate values, Delta / delta: indicators </span>
+<span class="line_number">354 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="comment">!alternating){</span>
+<span class="line_number">355 </span>        <span class="keyword">for</span><span class="sign">(</span>i in 1<span class="sign">:</span>m<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">356 </span>            <span class="keyword">for</span><span class="sign">(</span>j in 1<span class="sign">:</span>Ji<span class="sign">[</span>i<span class="sign">]</span><span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">357 </span>                ij <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">sum</span><span class="sign">(</span>Ji<span class="sign">[</span>0<span class="sign">:</span><span class="sign">(</span>i <span class="sign">-</span> 1<span class="sign">)</span><span class="sign">]</span><span class="sign">)</span> <span class="sign">+</span> j
+<span class="line_number">358 </span>                ThisFollowTime <span class="sign">&lt;</span><span class="sign">-</span> Cij<span class="sign">[</span>ij<span class="sign">]</span>
+<span class="line_number">359 </span>                CumTimes1 <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">cumsum</span><span class="sign">(</span>Rij1<span class="sign">[</span>ij<span class="sign">,</span> <span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">360 </span>                CumTimes2 <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">cumsum</span><span class="sign">(</span>Rij2<span class="sign">[</span>ij<span class="sign">,</span> <span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">361 </span>                CumTimesZ <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">cumsum</span><span class="sign">(</span>Zij1times<span class="sign">[</span>ij<span class="sign">,</span> <span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">362 </span>                CumTimes1 <span class="sign">&lt;</span><span class="sign">-</span> CumTimes1<span class="sign">[</span>CumTimes1 <span class="sign">&lt;</span> ThisFollowTime<span class="sign">]</span>
+<span class="line_number">363 </span>                CumTimes2 <span class="sign">&lt;</span><span class="sign">-</span> CumTimes2<span class="sign">[</span>CumTimes2 <span class="sign">&lt;</span> ThisFollowTime<span class="sign">]</span>
+<span class="line_number">364 </span>                CumTimesZ <span class="sign">&lt;</span><span class="sign">-</span> CumTimesZ<span class="sign">[</span>CumTimesZ <span class="sign">&lt;</span> ThisFollowTime<span class="sign">]</span>
+<span class="line_number">365 </span>                l1 <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">length</span><span class="sign">(</span>CumTimes1<span class="sign">)</span>
+<span class="line_number">366 </span>                l2 <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">length</span><span class="sign">(</span>CumTimes2<span class="sign">)</span>
+<span class="line_number">367 </span>                lZ <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">length</span><span class="sign">(</span>CumTimesZ<span class="sign">)</span>
+<span class="line_number">368 </span>                thisoutdata <span class="sign">&lt;</span><span class="sign">-</span> matrix<span class="sign">(</span>0<span class="sign">,</span> l1 <span class="sign">+</span> l2 <span class="sign">+</span> lZ <span class="sign">+</span> 1<span class="sign">,</span> 10<span class="sign">)</span>
+<span class="line_number">369 </span>                thisoutdata<span class="sign">[</span><span class="sign">,</span> 1<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> i<span class="sign">;</span>thisoutdata<span class="sign">[</span><span class="sign">,</span> 2<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> j<span class="sign">;</span>
+<span class="line_number">370 </span>                thisoutdata<span class="sign">[</span><span class="sign">,</span> 6<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span>CumTimes1<span class="sign">,</span> CumTimes2<span class="sign">,</span> CumTimesZ<span class="sign">,</span> ThisFollowTime<span class="sign">)</span>
+<span class="line_number">371 </span>                thisoutdata<span class="sign">[</span><span class="sign">,</span> 7<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span><span class="keyword">rep</span><span class="sign">(</span>1<span class="sign">,</span> l1<span class="sign">)</span><span class="sign">,</span> <span class="keyword">rep</span><span class="sign">(</span>0<span class="sign">,</span> l2 <span class="sign">+</span> lZ <span class="sign">+</span> 1<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">372 </span>                thisoutdata<span class="sign">[</span><span class="sign">,</span> 8<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span><span class="keyword">rep</span><span class="sign">(</span>0<span class="sign">,</span> l1<span class="sign">)</span><span class="sign">,</span> <span class="keyword">rep</span><span class="sign">(</span>1<span class="sign">,</span> l2<span class="sign">)</span><span class="sign">,</span> <span class="keyword">rep</span><span class="sign">(</span>0<span class="sign">,</span> lZ <span class="sign">+</span> 1<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">373 </span>                thisoutdata<span class="sign">[</span><span class="sign">,</span> 9<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span><span class="keyword">rep</span><span class="sign">(</span>NA<span class="sign">,</span> l1 <span class="sign">+</span> l2<span class="sign">)</span><span class="sign">,</span> Zij1<span class="sign">[</span>ij<span class="sign">,</span> <span class="sign">(</span>lZ <span class="sign">&gt;</span> 0<span class="sign">)</span> <span class="sign">*</span> <span class="sign">(</span>1<span class="sign">:</span>lZ<span class="sign">)</span><span class="sign">]</span><span class="sign">,</span>
+<span class="line_number">374 </span>                    Zij1<span class="sign">[</span>ij<span class="sign">,</span> min<span class="sign">(</span><span class="keyword">which</span><span class="sign">(</span><span class="keyword">cumsum</span><span class="sign">(</span>Zij1times<span class="sign">[</span>ij<span class="sign">,</span> <span class="sign">]</span><span class="sign">)</span> <span class="sign">&gt;</span> ThisFollowTime<span class="sign">)</span><span class="sign">)</span><span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">375 </span>                thisoutdata<span class="sign">[</span><span class="sign">,</span> 10<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span><span class="keyword">rep</span><span class="sign">(</span>NA<span class="sign">,</span> l1 <span class="sign">+</span> l2<span class="sign">)</span><span class="sign">,</span> Zij2<span class="sign">[</span>ij<span class="sign">,</span> <span class="sign">(</span>lZ <span class="sign">&gt;</span> 0<span class="sign">)</span> <span class="sign">*</span> <span class="sign">(</span>1<span class="sign">:</span>lZ<span class="sign">)</span><span class="sign">]</span><span class="sign">,</span>
+<span class="line_number">376 </span>                    Zij2<span class="sign">[</span>ij<span class="sign">,</span> min<span class="sign">(</span><span class="keyword">which</span><span class="sign">(</span><span class="keyword">cumsum</span><span class="sign">(</span>Zij1times<span class="sign">[</span>ij<span class="sign">,</span> <span class="sign">]</span><span class="sign">)</span> <span class="sign">&gt;</span> ThisFollowTime<span class="sign">)</span><span class="sign">)</span><span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">377 </span>                thisoutdata <span class="sign">&lt;</span><span class="sign">-</span> matrix<span class="sign">(</span>thisoutdata<span class="sign">[</span>order<span class="sign">(</span>thisoutdata<span class="sign">[</span><span class="sign">,</span> 6<span class="sign">]</span><span class="sign">)</span><span class="sign">,</span> <span class="sign">]</span><span class="sign">,</span>
+<span class="line_number">378 </span>                    <span class="keyword">dim</span><span class="sign">(</span>thisoutdata<span class="sign">)</span><span class="sign">[</span>1<span class="sign">]</span><span class="sign">,</span> <span class="keyword">dim</span><span class="sign">(</span>thisoutdata<span class="sign">)</span><span class="sign">[</span>2<span class="sign">]</span><span class="sign">)</span>    
+<span class="line_number">379 </span>                thisoutdata<span class="sign">[</span><span class="sign">,</span> 3<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">cumsum</span><span class="sign">(</span>c<span class="sign">(</span>1<span class="sign">,</span> thisoutdata<span class="sign">[</span><span class="sign">,</span> 7<span class="sign">]</span> <span class="sign">+</span> 
+<span class="line_number">380 </span>                    thisoutdata<span class="sign">[</span><span class="sign">,</span> 8<span class="sign">]</span><span class="sign">)</span><span class="sign">)</span><span class="sign">[</span> <span class="sign">-</span> <span class="sign">(</span><span class="keyword">dim</span><span class="sign">(</span>thisoutdata<span class="sign">)</span><span class="sign">[</span>1<span class="sign">]</span> <span class="sign">+</span> 1<span class="sign">)</span><span class="sign">]</span>     
+<span class="line_number">381 </span>                <span class="keyword">for</span><span class="sign">(</span>ind in <span class="sign">(</span><span class="keyword">dim</span><span class="sign">(</span>thisoutdata<span class="sign">)</span><span class="sign">[</span>1<span class="sign">]</span><span class="sign">)</span><span class="sign">:</span>1<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">382 </span>                    <span class="keyword">if</span><span class="sign">(</span><span class="comment">!is.na(thisoutdata[ind, 9])) thisZ1 &lt;- thisoutdata[ind, 9] </span>
+<span class="line_number">383 </span>                    <span class="keyword">else</span> thisoutdata<span class="sign">[</span>ind<span class="sign">,</span> 9<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> thisZ1
+<span class="line_number">384 </span>                    <span class="keyword">if</span><span class="sign">(</span><span class="comment">!is.na(thisoutdata[ind, 10])) thisZ2 &lt;- thisoutdata[ind, 10] </span>
+<span class="line_number">385 </span>                    <span class="keyword">else</span> thisoutdata<span class="sign">[</span>ind<span class="sign">,</span> 10<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> thisZ2
+<span class="line_number">386 </span>                    k <span class="sign">&lt;</span><span class="sign">-</span> thisoutdata<span class="sign">[</span>ind<span class="sign">,</span> 3<span class="sign">]</span>
+<span class="line_number">387 </span>                    thisoutdata<span class="sign">[</span>ind<span class="sign">,</span> 4<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> <a href="./bivrecsim_rsimulation2FL.html#robo66">L</a><span class="sign">(</span>i<span class="sign">,</span> j<span class="sign">,</span> k<span class="sign">,</span> Zij1<span class="sign">[</span>ij<span class="sign">,</span> k<span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">388 </span>                    <span class="keyword">if</span><span class="sign">(</span>ind <span class="sign">&gt;</span> 1<span class="sign">)</span> thisoutdata<span class="sign">[</span>ind<span class="sign">,</span> 5<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> thisoutdata<span class="sign">[</span>ind <span class="sign">-</span> 1<span class="sign">,</span> 6<span class="sign">]</span>
+<span class="line_number">389 </span>                <span class="sign">}</span>
+<span class="line_number">390 </span>                newoutrow <span class="sign">&lt;</span><span class="sign">-</span> outrow <span class="sign">+</span> <span class="keyword">dim</span><span class="sign">(</span>thisoutdata<span class="sign">)</span><span class="sign">[</span>1<span class="sign">]</span>
+<span class="line_number">391 </span>                outdata<span class="sign">.</span>matrix<span class="sign">[</span>outrow<span class="sign">:</span><span class="sign">(</span>newoutrow <span class="sign">-</span> 1<span class="sign">)</span><span class="sign">,</span> <span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> thisoutdata
+<span class="line_number">392 </span>                outrow <span class="sign">&lt;</span><span class="sign">-</span> newoutrow
+<span class="line_number">393 </span>            <span class="sign">}</span>
+<span class="line_number">394 </span>        <span class="sign">}</span>
+<span class="line_number">395 </span>    <span class="sign">}</span><span class="keyword">else</span><span class="sign">{</span>
+<span class="line_number">396 </span>        <span class="keyword">for</span><span class="sign">(</span>i in 1<span class="sign">:</span>m<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">397 </span>            <span class="keyword">for</span><span class="sign">(</span>j in 1<span class="sign">:</span>Ji<span class="sign">[</span>i<span class="sign">]</span><span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">398 </span>                ij <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">sum</span><span class="sign">(</span>Ji<span class="sign">[</span>0<span class="sign">:</span><span class="sign">(</span>i <span class="sign">-</span> 1<span class="sign">)</span><span class="sign">]</span><span class="sign">)</span> <span class="sign">+</span> j
+<span class="line_number">399 </span>                ThisFollowTime <span class="sign">&lt;</span><span class="sign">-</span> Cij<span class="sign">[</span>ij<span class="sign">]</span>
+<span class="line_number">400 </span>                CumTime <span class="sign">&lt;</span><span class="sign">-</span> 0
+<span class="line_number">401 </span>                k <span class="sign">&lt;</span><span class="sign">-</span> 1<span class="sign">;</span>eventct <span class="sign">&lt;</span><span class="sign">-</span> 1
+<span class="line_number">402 </span>                <span class="keyword">while</span><span class="sign">(</span>CumTime <span class="sign">&lt;</span> ThisFollowTime<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">403 </span>                    <span class="keyword">if</span><span class="sign">(</span><span class="sign">(</span>CumTime <span class="sign">+</span> Rij1<span class="sign">[</span>ij<span class="sign">,</span> eventct<span class="sign">]</span><span class="sign">)</span> <span class="sign">&lt;</span> ThisFollowTime<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">404 </span>                        thisoutdata <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span>i<span class="sign">,</span> j<span class="sign">,</span> k<span class="sign">,</span> <a href="./bivrecsim_rsimulation2FL.html#robo66">L</a><span class="sign">(</span>i<span class="sign">,</span> j<span class="sign">,</span> k<span class="sign">,</span> Zij1<span class="sign">[</span>ij<span class="sign">,</span> eventct<span class="sign">]</span><span class="sign">)</span><span class="sign">,</span>
+<span class="line_number">405 </span>                            CumTime<span class="sign">,</span> CumTime <span class="sign">+</span> Rij1<span class="sign">[</span>ij<span class="sign">,</span> eventct<span class="sign">]</span><span class="sign">,</span> 1<span class="sign">,</span> 0<span class="sign">,</span> 
+<span class="line_number">406 </span>                            Zij1<span class="sign">[</span>ij<span class="sign">,</span> eventct<span class="sign">]</span><span class="sign">,</span> Zij2<span class="sign">[</span>ij<span class="sign">,</span> eventct<span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">407 </span>                        CumTime <span class="sign">&lt;</span><span class="sign">-</span> CumTime <span class="sign">+</span> Rij1<span class="sign">[</span>ij<span class="sign">,</span> eventct<span class="sign">]</span>
+<span class="line_number">408 </span>                        outdata<span class="sign">.</span>matrix<span class="sign">[</span>outrow<span class="sign">,</span> <span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> thisoutdata
+<span class="line_number">409 </span>                        k <span class="sign">&lt;</span><span class="sign">-</span> k <span class="sign">+</span> 1<span class="sign">;</span>outrow <span class="sign">&lt;</span><span class="sign">-</span> outrow <span class="sign">+</span> 1
+<span class="line_number">410 </span>                    <span class="sign">}</span><span class="keyword">else</span><span class="sign">{</span>
+<span class="line_number">411 </span>                        thisoutdata <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span>i<span class="sign">,</span> j<span class="sign">,</span> k<span class="sign">,</span> <a href="./bivrecsim_rsimulation2FL.html#robo66">L</a><span class="sign">(</span>i<span class="sign">,</span> j<span class="sign">,</span> k<span class="sign">,</span> Zij1<span class="sign">[</span>ij<span class="sign">,</span> eventct<span class="sign">]</span><span class="sign">)</span><span class="sign">,</span>
+<span class="line_number">412 </span>                            CumTime<span class="sign">,</span> ThisFollowTime<span class="sign">,</span> 0<span class="sign">,</span> 0<span class="sign">,</span> Zij1<span class="sign">[</span>ij<span class="sign">,</span> eventct<span class="sign">]</span><span class="sign">,</span>
+<span class="line_number">413 </span>                            Zij2<span class="sign">[</span>ij<span class="sign">,</span> eventct<span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">414 </span>                        CumTime <span class="sign">&lt;</span><span class="sign">-</span> ThisFollowTime
+<span class="line_number">415 </span>                        outdata<span class="sign">.</span>matrix<span class="sign">[</span>outrow<span class="sign">,</span> <span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> thisoutdata
+<span class="line_number">416 </span>                        k <span class="sign">&lt;</span><span class="sign">-</span> k <span class="sign">+</span> 1<span class="sign">;</span>outrow <span class="sign">&lt;</span><span class="sign">-</span> outrow <span class="sign">+</span> 1
+<span class="line_number">417 </span>                    <span class="sign">}</span>
+<span class="line_number">418 </span>                    <span class="keyword">if</span><span class="sign">(</span><span class="sign">(</span>CumTime <span class="sign">+</span> Rij2<span class="sign">[</span>ij<span class="sign">,</span> eventct<span class="sign">]</span><span class="sign">)</span> <span class="sign">&lt;</span> ThisFollowTime<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">419 </span>                        thisoutdata <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span>i<span class="sign">,</span> j<span class="sign">,</span> k<span class="sign">,</span> <a href="./bivrecsim_rsimulation2FL.html#robo66">L</a><span class="sign">(</span>i<span class="sign">,</span> j<span class="sign">,</span> k<span class="sign">,</span> Zij2<span class="sign">[</span>ij<span class="sign">,</span> eventct<span class="sign">]</span><span class="sign">)</span><span class="sign">,</span>
+<span class="line_number">420 </span>                            CumTime<span class="sign">,</span> CumTime <span class="sign">+</span> Rij2<span class="sign">[</span>ij<span class="sign">,</span> eventct<span class="sign">]</span><span class="sign">,</span> 0<span class="sign">,</span> 1<span class="sign">,</span>
+<span class="line_number">421 </span>                            Zij1<span class="sign">[</span>ij<span class="sign">,</span> eventct<span class="sign">]</span><span class="sign">,</span> Zij2<span class="sign">[</span>ij<span class="sign">,</span> eventct<span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">422 </span>                        CumTime <span class="sign">&lt;</span><span class="sign">-</span> CumTime <span class="sign">+</span> Rij2<span class="sign">[</span>ij<span class="sign">,</span> eventct<span class="sign">]</span>
+<span class="line_number">423 </span>                        outdata<span class="sign">.</span>matrix<span class="sign">[</span>outrow<span class="sign">,</span> <span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> thisoutdata
+<span class="line_number">424 </span>                        k <span class="sign">&lt;</span><span class="sign">-</span> k <span class="sign">+</span> 1<span class="sign">;</span>outrow <span class="sign">&lt;</span><span class="sign">-</span> outrow <span class="sign">+</span> 1
+<span class="line_number">425 </span>                    <span class="sign">}</span><span class="keyword">else</span><span class="sign">{</span>
+<span class="line_number">426 </span>                        <span class="keyword">if</span><span class="sign">(</span>CumTime <span class="sign">&lt;</span> ThisFollowTime<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">427 </span>                            thisoutdata <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span>i<span class="sign">,</span> j<span class="sign">,</span> k<span class="sign">,</span> <a href="./bivrecsim_rsimulation2FL.html#robo66">L</a><span class="sign">(</span>i<span class="sign">,</span> j<span class="sign">,</span> k<span class="sign">,</span> Zij2<span class="sign">[</span>ij<span class="sign">,</span> eventct<span class="sign">]</span><span class="sign">)</span><span class="sign">,</span>
+<span class="line_number">428 </span>                                CumTime<span class="sign">,</span> ThisFollowTime<span class="sign">,</span> 0<span class="sign">,</span> 0<span class="sign">,</span> Zij1<span class="sign">[</span>ij<span class="sign">,</span> eventct<span class="sign">]</span><span class="sign">,</span>
+<span class="line_number">429 </span>                                Zij2<span class="sign">[</span>ij<span class="sign">,</span> eventct<span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">430 </span>                            CumTime <span class="sign">&lt;</span><span class="sign">-</span> ThisFollowTime
+<span class="line_number">431 </span>                            outdata<span class="sign">.</span>matrix<span class="sign">[</span>outrow<span class="sign">,</span> <span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> thisoutdata
+<span class="line_number">432 </span>                            k <span class="sign">&lt;</span><span class="sign">-</span> k <span class="sign">+</span> 1<span class="sign">;</span>outrow <span class="sign">&lt;</span><span class="sign">-</span> outrow <span class="sign">+</span> 1
+<span class="line_number">433 </span>                        <span class="sign">}</span>
+<span class="line_number">434 </span>                    <span class="sign">}</span>
+<span class="line_number">435 </span>                    eventct <span class="sign">&lt;</span><span class="sign">-</span> eventct <span class="sign">+</span> 1
+<span class="line_number">436 </span>                <span class="sign">}</span>
+<span class="line_number">437 </span>            <span class="sign">}</span>
+<span class="line_number">438 </span>        <span class="sign">}</span>
+<span class="line_number">439 </span>    
+<span class="line_number">440 </span>    <span class="sign">}</span>
+<span class="line_number">441 </span>        outdata <span class="sign">&lt;</span><span class="sign">-</span> as<span class="sign">.</span>data<span class="sign">.</span>frame<span class="sign">(</span>outdata<span class="sign">.</span>matrix<span class="sign">[</span>1<span class="sign">:</span><span class="sign">(</span>outrow <span class="sign">-</span> 1<span class="sign">)</span><span class="sign">,</span> <span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">442 </span>        <span class="keyword">colnames</span><span class="sign">(</span>outdata<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span><span class="quote">"i"</span><span class="sign">,</span> <span class="quote">"j"</span><span class="sign">,</span> <span class="quote">"k"</span><span class="sign">,</span> <span class="quote">"r"</span><span class="sign">,</span> <span class="quote">"start"</span><span class="sign">,</span> <span class="quote">"stop"</span><span class="sign">,</span>
+<span class="line_number">443 </span>                            <span class="quote">"delta"</span><span class="sign">,</span> <span class="quote">"Delta"</span><span class="sign">,</span> <span class="quote">"Z1"</span><span class="sign">,</span> <span class="quote">"Z2"</span><span class="sign">)</span>
+<span class="line_number">444 </span>        <span class="keyword">return</span><span class="sign">(</span>outdata<span class="sign">)</span>
+<span class="line_number">445 </span><span class="sign">}</span>
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./blupsurv/R/bivrecsim.r with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.36 on Sun Jun 29 2008 13:34:52
+</p>
+</div> <!-- footer -->
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=3825293; 
+var sc_invisible=1; 
+var sc_partition=34; 
+var sc_click_stat=1; 
+var sc_security="2dd2334a"; 
+</script>
+
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div
+class="statcounter"><a href="http://www.statcounter.com/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/3825293/0/2dd2334a/1/" alt="free html hit
+counter" ></a></div></noscript>
+<!-- End of StatCounter Code -->
+</body>
+
+</html>

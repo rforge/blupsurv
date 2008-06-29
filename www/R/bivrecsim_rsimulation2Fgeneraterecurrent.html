@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./blupsurv/R/bivrecsim.r</title>
+<!-- Source: ./blupsurv/R/bivrecsim.r -->
+<!-- Generated with ROBODoc Version 4.99.36 (Jun 17 2008) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">blupsurv</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="./bivrecsim_r2Fsimulation.html#robo5">simulation</a><a class="menuitem" href="../robo_functions.html#robo_top_of_doc">Functions</a></div> <!-- navigation -->
+<div id="content">
+<h3>TABLE OF CONTENTS</h3>
+<ul>
+<li>1. <a href="#robo64">simulation/generaterecurrent</a></li>
+</ul>
+<hr />
+<a name="simulation2fgeneraterecurrent"></a>
+<a name="robo64"></a><h2>simulation/generaterecurrent [ Functions ]</h2>
+
+<p class="item_name">NAME</p>
+<pre>    <strong>generaterecurrent</strong> --- generate simulated recurrent event times
+</pre>
+<p class="item_name">FUNCTION</p>
+<p> Generates recurrent event times from a Weibull hazard with baseline lambda_0, shape gamma.
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">612 </span><strong>generaterecurrent</strong> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">function</span><span class="sign">(</span>m<span class="sign">,</span> Ji<span class="sign">,</span> Zij<span class="sign">,</span> Uij<span class="sign">,</span> beta1<span class="sign">,</span> beta2<span class="sign">,</span> lambda0<span class="sign">,</span> gamweib<span class="sign">,</span> timedep<span class="sign">,</span> Cij<span class="sign">)</span>
+<span class="line_number">613 </span><span class="sign">{</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>    m      number of clusters
+    Ji     cluster sizes
+    Zij    covariates
+    Uij    frailties
+    beta1  coefficient for covariate 1
+    beta2  coefficient for covariate 2 (if applicable)
+    labmda0    weibull baseline
+    gamweib    weibull shape
+    timedep    boolean to indicate time-dependence
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">616 </span>    <span class="comment"># Convert the provided covariates into two matrices of time - dependent covariates</span>
+<span class="line_number">617 </span>    <span class="keyword">if</span><span class="sign">(</span>timedep<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">618 </span>        Zij1 <span class="sign">&lt;</span><span class="sign">-</span> Zij<span class="sign">$</span>Zij1
+<span class="line_number">619 </span>        Zij1times <span class="sign">&lt;</span><span class="sign">-</span> Zij<span class="sign">$</span>Zij1times
+<span class="line_number">620 </span>        Zij2 <span class="sign">&lt;</span><span class="sign">-</span> matrix<span class="sign">(</span>0<span class="sign">,</span> <span class="keyword">dim</span><span class="sign">(</span>Zij1<span class="sign">)</span><span class="sign">[</span>1<span class="sign">]</span><span class="sign">,</span> 100<span class="sign">)</span>  
+<span class="line_number">621 </span>        
+<span class="line_number">622 </span>        Rij <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">rep</span><span class="sign">(</span>0<span class="sign">,</span> <span class="keyword">sum</span><span class="sign">(</span>Ji<span class="sign">)</span> <span class="sign">*</span> 100<span class="sign">)</span><span class="sign">;</span> <span class="keyword">dim</span><span class="sign">(</span>Rij<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span><span class="keyword">sum</span><span class="sign">(</span>Ji<span class="sign">)</span><span class="sign">,</span> 100<span class="sign">)</span>
+<span class="line_number">623 </span>        <span class="keyword">for</span><span class="sign">(</span>ind in 1<span class="sign">:</span><span class="keyword">sum</span><span class="sign">(</span>Ji<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">624 </span>        <span class="sign">{</span>
+<span class="line_number">625 </span>            timescum <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">cumsum</span><span class="sign">(</span>Zij1times<span class="sign">[</span>ind<span class="sign">,</span> <span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">626 </span>            timescum<span class="sign">[</span>min<span class="sign">(</span><span class="keyword">which</span><span class="sign">(</span>timescum <span class="sign">&gt;</span> Cij<span class="sign">[</span>ind<span class="sign">]</span><span class="sign">)</span><span class="sign">)</span><span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> Inf
+<span class="line_number">627 </span>            obstimes <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span>timescum<span class="sign">[</span>timescum <span class="sign">&lt;</span> Cij<span class="sign">[</span>ind<span class="sign">]</span><span class="sign">]</span><span class="sign">,</span> Cij<span class="sign">[</span>ind<span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">628 </span>            Rijcum <span class="sign">&lt;</span><span class="sign">-</span> 0<span class="sign">;</span>k <span class="sign">&lt;</span><span class="sign">-</span> 1
+<span class="line_number">629 </span>            <span class="keyword">while</span><span class="sign">(</span>k <span class="sign">&lt;</span> 100<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">630 </span>                
+<span class="line_number">631 </span>                hazards <span class="sign">&lt;</span><span class="sign">-</span> Uij<span class="sign">[</span>ind<span class="sign">]</span> <span class="sign">*</span> lambda0 <span class="sign">*</span> gamweib <span class="sign">*</span> <span class="sign">(</span>obstimes <span class="sign">-</span> Rijcum<span class="sign">)</span><span class="sign">^</span><span class="sign">(</span>gamweib <span class="sign">-</span> 1<span class="sign">)</span> <span class="sign">*</span>
+<span class="line_number">632 </span>                    <span class="keyword">exp</span><span class="sign">(</span>beta1 <span class="sign">*</span> Zij1<span class="sign">[</span>ind<span class="sign">,</span> 1<span class="sign">:</span><span class="keyword">length</span><span class="sign">(</span>obstimes<span class="sign">)</span><span class="sign">]</span> <span class="sign">+</span> beta2 <span class="sign">*</span>
+<span class="line_number">633 </span>                    Zij2<span class="sign">[</span>ind<span class="sign">,</span> 1<span class="sign">:</span><span class="keyword">length</span><span class="sign">(</span>obstimes<span class="sign">)</span><span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">634 </span>                maxhaz <span class="sign">&lt;</span><span class="sign">-</span> max<span class="sign">(</span>hazards<span class="sign">,</span> na<span class="sign">.</span>rm <span class="sign">=</span> TRUE<span class="sign">)</span>
+<span class="line_number">635 </span>                accept <span class="sign">&lt;</span><span class="sign">-</span> FALSE
+<span class="line_number">636 </span>                <span class="comment"># Generate by accept-reject</span>
+<span class="line_number">637 </span>                n <span class="sign">&lt;</span><span class="sign">-</span> 0<span class="sign">;</span>Rijprop <span class="sign">&lt;</span><span class="sign">-</span> 0
+<span class="line_number">638 </span>                <span class="keyword">while</span><span class="sign">(</span><span class="comment">!accept){</span>
+<span class="line_number">639 </span>                    genunif <span class="sign">&lt;</span><span class="sign">-</span> runif<span class="sign">(</span>1<span class="sign">)</span>
+<span class="line_number">640 </span>                    Rijprop <span class="sign">&lt;</span><span class="sign">-</span> Rijprop <span class="sign">-</span> 1 <span class="sign">/</span> maxhaz <span class="sign">*</span> log<span class="sign">(</span>genunif<span class="sign">)</span>
+<span class="line_number">641 </span>                    thistime <span class="sign">&lt;</span><span class="sign">-</span> min<span class="sign">(</span><span class="keyword">which</span><span class="sign">(</span>timescum <span class="sign">&gt;</span> <span class="sign">(</span>Rijcum <span class="sign">+</span> Rijprop<span class="sign">)</span><span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">642 </span>                    <span class="keyword">if</span><span class="sign">(</span>thistime <span class="sign">=</span><span class="sign">=</span> 101<span class="sign">)</span> thistime <span class="sign">&lt;</span><span class="sign">-</span> 100
+<span class="line_number">643 </span>                    thishaz <span class="sign">&lt;</span><span class="sign">-</span> Uij<span class="sign">[</span>ind<span class="sign">]</span> <span class="sign">*</span> lambda0 <span class="sign">*</span> gamweib <span class="sign">*</span> <span class="sign">(</span>Rijprop<span class="sign">)</span><span class="sign">^</span><span class="sign">(</span>gamweib <span class="sign">-</span> 1<span class="sign">)</span> <span class="sign">*</span>
+<span class="line_number">644 </span>                        <span class="keyword">exp</span><span class="sign">(</span>beta1 <span class="sign">*</span> Zij1<span class="sign">[</span>ind<span class="sign">,</span> thistime<span class="sign">]</span> <span class="sign">+</span> beta2 <span class="sign">*</span> Zij2<span class="sign">[</span>ind<span class="sign">,</span> thistime<span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">645 </span>                    accunif <span class="sign">&lt;</span><span class="sign">-</span> runif<span class="sign">(</span>1<span class="sign">)</span>
+<span class="line_number">646 </span>                    <span class="keyword">if</span><span class="sign">(</span>accunif <span class="sign">*</span> maxhaz <span class="sign">&lt;</span> thishaz<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">647 </span>                        Rij<span class="sign">[</span>ind<span class="sign">,</span> k<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> Rijprop
+<span class="line_number">648 </span>                        Rijcum <span class="sign">&lt;</span><span class="sign">-</span> Rijcum <span class="sign">+</span> Rijprop
+<span class="line_number">649 </span>                        <span class="keyword">if</span><span class="sign">(</span>Rijcum <span class="sign">&gt;</span> Cij<span class="sign">[</span>ind<span class="sign">]</span><span class="sign">)</span> k <span class="sign">&lt;</span><span class="sign">-</span> 100
+<span class="line_number">650 </span>                        accept <span class="sign">&lt;</span><span class="sign">-</span> TRUE
+<span class="line_number">651 </span>                    <span class="sign">}</span>
+<span class="line_number">652 </span>                    n <span class="sign">&lt;</span><span class="sign">-</span> n <span class="sign">+</span> 1
+<span class="line_number">653 </span>                <span class="sign">}</span>
+<span class="line_number">654 </span>            k <span class="sign">&lt;</span><span class="sign">-</span> k <span class="sign">+</span> 1
+<span class="line_number">655 </span>            <span class="sign">}</span>   
+<span class="line_number">656 </span>        <span class="sign">}</span>
+<span class="line_number">657 </span>        <span class="keyword">return</span><span class="sign">(</span>Rij<span class="sign">)</span>     
+<span class="line_number">658 </span>    <span class="sign">}</span><span class="keyword">else</span><span class="sign">{</span>
+<span class="line_number">659 </span>        <span class="keyword">if</span><span class="sign">(</span><span class="comment">!is.matrix(Zij) &amp;&amp; !is.list(Zij)) {</span>
+<span class="line_number">660 </span>            Zij1 <span class="sign">&lt;</span><span class="sign">-</span> matrix<span class="sign">(</span><span class="keyword">rep</span><span class="sign">(</span>Zij<span class="sign">,</span> 100<span class="sign">)</span><span class="sign">,</span> <span class="keyword">length</span><span class="sign">(</span>Zij<span class="sign">)</span><span class="sign">,</span> 100<span class="sign">)</span>
+<span class="line_number">661 </span>            Zij2 <span class="sign">&lt;</span><span class="sign">-</span> matrix<span class="sign">(</span>0<span class="sign">,</span> <span class="keyword">dim</span><span class="sign">(</span>Zij1<span class="sign">)</span><span class="sign">[</span>1<span class="sign">]</span><span class="sign">,</span> 100<span class="sign">)</span>
+<span class="line_number">662 </span>        <span class="sign">}</span>
+<span class="line_number">663 </span>        <span class="keyword">if</span><span class="sign">(</span>is<span class="sign">.</span><span class="keyword">list</span><span class="sign">(</span>Zij<span class="sign">)</span><span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">664 </span>            Zij1 <span class="sign">&lt;</span><span class="sign">-</span> matrix<span class="sign">(</span><span class="keyword">rep</span><span class="sign">(</span>Zij<span class="sign">$</span>Zij1<span class="sign">,</span> 100<span class="sign">)</span><span class="sign">,</span> <span class="keyword">length</span><span class="sign">(</span>Zij<span class="sign">$</span>Zij1<span class="sign">)</span><span class="sign">,</span> 100<span class="sign">)</span>
+<span class="line_number">665 </span>            Zij2 <span class="sign">&lt;</span><span class="sign">-</span> matrix<span class="sign">(</span><span class="keyword">rep</span><span class="sign">(</span>Zij<span class="sign">$</span>Zij2<span class="sign">,</span> 100<span class="sign">)</span><span class="sign">,</span> <span class="keyword">length</span><span class="sign">(</span>Zij<span class="sign">$</span>Zij2<span class="sign">)</span><span class="sign">,</span> 100<span class="sign">)</span>
+<span class="line_number">666 </span>        <span class="sign">}</span>    
+<span class="line_number">667 </span>        <span class="comment"># Initialize output matrix</span>
+<span class="line_number">668 </span>        Rij <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">rep</span><span class="sign">(</span>0<span class="sign">,</span> <span class="keyword">sum</span><span class="sign">(</span>Ji<span class="sign">)</span> <span class="sign">*</span> 100<span class="sign">)</span>  <span class="comment"># Gap data for times between events</span>
+<span class="line_number">669 </span>        <span class="keyword">dim</span><span class="sign">(</span>Rij<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span><span class="keyword">sum</span><span class="sign">(</span>Ji<span class="sign">)</span><span class="sign">,</span> 100<span class="sign">)</span>
+<span class="line_number">670 </span>        <span class="comment"># Generate interevent gap times by inversion</span>
+<span class="line_number">671 </span>        <span class="keyword">for</span><span class="sign">(</span>k in 1<span class="sign">:</span>100<span class="sign">)</span>  Rij<span class="sign">[</span><span class="sign">,</span> k<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="sign">(</span><span class="sign">(</span><span class="sign">-</span><span class="keyword">exp</span><span class="sign">(</span><span class="sign">-</span>beta1 <span class="sign">*</span> Zij1<span class="sign">[</span><span class="sign">,</span> k<span class="sign">]</span> <span class="sign">-</span> beta2 <span class="sign">*</span> Zij2<span class="sign">[</span><span class="sign">,</span> k<span class="sign">]</span><span class="sign">)</span> <span class="sign">*</span>
+<span class="line_number">672 </span>            log<span class="sign">(</span>1 <span class="sign">-</span> runif<span class="sign">(</span><span class="keyword">sum</span><span class="sign">(</span>Ji<span class="sign">)</span><span class="sign">)</span><span class="sign">)</span> <span class="sign">/</span> <span class="sign">(</span>lambda0 <span class="sign">*</span> Uij<span class="sign">)</span><span class="sign">)</span><span class="sign">^</span><span class="sign">(</span>1 <span class="sign">/</span> gamweib<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">673 </span>        Rij<span class="sign">[</span>Rij <span class="sign">=</span><span class="sign">=</span> 0<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> 1
+<span class="line_number">674 </span>        <span class="keyword">return</span><span class="sign">(</span>Rij<span class="sign">)</span>
+<span class="line_number">675 </span>    <span class="sign">}</span>
+<span class="line_number">676 </span><span class="sign">}</span>
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./blupsurv/R/bivrecsim.r with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.36 on Sun Jun 29 2008 13:34:52
+</p>
+</div> <!-- footer -->
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=3825293; 
+var sc_invisible=1; 
+var sc_partition=34; 
+var sc_click_stat=1; 
+var sc_security="2dd2334a"; 
+</script>
+
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div
+class="statcounter"><a href="http://www.statcounter.com/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/3825293/0/2dd2334a/1/" alt="free html hit
+counter" ></a></div></noscript>
+<!-- End of StatCounter Code -->
+</body>
+
+</html>

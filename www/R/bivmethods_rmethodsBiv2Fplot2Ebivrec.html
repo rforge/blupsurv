@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./blupsurv/R/bivmethods.r</title>
+<!-- Source: ./blupsurv/R/bivmethods.r -->
+<!-- Generated with ROBODoc Version 4.99.36 (Jun 17 2008) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">blupsurv</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="./bivmethods_r2FmethodsBiv.html#robo3">methodsBiv</a><a class="menuitem" href="../robo_functions.html#robo_top_of_doc">Functions</a></div> <!-- navigation -->
+<div id="content">
+<h3>TABLE OF CONTENTS</h3>
+<ul>
+<li>1. <a href="#robo45">methodsBiv/plot.bivrec</a></li>
+</ul>
+<hr />
+<a name="methodsBiv2fplot2ebivrec"></a>
+<a name="robo45"></a><h2>methodsBiv/plot.bivrec [ Functions ]</h2>
+
+<p class="item_name">NAME</p>
+<pre>    <strong>plot.bivrec</strong> --- S3 plot method for <a href="./bivmethods_rmethodsBiv2Fbivrec.html#robo38">bivrec</a> objects
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>    User-facing plotting function to plot survivor functions
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">432 </span><strong>plot.bivrec</strong> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">function</span><span class="sign">(</span>x<span class="sign">,</span> <span class="keyword">which</span> <span class="sign">=</span> c<span class="sign">(</span>0<span class="sign">,</span> 1<span class="sign">,</span> 2<span class="sign">)</span><span class="sign">,</span> main <span class="sign">=</span> NULL<span class="sign">,</span> xscale <span class="sign">=</span> 1<span class="sign">,</span> hazscale <span class="sign">=</span> 1<span class="sign">,</span>
+<span class="line_number">433 </span>                        add <span class="sign">=</span> FALSE<span class="sign">,</span> legend <span class="sign">=</span> NULL<span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>    see package documentation
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">436 </span><span class="sign">{</span>
+<span class="line_number">437 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="keyword">length</span><span class="sign">(</span><span class="keyword">which</span><span class="sign">)</span> <span class="sign">&gt;</span> 1<span class="sign">)</span> <span class="keyword">which</span> <span class="sign">&lt;</span><span class="sign">-</span> 0
+<span class="line_number">438 </span>    <span class="keyword">which</span> <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span>0<span class="sign">,</span> 1<span class="sign">,</span> 2<span class="sign">)</span><span class="sign">[</span>pmatch<span class="sign">(</span><span class="keyword">which</span><span class="sign">,</span> c<span class="sign">(</span>0<span class="sign">,</span> 1<span class="sign">,</span> 2<span class="sign">)</span><span class="sign">)</span><span class="sign">]</span>
+<span class="line_number">439 </span>    processnames <span class="sign">&lt;</span><span class="sign">-</span> attr<span class="sign">(</span>x<span class="sign">,</span> <span class="quote">"processnames"</span><span class="sign">)</span>
+<span class="line_number">440 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="comment">!is.null(main)) processnames &lt;- c(main[1], ifelse(length(main) &gt; 1,</span>
+<span class="line_number">441 </span>                     main<span class="sign">[</span>2<span class="sign">]</span><span class="sign">,</span> main<span class="sign">[</span>1<span class="sign">]</span><span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">442 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="keyword">which</span> <span class="sign">=</span><span class="sign">=</span> 0<span class="sign">)</span> par<span class="sign">(</span>mfrow <span class="sign">=</span> c<span class="sign">(</span>1<span class="sign">,</span> 2<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">443 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="keyword">which</span> <span class="sign">=</span><span class="sign">=</span> 0 <span class="sign">|</span> <span class="keyword">which</span> <span class="sign">=</span><span class="sign">=</span> 1<span class="sign">)</span> <a href="./bivmethods_rmethodsBiv2Fplotsurvivor.html#robo46">plotsurvivor</a><span class="sign">(</span>x<span class="sign">$</span>hazard<span class="sign">$</span>breaks1 <span class="sign">*</span> xscale<span class="sign">,</span>
+<span class="line_number">444 </span>        x<span class="sign">$</span>hazard<span class="sign">$</span>hazard1 <span class="sign">/</span> xscale <span class="sign">*</span> hazscale<span class="sign">,</span> main <span class="sign">=</span> processnames<span class="sign">[</span>1<span class="sign">]</span><span class="sign">,</span>
+<span class="line_number">445 </span>        add <span class="sign">=</span> add<span class="sign">,</span> legend <span class="sign">=</span> legend<span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">446 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="keyword">which</span> <span class="sign">=</span><span class="sign">=</span> 0 <span class="sign">|</span> <span class="keyword">which</span> <span class="sign">=</span><span class="sign">=</span> 2<span class="sign">)</span> <a href="./bivmethods_rmethodsBiv2Fplotsurvivor.html#robo46">plotsurvivor</a><span class="sign">(</span>x<span class="sign">$</span>hazard<span class="sign">$</span>breaks2 <span class="sign">*</span> xscale<span class="sign">,</span>
+<span class="line_number">447 </span>        x<span class="sign">$</span>hazard<span class="sign">$</span>hazard2 <span class="sign">/</span> xscale <span class="sign">*</span> hazscale<span class="sign">,</span> main <span class="sign">=</span> processnames<span class="sign">[</span>2<span class="sign">]</span><span class="sign">,</span>
+<span class="line_number">448 </span>        add <span class="sign">=</span> add<span class="sign">,</span> legend <span class="sign">=</span> legend<span class="sign">,</span> <span class="sign">.</span><span class="sign">.</span><span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">449 </span>    invisible<span class="sign">(</span>x<span class="sign">)</span>
+<span class="line_number">450 </span><span class="sign">}</span>
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./blupsurv/R/bivmethods.r with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.36 on Sun Jun 29 2008 13:34:50
+</p>
+</div> <!-- footer -->
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=3825293; 
+var sc_invisible=1; 
+var sc_partition=34; 
+var sc_click_stat=1; 
+var sc_security="2dd2334a"; 
+</script>
+
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div
+class="statcounter"><a href="http://www.statcounter.com/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/3825293/0/2dd2334a/1/" alt="free html hit
+counter" ></a></div></noscript>
+<!-- End of StatCounter Code -->
+</body>
+
+</html>

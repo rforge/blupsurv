@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./blupsurv/src/bivrec.f</title>
+<!-- Source: ./blupsurv/src/bivrec.f -->
+<!-- Generated with ROBODoc Version 4.99.36 (Jun 17 2008) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">blupsurv</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="./bivrec_f2Ffortran.html#robo2">fortran</a><a class="menuitem" href="../robo_methods.html#robo_top_of_doc">Methods</a></div> <!-- navigation -->
+<div id="content">
+<h3>TABLE OF CONTENTS</h3>
+<ul>
+<li>1. <a href="#robo25">fortran/fmksens2</a></li>
+</ul>
+<hr />
+<a name="fortran2ffmksens2"></a>
+<a name="robo25"></a><h2>fortran/fmksens2 [ Methods ]</h2>
+
+<p class="item_name">NAME</p>
+<pre>  <strong>fmksens2</strong> --- compute sensitivity matrix
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>    Construct the sensitivity matrix at the end of the procedure.
+    This is only for the regression coefficients. The full sensitivity
+    is computed by <a href="./bivrec_ffortran2Ffmksens2full.html#robo26">fmksens2full</a>
+    See also the R function <a href="../R/bivrec_rZZdebug2FmakeSens2.html#robo77">makeSens2</a>.
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">615 </span>      <span class="keyword">subroutine</span> <strong>fmksens2</strong><span class="sign">(</span>Smat<span class="sign">,</span>index1<span class="sign">,</span>index2<span class="sign">,</span>Z<span class="sign">,</span>Zd<span class="sign">,</span>alphars<span class="sign">,</span>alpharsd<span class="sign">,</span>
+<span class="line_number">616 </span>     <span class="sign">$</span> as<span class="sign">,</span>asd<span class="sign">,</span>betahat<span class="sign">,</span>betadhat<span class="sign">,</span>times1<span class="sign">,</span>times2<span class="sign">,</span>pi<span class="sign">,</span>qi<span class="sign">,</span>ri<span class="sign">,</span>si<span class="sign">,</span>wi<span class="sign">,</span>wij<span class="sign">,</span>zij<span class="sign">,</span>
+<span class="line_number">617 </span>     <span class="sign">$</span> sig2<span class="sign">,</span>sig2d<span class="sign">,</span>nu2<span class="sign">,</span>nu2d<span class="sign">,</span>theta<span class="sign">,</span>ncovs1<span class="sign">,</span>ncovs2<span class="sign">,</span>nr<span class="sign">,</span>ns<span class="sign">,</span>nsd<span class="sign">,</span>
+<span class="line_number">618 </span>     <span class="sign">$</span> d1<span class="sign">,</span>d2<span class="sign">,</span>m<span class="sign">,</span>Ji<span class="sign">,</span>maxj<span class="sign">)</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>   Too many to list, but analogous to those in other routines in
+   this file. Inputs appended with d refer to process 2.
+</pre>
+<p class="item_name">OUTPUTS</p>
+<pre>   Smat    matrix of size ncovs1+ncovs2 x ncovs2+ncovs2
+           sensitivity matrix
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">621 </span><span class="comment">! output of frailty <a href="../R/bivrec_rbivrecFit2Festimation.html#robo6">estimation</a></span>
+<span class="line_number">622 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> pi<span class="sign">(</span>m<span class="sign">)</span><span class="sign">,</span>qi<span class="sign">(</span>m<span class="sign">)</span><span class="sign">,</span>ri<span class="sign">(</span>m<span class="sign">)</span><span class="sign">,</span>si<span class="sign">(</span>m<span class="sign">)</span><span class="sign">,</span>wi<span class="sign">(</span>m<span class="sign">)</span><span class="sign">,</span>
+<span class="line_number">623 </span>     <span class="sign">$</span>  wij<span class="sign">(</span>m<span class="sign">,</span>maxj<span class="sign">)</span><span class="sign">,</span>zij<span class="sign">(</span>m<span class="sign">,</span>maxj<span class="sign">)</span>
+<span class="line_number">624 </span><span class="comment">! output of dispersion estimates</span>
+<span class="line_number">625 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> sig2<span class="sign">,</span>sig2d<span class="sign">,</span>nu2<span class="sign">,</span>nu2d<span class="sign">,</span>theta
+<span class="line_number">626 </span><span class="comment">! d1,d2: length of data matrix</span>
+<span class="line_number">627 </span><span class="comment">! m, Ji, maxj: # of clusters, individuals, max individuals</span>
+<span class="line_number">628 </span>      <span class="keyword">integer</span> d1<span class="sign">,</span>d2<span class="sign">,</span>m<span class="sign">,</span>Ji<span class="sign">(</span>m<span class="sign">)</span><span class="sign">,</span>maxj<span class="sign">,</span>ncovs1<span class="sign">,</span>ncovs2<span class="sign">,</span>nr<span class="sign">,</span>ns<span class="sign">,</span>nsd
+<span class="line_number">629 </span><span class="comment">! Sensitivity matrix (for output)</span>
+<span class="line_number">630 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> Smat<span class="sign">(</span>ncovs1<span class="sign">+</span>ncovs2<span class="sign">,</span>ncovs1<span class="sign">+</span>ncovs2<span class="sign">)</span>
+<span class="line_number">631 </span><span class="comment">! matrix of alpharh values</span>
+<span class="line_number">632 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> as<span class="sign">(</span>nr<span class="sign">,</span>ns<span class="sign">)</span><span class="sign">,</span> asd<span class="sign">(</span>nr<span class="sign">,</span>nsd<span class="sign">)</span>
+<span class="line_number">633 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> alphars<span class="sign">(</span>nr<span class="sign">,</span>ns<span class="sign">)</span><span class="sign">,</span>alpharsd<span class="sign">(</span>nr<span class="sign">,</span>nsd<span class="sign">)</span>
+<span class="line_number">634 </span><span class="comment">! matrix of coefficient estimates</span>
+<span class="line_number">635 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> betahat<span class="sign">(</span>ncovs1<span class="sign">)</span><span class="sign">,</span>betadhat<span class="sign">(</span>ncovs2<span class="sign">)</span>
+<span class="line_number">636 </span><span class="comment">! matrix of indices</span>
+<span class="line_number">637 </span>      <span class="keyword">integer</span> index1<span class="sign">(</span>d1<span class="sign">,</span>6<span class="sign">)</span><span class="sign">,</span>index2<span class="sign">(</span>d2<span class="sign">,</span>6<span class="sign">)</span>
+<span class="line_number">638 </span><span class="comment">! covariates: matrix of covariates for each index entry</span>
+<span class="line_number">639 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> Z<span class="sign">(</span>d1<span class="sign">,</span>ncovs1<span class="sign">)</span>
+<span class="line_number">640 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> Zd<span class="sign">(</span>d2<span class="sign">,</span>ncovs2<span class="sign">)</span>
+<span class="line_number">641 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> times1<span class="sign">(</span>d1<span class="sign">)</span><span class="sign">,</span>times2<span class="sign">(</span>d2<span class="sign">)</span>
+<span class="line_number">642 </span><span class="comment">! variables to hold the current values</span>
+<span class="line_number">643 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> bZd<span class="sign">,</span>bZ<span class="sign">,</span>mu<span class="sign">,</span>eta
+<span class="line_number">644 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> w<span class="sign">,</span>wj<span class="sign">,</span>time<span class="sign">,</span>thisA
+<span class="line_number">645 </span>      <span class="keyword">integer</span> i<span class="sign">,</span>ind<span class="sign">,</span>r<span class="sign">,</span>iind0<span class="sign">,</span>iind1<span class="sign">,</span>iind0d<span class="sign">,</span>iind1d<span class="sign">,</span>s
+<span class="line_number">646 </span><span class="comment">! Constants for column indices</span>
+<span class="line_number">647 </span>      <span class="keyword">parameter</span><span class="sign">(</span>icol<span class="sign">=</span>1<span class="sign">,</span> jcol<span class="sign">=</span>2<span class="sign">,</span> kcol<span class="sign">=</span>3<span class="sign">,</span> ircol<span class="sign">=</span>4<span class="sign">,</span> ismincol<span class="sign">=</span>5<span class="sign">,</span> ismaxcol<span class="sign">=</span>6<span class="sign">)</span>
+<span class="line_number">648 </span>      
+<span class="line_number">649 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> S11<span class="sign">(</span>ncovs1<span class="sign">,</span>ncovs1<span class="sign">)</span>
+<span class="line_number">650 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> S12<span class="sign">(</span>ncovs1<span class="sign">,</span>ncovs2<span class="sign">)</span>
+<span class="line_number">651 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> S13<span class="sign">(</span>ncovs2<span class="sign">,</span>ncovs2<span class="sign">)</span>
+<span class="line_number">652 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> S21<span class="sign">(</span>ncovs1<span class="sign">)</span><span class="sign">,</span>S22<span class="sign">(</span>ncovs2<span class="sign">)</span>
+<span class="line_number">653 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> S31<span class="sign">(</span>ncovs1<span class="sign">)</span><span class="sign">,</span>S32<span class="sign">(</span>ncovs2<span class="sign">)</span>      
+<span class="line_number">654 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> S2<span class="sign">(</span>ncovs1<span class="sign">+</span>ncovs2<span class="sign">)</span>
+<span class="line_number">655 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> S3<span class="sign">(</span>ncovs1<span class="sign">+</span>ncovs2<span class="sign">)</span>
+<span class="line_number">656 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> Sii<span class="sign">(</span>ncovs1<span class="sign">+</span>ncovs2<span class="sign">,</span>ncovs1<span class="sign">+</span>ncovs2<span class="sign">)</span>
+<span class="line_number">657 </span><span class="comment">!      double precision Sinv(g+gd,g+gd)</span>
+<span class="line_number">658 </span>      
+<span class="line_number">659 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> Sm<span class="sign">(</span>maxj<span class="sign">)</span>
+<span class="line_number">660 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> Se<span class="sign">(</span>maxj<span class="sign">)</span>
+<span class="line_number">661 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> Smx<span class="sign">(</span>maxj<span class="sign">,</span>ncovs1<span class="sign">)</span>
+<span class="line_number">662 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> Sex<span class="sign">(</span>maxj<span class="sign">,</span>ncovs2<span class="sign">)</span>
+<span class="line_number">663 </span>      
+<span class="line_number">664 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> phi<span class="sign">(</span>maxj<span class="sign">)</span><span class="sign">,</span>Z2<span class="sign">(</span>ncovs1<span class="sign">)</span><span class="sign">,</span>Z2d<span class="sign">(</span>ncovs2<span class="sign">)</span>
+<span class="line_number">665 </span>      
+<span class="line_number">666 </span><span class="comment">! indices for the start and end of the i portion of the data matrix      </span>
+<span class="line_number">667 </span>      iind0<span class="sign">=</span>0
+<span class="line_number">668 </span>      iind1<span class="sign">=</span>0
+<span class="line_number">669 </span>      iind0d<span class="sign">=</span>0
+<span class="line_number">670 </span>      iind1d<span class="sign">=</span>0
+<span class="line_number">671 </span>      
+<span class="line_number">672 </span>      <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>Smat<span class="sign">,</span><span class="sign">(</span>ncovs1<span class="sign">+</span>ncovs2<span class="sign">)</span><span class="sign">*</span><span class="sign">(</span>ncovs1<span class="sign">+</span>ncovs2<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">673 </span>      
+<span class="line_number">674 </span><span class="comment">! Loop over the values of i</span>
+<span class="line_number">675 </span>      <span class="keyword">do</span> 200 i<span class="sign">=</span>1<span class="sign">,</span>m
+<span class="line_number">676 </span>      
+<span class="line_number">677 </span>        <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>S11<span class="sign">,</span>ncovs1<span class="sign">*</span>ncovs1<span class="sign">)</span>
+<span class="line_number">678 </span>        <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>S12<span class="sign">,</span>ncovs1<span class="sign">*</span>ncovs2<span class="sign">)</span>
+<span class="line_number">679 </span>        <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>S13<span class="sign">,</span>ncovs2<span class="sign">*</span>ncovs2<span class="sign">)</span>
+<span class="line_number">680 </span>        <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>S21<span class="sign">,</span>ncovs1<span class="sign">)</span>
+<span class="line_number">681 </span>        <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>S31<span class="sign">,</span>ncovs1<span class="sign">)</span>
+<span class="line_number">682 </span>        <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>S22<span class="sign">,</span>ncovs2<span class="sign">)</span>
+<span class="line_number">683 </span>        <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>S32<span class="sign">,</span>ncovs2<span class="sign">)</span>       
+<span class="line_number">684 </span>        <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>S2<span class="sign">,</span>ncovs1<span class="sign">+</span>ncovs2<span class="sign">)</span>
+<span class="line_number">685 </span>        <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>S3<span class="sign">,</span>ncovs1<span class="sign">+</span>ncovs2<span class="sign">)</span>
+<span class="line_number">686 </span>        <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>Sm<span class="sign">,</span>maxj<span class="sign">)</span>
+<span class="line_number">687 </span>        <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>Se<span class="sign">,</span>maxj<span class="sign">)</span>
+<span class="line_number">688 </span>        <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>Smx<span class="sign">,</span>maxj<span class="sign">*</span>ncovs1<span class="sign">)</span>
+<span class="line_number">689 </span>        <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>Sex<span class="sign">,</span>maxj<span class="sign">*</span>ncovs2<span class="sign">)</span>
+<span class="line_number">690 </span>        <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>Z2<span class="sign">,</span>ncovs1<span class="sign">)</span>
+<span class="line_number">691 </span>        <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>Z2d<span class="sign">,</span>ncovs2<span class="sign">)</span>
+<span class="line_number">692 </span>
+<span class="line_number">693 </span>        iind0<span class="sign">=</span>iind1<span class="sign">+</span>1
+<span class="line_number">694 </span>        iind1<span class="sign">=</span>iind1<span class="sign">+</span>1
+<span class="line_number">695 </span>        iind0d<span class="sign">=</span>iind1d<span class="sign">+</span>1
+<span class="line_number">696 </span>        iind1d<span class="sign">=</span>iind1d<span class="sign">+</span>1
+<span class="line_number">697 </span>
+<span class="line_number">698 </span>      
+<span class="line_number">699 </span><span class="comment">!     while loop to find start and end indices in ij for cluster i</span>
+<span class="line_number">700 </span> 210    <span class="keyword">if</span><span class="sign">(</span><span class="sign">(</span>index1<span class="sign">(</span>iind1<span class="sign">,</span>icol<span class="sign">)</span><span class="sign">.</span>eq<span class="sign">.</span>i<span class="sign">)</span><span class="sign">.</span>and<span class="sign">.</span><span class="sign">(</span>iind1<span class="sign">.</span>le<span class="sign">.</span>d1<span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">701 </span>            iind1<span class="sign">=</span>iind1<span class="sign">+</span>1
+<span class="line_number">702 </span>            goto 210
+<span class="line_number">703 </span>        <span class="keyword">endif</span>      
+<span class="line_number">704 </span> 211    <span class="keyword">if</span><span class="sign">(</span><span class="sign">(</span>index2<span class="sign">(</span>iind1d<span class="sign">,</span>icol<span class="sign">)</span><span class="sign">.</span>eq<span class="sign">.</span>i<span class="sign">)</span><span class="sign">.</span>and<span class="sign">.</span><span class="sign">(</span>iind1d<span class="sign">.</span>le<span class="sign">.</span>d2<span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">705 </span>            iind1d<span class="sign">=</span>iind1d<span class="sign">+</span>1
+<span class="line_number">706 </span>            goto 211
+<span class="line_number">707 </span>        <span class="keyword">endif</span>     
+<span class="line_number">708 </span>
+<span class="line_number">709 </span><span class="comment">!       Compute the Sm, Se vectors and Smx,Sex matrix</span>
+<span class="line_number">710 </span><span class="comment">!       Sm=Sum(mu_ij*) for j=1..Ji</span>
+<span class="line_number">711 </span><span class="comment">!       Smx=Sum(mu_ijkh*x_ijkh) for j=1..Ji</span>
+<span class="line_number">712 </span>        iind1<span class="sign">=</span>iind1<span class="sign">-</span>1                
+<span class="line_number">713 </span>        <span class="keyword">do</span> 220 ind<span class="sign">=</span>iind0<span class="sign">,</span>iind1
+<span class="line_number">714 </span>            j<span class="sign">=</span>index1<span class="sign">(</span>ind<span class="sign">,</span>jcol<span class="sign">)</span>
+<span class="line_number">715 </span>            smin<span class="sign">=</span>index1<span class="sign">(</span>ind<span class="sign">,</span>ismincol<span class="sign">)</span>
+<span class="line_number">716 </span>            smax<span class="sign">=</span>index1<span class="sign">(</span>ind<span class="sign">,</span>ismaxcol<span class="sign">)</span>
+<span class="line_number">717 </span>            r<span class="sign">=</span>index1<span class="sign">(</span>ind<span class="sign">,</span>ircol<span class="sign">)</span>
+<span class="line_number">718 </span>            time<span class="sign">=</span>times1<span class="sign">(</span>ind<span class="sign">)</span>
+<span class="line_number">719 </span>            bZ<span class="sign">=</span>ddot<span class="sign">(</span>ncovs1<span class="sign">,</span>Z<span class="sign">(</span>ind<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>d1<span class="sign">,</span>betahat<span class="sign">,</span>1<span class="sign">)</span>
+<span class="line_number">720 </span>            <span class="keyword">if</span><span class="sign">(</span>smax <span class="sign">.</span>GT<span class="sign">.</span> 0<span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">721 </span>                <span class="keyword">do</span> 230 s<span class="sign">=</span>smin<span class="sign">,</span>smax
+<span class="line_number">722 </span>                    thisA<span class="sign">=</span>0<span class="sign">.</span>d0
+<span class="line_number">723 </span>                    <span class="keyword">call</span> <a href="./bivrec_ffortran2FA.html#robo20">A</a><span class="sign">(</span>thisA<span class="sign">,</span>time<span class="sign">,</span>as<span class="sign">,</span>r<span class="sign">,</span>s<span class="sign">,</span>nr<span class="sign">,</span>ns<span class="sign">)</span>
+<span class="line_number">724 </span>                    mu<span class="sign">=</span><span class="keyword">exp</span><span class="sign">(</span>bZ<span class="sign">)</span><span class="sign">*</span>alphars<span class="sign">(</span>r<span class="sign">,</span>s<span class="sign">)</span><span class="sign">*</span>thisA
+<span class="line_number">725 </span>                    Sm<span class="sign">(</span>j<span class="sign">)</span><span class="sign">=</span>Sm<span class="sign">(</span>j<span class="sign">)</span><span class="sign">+</span>mu                        
+<span class="line_number">726 </span>                    <span class="keyword">call</span> daxpy<span class="sign">(</span>ncovs1<span class="sign">,</span>mu<span class="sign">,</span>Z<span class="sign">(</span>ind<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>d1<span class="sign">,</span>Smx<span class="sign">(</span>j<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>maxj<span class="sign">)</span>
+<span class="line_number">727 </span> 230            <span class="keyword">continue</span>
+<span class="line_number">728 </span>            <span class="keyword">endif</span>  
+<span class="line_number">729 </span> 220    <span class="keyword">continue</span> 
+<span class="line_number">730 </span>        iind1d<span class="sign">=</span>iind1d<span class="sign">-</span>1                
+<span class="line_number">731 </span>        <span class="keyword">do</span> 221 ind<span class="sign">=</span>iind0d<span class="sign">,</span>iind1d              
+<span class="line_number">732 </span>            j<span class="sign">=</span>index2<span class="sign">(</span>ind<span class="sign">,</span>jcol<span class="sign">)</span>
+<span class="line_number">733 </span>            smin<span class="sign">=</span>index2<span class="sign">(</span>ind<span class="sign">,</span>ismincol<span class="sign">)</span>
+<span class="line_number">734 </span>            smax<span class="sign">=</span>index2<span class="sign">(</span>ind<span class="sign">,</span>ismaxcol<span class="sign">)</span>
+<span class="line_number">735 </span>            r<span class="sign">=</span>index2<span class="sign">(</span>ind<span class="sign">,</span>ircol<span class="sign">)</span>
+<span class="line_number">736 </span>            time<span class="sign">=</span>times2<span class="sign">(</span>ind<span class="sign">)</span>
+<span class="line_number">737 </span>            bZ<span class="sign">=</span>ddot<span class="sign">(</span>ncovs2<span class="sign">,</span>Zd<span class="sign">(</span>ind<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>d2<span class="sign">,</span>betadhat<span class="sign">,</span>1<span class="sign">)</span>
+<span class="line_number">738 </span>            <span class="keyword">if</span><span class="sign">(</span><span class="sign">(</span>smax <span class="sign">.</span>GT<span class="sign">.</span> 0<span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">739 </span>                <span class="keyword">do</span> 240 s<span class="sign">=</span>smin<span class="sign">,</span>smax
+<span class="line_number">740 </span>                    thisA<span class="sign">=</span>0<span class="sign">.</span>d0
+<span class="line_number">741 </span>                    <span class="keyword">call</span> <a href="./bivrec_ffortran2FA.html#robo20">A</a><span class="sign">(</span>thisA<span class="sign">,</span>time<span class="sign">,</span>asd<span class="sign">,</span>r<span class="sign">,</span>s<span class="sign">,</span>nr<span class="sign">,</span>nsd<span class="sign">)</span>
+<span class="line_number">742 </span>                    eta<span class="sign">=</span><span class="keyword">exp</span><span class="sign">(</span>bZ<span class="sign">)</span><span class="sign">*</span>alpharsd<span class="sign">(</span>r<span class="sign">,</span>s<span class="sign">)</span><span class="sign">*</span>thisA
+<span class="line_number">743 </span>                    Se<span class="sign">(</span>j<span class="sign">)</span><span class="sign">=</span>Se<span class="sign">(</span>j<span class="sign">)</span><span class="sign">+</span>eta                        
+<span class="line_number">744 </span>                    <span class="keyword">call</span> daxpy<span class="sign">(</span>ncovs2<span class="sign">,</span>eta<span class="sign">,</span>Zd<span class="sign">(</span>ind<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>d2<span class="sign">,</span>Sex<span class="sign">(</span>j<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>maxj<span class="sign">)</span>
+<span class="line_number">745 </span> 240            <span class="keyword">continue</span>
+<span class="line_number">746 </span>            <span class="keyword">endif</span>   
+<span class="line_number">747 </span> 221    <span class="keyword">continue</span> 
+<span class="line_number">748 </span>        
+<span class="line_number">749 </span> 
+<span class="line_number">750 </span><span class="comment">! Compute phi</span>
+<span class="line_number">751 </span>        <span class="keyword">do</span> 300 j<span class="sign">=</span>1<span class="sign">,</span>Ji<span class="sign">(</span>i<span class="sign">)</span>
+<span class="line_number">752 </span>            phi<span class="sign">(</span>j<span class="sign">)</span><span class="sign">=</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>nu2<span class="sign">*</span>Sm<span class="sign">(</span>j<span class="sign">)</span><span class="sign">)</span><span class="sign">*</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>nu2d<span class="sign">*</span>Se<span class="sign">(</span>j<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">753 </span>     <span class="sign">$</span>      <span class="sign">-</span>theta<span class="sign">*</span>theta<span class="sign">*</span>Sm<span class="sign">(</span>j<span class="sign">)</span><span class="sign">*</span>Se<span class="sign">(</span>j<span class="sign">)</span>   
+<span class="line_number">754 </span> 300    <span class="keyword">continue</span>    
+<span class="line_number">755 </span>            
+<span class="line_number">756 </span>      
+<span class="line_number">757 </span><span class="comment">! Compute the various components of the matrix (pass 2)</span>
+<span class="line_number">758 </span>        <span class="keyword">do</span> 400 ind<span class="sign">=</span>iind0<span class="sign">,</span>iind1
+<span class="line_number">759 </span>            j<span class="sign">=</span>index1<span class="sign">(</span>ind<span class="sign">,</span>jcol<span class="sign">)</span>
+<span class="line_number">760 </span>            smin<span class="sign">=</span>index1<span class="sign">(</span>ind<span class="sign">,</span>ismincol<span class="sign">)</span>
+<span class="line_number">761 </span>            smax<span class="sign">=</span>index1<span class="sign">(</span>ind<span class="sign">,</span>ismaxcol<span class="sign">)</span>
+<span class="line_number">762 </span>            r<span class="sign">=</span>index1<span class="sign">(</span>ind<span class="sign">,</span>ircol<span class="sign">)</span>
+<span class="line_number">763 </span>            time<span class="sign">=</span>times1<span class="sign">(</span>ind<span class="sign">)</span>
+<span class="line_number">764 </span>            bZ<span class="sign">=</span>ddot<span class="sign">(</span>ncovs1<span class="sign">,</span>Z<span class="sign">(</span>ind<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>d1<span class="sign">,</span>betahat<span class="sign">,</span>1<span class="sign">)</span>
+<span class="line_number">765 </span>            <span class="keyword">call</span> dcopy<span class="sign">(</span>ncovs1<span class="sign">,</span>Z<span class="sign">(</span>ind<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>d1<span class="sign">,</span>Z2<span class="sign">(</span>1<span class="sign">)</span><span class="sign">,</span>1<span class="sign">)</span>
+<span class="line_number">766 </span>            
+<span class="line_number">767 </span>            <span class="keyword">if</span><span class="sign">(</span>smax <span class="sign">.</span>GT<span class="sign">.</span> 0<span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">768 </span>                <span class="keyword">do</span> 410 s<span class="sign">=</span>smin<span class="sign">,</span>smax
+<span class="line_number">769 </span>                    thisA<span class="sign">=</span>0<span class="sign">.</span>d0
+<span class="line_number">770 </span>                    <span class="keyword">call</span> <a href="./bivrec_ffortran2FA.html#robo20">A</a><span class="sign">(</span>thisA<span class="sign">,</span>time<span class="sign">,</span>as<span class="sign">,</span>r<span class="sign">,</span>s<span class="sign">,</span>nr<span class="sign">,</span>ns<span class="sign">)</span>
+<span class="line_number">771 </span>                    mu<span class="sign">=</span><span class="keyword">exp</span><span class="sign">(</span>bZ<span class="sign">)</span><span class="sign">*</span>alphars<span class="sign">(</span>r<span class="sign">,</span>s<span class="sign">)</span><span class="sign">*</span>thisA
+<span class="line_number">772 </span>      
+<span class="line_number">773 </span>                    <span class="keyword">call</span> dger<span class="sign">(</span>ncovs1<span class="sign">,</span>ncovs1<span class="sign">,</span>mu<span class="sign">,</span>Z2<span class="sign">,</span>1<span class="sign">,</span>Z2<span class="sign">,</span>1<span class="sign">,</span>S11<span class="sign">,</span>ncovs1<span class="sign">)</span>
+<span class="line_number">774 </span>                    
+<span class="line_number">775 </span>                    w<span class="sign">=</span>1<span class="sign">.</span>0d0<span class="sign">/</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>wij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">*</span>Sm<span class="sign">(</span>j<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">776 </span>                    <span class="keyword">call</span> daxpy<span class="sign">(</span>ncovs1<span class="sign">,</span>w<span class="sign">*</span>mu<span class="sign">,</span>Z<span class="sign">(</span>ind<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>d1<span class="sign">,</span>S21<span class="sign">(</span>1<span class="sign">)</span><span class="sign">,</span>1<span class="sign">)</span>
+<span class="line_number">777 </span>                    
+<span class="line_number">778 </span>                    w<span class="sign">=</span> <span class="sign">-</span>theta<span class="sign">*</span>Se<span class="sign">(</span>j<span class="sign">)</span><span class="sign">/</span>phi<span class="sign">(</span>j<span class="sign">)</span>
+<span class="line_number">779 </span>                    <span class="keyword">call</span> daxpy<span class="sign">(</span>ncovs1<span class="sign">,</span>w<span class="sign">*</span>mu<span class="sign">,</span>Z<span class="sign">(</span>ind<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>d1<span class="sign">,</span>S31<span class="sign">(</span>1<span class="sign">)</span><span class="sign">,</span>1<span class="sign">)</span>
+<span class="line_number">780 </span> 410            <span class="keyword">continue</span>
+<span class="line_number">781 </span>            <span class="keyword">endif</span>
+<span class="line_number">782 </span> 400    <span class="keyword">continue</span>
+<span class="line_number">783 </span>        <span class="keyword">do</span> 401 ind<span class="sign">=</span>iind0d<span class="sign">,</span>iind1d
+<span class="line_number">784 </span>            j<span class="sign">=</span>index2<span class="sign">(</span>ind<span class="sign">,</span>jcol<span class="sign">)</span>
+<span class="line_number">785 </span>            smin<span class="sign">=</span>index2<span class="sign">(</span>ind<span class="sign">,</span>ismincol<span class="sign">)</span>
+<span class="line_number">786 </span>            smax<span class="sign">=</span>index2<span class="sign">(</span>ind<span class="sign">,</span>ismaxcol<span class="sign">)</span>
+<span class="line_number">787 </span>            r<span class="sign">=</span>index2<span class="sign">(</span>ind<span class="sign">,</span>ircol<span class="sign">)</span>
+<span class="line_number">788 </span>            time<span class="sign">=</span>times2<span class="sign">(</span>ind<span class="sign">)</span>
+<span class="line_number">789 </span>            bZ<span class="sign">=</span>ddot<span class="sign">(</span>ncovs2<span class="sign">,</span>Zd<span class="sign">(</span>ind<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>d2<span class="sign">,</span>betadhat<span class="sign">,</span>1<span class="sign">)</span>
+<span class="line_number">790 </span>            <span class="keyword">call</span> dcopy<span class="sign">(</span>ncovs<span class="sign">,</span>Zd<span class="sign">(</span>ind<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>d2<span class="sign">,</span>Z2<span class="sign">(</span>1<span class="sign">)</span><span class="sign">,</span>1<span class="sign">)</span>
+<span class="line_number">791 </span>            <span class="keyword">if</span><span class="sign">(</span><span class="sign">(</span>smax <span class="sign">.</span>GT<span class="sign">.</span> 0<span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">792 </span>                <span class="keyword">do</span> 420 s<span class="sign">=</span>smin<span class="sign">,</span>smax
+<span class="line_number">793 </span>                    thisA<span class="sign">=</span>0<span class="sign">.</span>d0
+<span class="line_number">794 </span>                    <span class="keyword">call</span> <a href="./bivrec_ffortran2FA.html#robo20">A</a><span class="sign">(</span>thisA<span class="sign">,</span>time<span class="sign">,</span>asd<span class="sign">,</span>r<span class="sign">,</span>s<span class="sign">,</span>nr<span class="sign">,</span>nsd<span class="sign">)</span>
+<span class="line_number">795 </span>                    eta<span class="sign">=</span><span class="keyword">exp</span><span class="sign">(</span>bZ<span class="sign">)</span><span class="sign">*</span>alpharsd<span class="sign">(</span>r<span class="sign">,</span>s<span class="sign">)</span><span class="sign">*</span>thisA
+<span class="line_number">796 </span>
+<span class="line_number">797 </span>                    <span class="keyword">call</span> dger<span class="sign">(</span>ncovs2<span class="sign">,</span>ncovs2<span class="sign">,</span>eta<span class="sign">,</span>Z2<span class="sign">,</span>1<span class="sign">,</span>Z2<span class="sign">,</span>1<span class="sign">,</span>S13<span class="sign">,</span>ncovs2<span class="sign">)</span>
+<span class="line_number">798 </span>                    
+<span class="line_number">799 </span>                    w<span class="sign">=</span> <span class="sign">-</span>theta<span class="sign">*</span>Sm<span class="sign">(</span>j<span class="sign">)</span><span class="sign">/</span>phi<span class="sign">(</span>j<span class="sign">)</span>
+<span class="line_number">800 </span>                    <span class="keyword">call</span> daxpy<span class="sign">(</span>ncovs2<span class="sign">,</span>w<span class="sign">*</span>eta<span class="sign">,</span>Zd<span class="sign">(</span>ind<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>d2<span class="sign">,</span>S22<span class="sign">(</span>1<span class="sign">)</span><span class="sign">,</span>1<span class="sign">)</span>
+<span class="line_number">801 </span>                    
+<span class="line_number">802 </span>                    w<span class="sign">=</span>1<span class="sign">.</span>0d0<span class="sign">/</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>zij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">*</span>Se<span class="sign">(</span>j<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">803 </span>                    <span class="keyword">call</span> daxpy<span class="sign">(</span>ncovs2<span class="sign">,</span>w<span class="sign">*</span>eta<span class="sign">,</span>Zd<span class="sign">(</span>ind<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>d2<span class="sign">,</span>S32<span class="sign">(</span>1<span class="sign">)</span><span class="sign">,</span>1<span class="sign">)</span>
+<span class="line_number">804 </span> 420            <span class="keyword">continue</span>
+<span class="line_number">805 </span>            <span class="keyword">endif</span>
+<span class="line_number">806 </span> 401    <span class="keyword">continue</span>
+<span class="line_number">807 </span>  
+<span class="line_number">808 </span>          
+<span class="line_number">809 </span>
+<span class="line_number">810 </span><span class="comment">! Finish computation of the components via appropriate rank 1 transforms</span>
+<span class="line_number">811 </span>        <span class="keyword">do</span> 500 j<span class="sign">=</span>1<span class="sign">,</span>Ji<span class="sign">(</span>i<span class="sign">)</span>
+<span class="line_number">812 </span>         w<span class="sign">=</span><span class="sign">-</span>wij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">/</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>wij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">*</span>Sm<span class="sign">(</span>j<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">813 </span>       <span class="keyword">call</span> dger<span class="sign">(</span>ncovs1<span class="sign">,</span>ncovs1<span class="sign">,</span>w<span class="sign">,</span>Smx<span class="sign">(</span>j<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>maxj<span class="sign">,</span>Smx<span class="sign">(</span>j<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>maxj<span class="sign">,</span>S11<span class="sign">,</span>ncovs1<span class="sign">)</span>
+<span class="line_number">814 </span>         w<span class="sign">=</span><span class="sign">-</span>theta<span class="sign">/</span>phi<span class="sign">(</span>j<span class="sign">)</span>
+<span class="line_number">815 </span>       <span class="keyword">call</span> dger<span class="sign">(</span>ncovs1<span class="sign">,</span>ncovs2<span class="sign">,</span>w<span class="sign">,</span>Smx<span class="sign">(</span>j<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>maxj<span class="sign">,</span>Sex<span class="sign">(</span>j<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>maxj<span class="sign">,</span>S12<span class="sign">,</span>ncovs1<span class="sign">)</span>
+<span class="line_number">816 </span>         w<span class="sign">=</span><span class="sign">-</span>zij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">/</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>zij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">*</span>Se<span class="sign">(</span>j<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">817 </span>       <span class="keyword">call</span> dger<span class="sign">(</span>ncovs2<span class="sign">,</span>ncovs2<span class="sign">,</span>w<span class="sign">,</span>Sex<span class="sign">(</span>j<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>maxj<span class="sign">,</span>Sex<span class="sign">(</span>j<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>maxj<span class="sign">,</span>S13<span class="sign">,</span>ncovs2<span class="sign">)</span>
+<span class="line_number">818 </span> 500    <span class="keyword">continue</span> 
+<span class="line_number">819 </span>        <span class="keyword">call</span> dcopy<span class="sign">(</span>ncovs1<span class="sign">,</span>S21<span class="sign">,</span>1<span class="sign">,</span>S2<span class="sign">,</span>1<span class="sign">)</span>
+<span class="line_number">820 </span>        <span class="keyword">call</span> dcopy<span class="sign">(</span>ncovs2<span class="sign">,</span>S22<span class="sign">,</span>1<span class="sign">,</span>S2<span class="sign">(</span>ncovs1<span class="sign">+</span>1<span class="sign">)</span><span class="sign">,</span>1<span class="sign">)</span>
+<span class="line_number">821 </span>        <span class="keyword">call</span> dcopy<span class="sign">(</span>ncovs1<span class="sign">,</span>S31<span class="sign">,</span>1<span class="sign">,</span>S3<span class="sign">,</span>1<span class="sign">)</span>
+<span class="line_number">822 </span>        <span class="keyword">call</span> dcopy<span class="sign">(</span>ncovs2<span class="sign">,</span>S32<span class="sign">,</span>1<span class="sign">,</span>S3<span class="sign">(</span>ncovs1<span class="sign">+</span>1<span class="sign">)</span><span class="sign">,</span>1<span class="sign">)</span>
+<span class="line_number">823 </span> 
+<span class="line_number">824 </span> 
+<span class="line_number">825 </span>      
+<span class="line_number">826 </span><span class="comment">! Concatenate the matrices S11,S12,S13 correctly into Si</span>
+<span class="line_number">827 </span><span class="comment">! At the same time, apply the minus sign</span>
+<span class="line_number">828 </span>        <span class="keyword">do</span> 610 jj<span class="sign">=</span>1<span class="sign">,</span>ncovs1
+<span class="line_number">829 </span>            <span class="keyword">do</span> 620 ii<span class="sign">=</span>1<span class="sign">,</span>ncovs1
+<span class="line_number">830 </span>                Sii<span class="sign">(</span>ii<span class="sign">,</span>jj<span class="sign">)</span><span class="sign">=</span><span class="sign">-</span>S11<span class="sign">(</span>ii<span class="sign">,</span>jj<span class="sign">)</span>
+<span class="line_number">831 </span> 620        <span class="keyword">continue</span>
+<span class="line_number">832 </span> 610    <span class="keyword">continue</span>        
+<span class="line_number">833 </span>        <span class="keyword">do</span> 630 jj<span class="sign">=</span>1<span class="sign">,</span>ncovs2
+<span class="line_number">834 </span>            <span class="keyword">do</span> 640 ii<span class="sign">=</span>1<span class="sign">,</span>ncovs1
+<span class="line_number">835 </span>                Sii<span class="sign">(</span>ii<span class="sign">,</span>jj<span class="sign">+</span>ncovs1<span class="sign">)</span><span class="sign">=</span><span class="sign">-</span>S12<span class="sign">(</span>ii<span class="sign">,</span>jj<span class="sign">)</span>
+<span class="line_number">836 </span>                Sii<span class="sign">(</span>jj<span class="sign">+</span>ncovs1<span class="sign">,</span>ii<span class="sign">)</span><span class="sign">=</span><span class="sign">-</span>S12<span class="sign">(</span>ii<span class="sign">,</span>jj<span class="sign">)</span>
+<span class="line_number">837 </span> 640        <span class="keyword">continue</span>
+<span class="line_number">838 </span> 630    <span class="keyword">continue</span>
+<span class="line_number">839 </span>        <span class="keyword">do</span> 650 jj<span class="sign">=</span>1<span class="sign">,</span>ncovs2
+<span class="line_number">840 </span>            <span class="keyword">do</span> 660 ii<span class="sign">=</span>1<span class="sign">,</span>ncovs2
+<span class="line_number">841 </span>                Sii<span class="sign">(</span>ii<span class="sign">+</span>ncovs1<span class="sign">,</span>jj<span class="sign">+</span>ncovs1<span class="sign">)</span><span class="sign">=</span><span class="sign">-</span>S13<span class="sign">(</span>ii<span class="sign">,</span>jj<span class="sign">)</span>
+<span class="line_number">842 </span> 660        <span class="keyword">continue</span>
+<span class="line_number">843 </span> 650    <span class="keyword">continue</span>
+<span class="line_number">844 </span> 
+<span class="line_number">845 </span>
+<span class="line_number">846 </span><span class="comment">! Compute the ith sensitivity matrix with several rank 1 operations</span>
+<span class="line_number">847 </span>        wj<span class="sign">=</span>wi<span class="sign">(</span>i<span class="sign">)</span><span class="sign">*</span>sig2<span class="sign">*</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>sig2d<span class="sign">*</span>si<span class="sign">(</span>i<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">848 </span>        <span class="keyword">call</span> dsyr<span class="sign">(</span><span class="squote">'u'</span><span class="sign">,</span>ncovs1<span class="sign">+</span>ncovs2<span class="sign">,</span>wj<span class="sign">,</span>S2<span class="sign">,</span>1<span class="sign">,</span>Sii<span class="sign">,</span>ncovs1<span class="sign">+</span>ncovs2<span class="sign">)</span>
+<span class="line_number">849 </span>        wj<span class="sign">=</span><span class="sign">-</span>wi<span class="sign">(</span>i<span class="sign">)</span><span class="sign">*</span>sig2<span class="sign">*</span>sig2d<span class="sign">*</span>qi<span class="sign">(</span>i<span class="sign">)</span>
+<span class="line_number">850 </span>        <span class="keyword">call</span> dsyr2<span class="sign">(</span><span class="squote">'u'</span><span class="sign">,</span>ncovs1<span class="sign">+</span>ncovs2<span class="sign">,</span>wj<span class="sign">,</span>S2<span class="sign">,</span>1<span class="sign">,</span>S3<span class="sign">,</span>1<span class="sign">,</span>Sii<span class="sign">,</span>ncovs1<span class="sign">+</span>ncovs2<span class="sign">)</span>
+<span class="line_number">851 </span>        wj<span class="sign">=</span>wi<span class="sign">(</span>i<span class="sign">)</span><span class="sign">*</span>sig2d<span class="sign">*</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>sig2<span class="sign">*</span>pi<span class="sign">(</span>i<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">852 </span>        <span class="keyword">call</span> dsyr<span class="sign">(</span><span class="squote">'u'</span><span class="sign">,</span>ncovs1<span class="sign">+</span>ncovs2<span class="sign">,</span>wj<span class="sign">,</span>S3<span class="sign">,</span>1<span class="sign">,</span>Sii<span class="sign">,</span>ncovs1<span class="sign">+</span>ncovs2<span class="sign">)</span>
+<span class="line_number">853 </span>        
+<span class="line_number">854 </span>
+<span class="line_number">855 </span><span class="comment">! Add this matrix to the total</span>
+<span class="line_number">856 </span>        <span class="keyword">call</span> daxpy<span class="sign">(</span><span class="sign">(</span>ncovs1<span class="sign">+</span>ncovs2<span class="sign">)</span><span class="sign">*</span><span class="sign">(</span>ncovs1<span class="sign">+</span>ncovs2<span class="sign">)</span><span class="sign">,</span>1<span class="sign">.</span>d0<span class="sign">,</span>Sii<span class="sign">,</span>1<span class="sign">,</span>Smat<span class="sign">,</span>1<span class="sign">)</span>
+<span class="line_number">857 </span> 
+<span class="line_number">858 </span> 200  <span class="keyword">continue</span>    
+<span class="line_number">859 </span>
+<span class="line_number">860 </span><span class="comment">! Make the matrix symmetrical again (copy U to <a href="../R/bivrecsim_rsimulation2FL.html#robo66">L</a>)</span>
+<span class="line_number">861 </span>      <span class="keyword">do</span> 700 j<span class="sign">=</span>1<span class="sign">,</span>ncovs1<span class="sign">+</span>ncovs2<span class="sign">-</span>1
+<span class="line_number">862 </span>         <span class="keyword">do</span> 710 i<span class="sign">=</span>j<span class="sign">+</span>1<span class="sign">,</span>ncovs1<span class="sign">+</span>ncovs2
+<span class="line_number">863 </span>            Smat<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">=</span>Smat<span class="sign">(</span>j<span class="sign">,</span>i<span class="sign">)</span>
+<span class="line_number">864 </span> 710     <span class="keyword">continue</span>
+<span class="line_number">865 </span> 700  <span class="keyword">continue</span>      
+<span class="line_number">866 </span>      
+<span class="line_number">867 </span>      <span class="keyword">end</span>
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./blupsurv/src/bivrec.f with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.36 on Sun Jun 29 2008 13:34:50
+</p>
+</div> <!-- footer -->
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=3825293; 
+var sc_invisible=1; 
+var sc_partition=34; 
+var sc_click_stat=1; 
+var sc_security="2dd2334a"; 
+</script>
+
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div
+class="statcounter"><a href="http://www.statcounter.com/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/3825293/0/2dd2334a/1/" alt="free html hit
+counter" ></a></div></noscript>
+<!-- End of StatCounter Code -->
+</body>
+
+</html>

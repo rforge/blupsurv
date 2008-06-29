@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./blupsurv/src/bivrec.f</title>
+<!-- Source: ./blupsurv/src/bivrec.f -->
+<!-- Generated with ROBODoc Version 4.99.36 (Jun 17 2008) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">blupsurv</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="./bivrec_f2Ffortran.html#robo2">fortran</a><a class="menuitem" href="../robo_methods.html#robo_top_of_doc">Methods</a></div> <!-- navigation -->
+<div id="content">
+<h3>TABLE OF CONTENTS</h3>
+<ul>
+<li>1. <a href="#robo28">fortran/fprofgr</a></li>
+</ul>
+<hr />
+<a name="fortran2ffprofgr"></a>
+<a name="robo28"></a><h2>fortran/fprofgr [ Methods ]</h2>
+
+<p class="item_name">NAME</p>
+<pre>  <strong>fprofgr</strong> --- compute profile likelihood gradient
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>    Compute profile likelihood of regression parameters for a single process.
+    See also the R function <a href="../R/bivrec_rZZdebug2Fmkproflik.html#robo79">mkproflik</a>.
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">219 </span>      <span class="keyword">subroutine</span> <strong>fprofgr</strong><span class="sign">(</span>betahat<span class="sign">,</span>index<span class="sign">,</span>delta<span class="sign">,</span>times<span class="sign">,</span>Z<span class="sign">,</span>as<span class="sign">,</span>Uijmat<span class="sign">,</span>d<span class="sign">,</span>
+<span class="line_number">220 </span>     <span class="sign">$</span> ncovs<span class="sign">,</span>nr<span class="sign">,</span>ns<span class="sign">,</span>m<span class="sign">,</span>maxj<span class="sign">,</span>gr<span class="sign">)</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>    betahat    regression parameters (length p)
+    index      d x 6 matrix of indices i,j,k,r,smin,smax 
+    delta      length d vector of event indicators (double)
+    times      length d vector of actual time span for each row (double)
+    Z          d x ncovs matrix of covariates (as a double row vector)
+    as         nr x ns matrix of discretization breakpoints (double) 
+    Uijmat     m x maxj matrix of frailty estimates (double row vector)
+    d          number of rows of Z
+    ncovs      number of covariates
+    nr         number of strata
+    ns         number of breakpoints
+    m          number of clusters
+    maxj       largest cluster size
+</pre>
+<p class="item_name">OUTPUTS</p>
+<pre>    gr         ncovs vector for output
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">222 </span>      <span class="keyword">integer</span> d<span class="sign">,</span>ncovs<span class="sign">,</span>nr<span class="sign">,</span>ns<span class="sign">,</span>nk<span class="sign">,</span>m<span class="sign">,</span>maxj
+<span class="line_number">223 </span>      <span class="keyword">integer</span> index<span class="sign">(</span>d<span class="sign">,</span>6<span class="sign">)</span>
+<span class="line_number">224 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> betahat<span class="sign">(</span>ncovs<span class="sign">)</span>
+<span class="line_number">225 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> delta<span class="sign">(</span>d<span class="sign">)</span><span class="sign">,</span>times<span class="sign">(</span>d<span class="sign">)</span>
+<span class="line_number">226 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> Z<span class="sign">(</span>d<span class="sign">,</span>ncovs<span class="sign">)</span>
+<span class="line_number">227 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> Uijmat<span class="sign">(</span>m<span class="sign">,</span>maxj<span class="sign">)</span>
+<span class="line_number">228 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> lp<span class="sign">,</span>deltat<span class="sign">,</span>gr<span class="sign">(</span>ncovs<span class="sign">)</span>
+<span class="line_number">229 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> mrs<span class="sign">(</span>nr<span class="sign">,</span>ns<span class="sign">)</span>
+<span class="line_number">230 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> mrsgr<span class="sign">(</span>nr<span class="sign">,</span>ns<span class="sign">,</span>ncovs<span class="sign">)</span>
+<span class="line_number">231 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> as<span class="sign">(</span>nr<span class="sign">,</span>ns<span class="sign">)</span>
+<span class="line_number">232 </span>      <span class="keyword">integer</span> ind<span class="sign">,</span>i<span class="sign">,</span>j<span class="sign">,</span>k<span class="sign">,</span>r<span class="sign">,</span>s<span class="sign">,</span>smax<span class="sign">,</span>smin
+<span class="line_number">233 </span>
+<span class="line_number">234 </span>      <span class="keyword">parameter</span><span class="sign">(</span>icol<span class="sign">=</span>1<span class="sign">,</span> jcol<span class="sign">=</span>2<span class="sign">,</span> kcol<span class="sign">=</span>3<span class="sign">,</span> ircol<span class="sign">=</span>4<span class="sign">,</span> ismincol<span class="sign">=</span>5<span class="sign">,</span> ismaxcol<span class="sign">=</span>6<span class="sign">)</span>
+<span class="line_number">235 </span>      
+<span class="line_number">236 </span>      <span class="keyword">call</span> <a href="./bivrec_ffortran2Ffmkmrs.html#robo24">fmkmrs</a><span class="sign">(</span>betahat<span class="sign">,</span>index<span class="sign">,</span>times<span class="sign">,</span>Z<span class="sign">,</span>as<span class="sign">,</span>Uijmat<span class="sign">,</span>d<span class="sign">,</span>ncovs<span class="sign">,</span>nr<span class="sign">,</span>ns<span class="sign">,</span>
+<span class="line_number">237 </span>     <span class="sign">$</span>  m<span class="sign">,</span>maxj<span class="sign">,</span>mrs<span class="sign">,</span>mrsgr<span class="sign">,</span>1<span class="sign">)</span>
+<span class="line_number">238 </span>      
+<span class="line_number">239 </span>      lik<span class="sign">=</span>0<span class="sign">.</span>d0
+<span class="line_number">240 </span>      <span class="keyword">do</span> 100 ind<span class="sign">=</span>1<span class="sign">,</span>d
+<span class="line_number">241 </span>        i<span class="sign">=</span>index<span class="sign">(</span>ind<span class="sign">,</span>icol<span class="sign">)</span>
+<span class="line_number">242 </span>        j<span class="sign">=</span>index<span class="sign">(</span>ind<span class="sign">,</span>jcol<span class="sign">)</span>
+<span class="line_number">243 </span>        k<span class="sign">=</span>index<span class="sign">(</span>ind<span class="sign">,</span>kcol<span class="sign">)</span>
+<span class="line_number">244 </span>        r<span class="sign">=</span>index<span class="sign">(</span>ind<span class="sign">,</span>ircol<span class="sign">)</span>
+<span class="line_number">245 </span>        smin<span class="sign">=</span>index<span class="sign">(</span>ind<span class="sign">,</span>ismincol<span class="sign">)</span>
+<span class="line_number">246 </span>        smax<span class="sign">=</span>index<span class="sign">(</span>ind<span class="sign">,</span>ismaxcol<span class="sign">)</span>
+<span class="line_number">247 </span>        deltat<span class="sign">=</span>delta<span class="sign">(</span>ind<span class="sign">)</span>
+<span class="line_number">248 </span>        <span class="keyword">if</span><span class="sign">(</span>deltat<span class="sign">.</span>EQ<span class="sign">.</span>1<span class="sign">.</span>d0<span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">249 </span>            <span class="keyword">call</span> daxpy<span class="sign">(</span>ncovs<span class="sign">,</span>1<span class="sign">.</span>d0<span class="sign">,</span>Z<span class="sign">(</span>ind<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>d<span class="sign">,</span>gr<span class="sign">,</span>1<span class="sign">)</span>
+<span class="line_number">250 </span>            <span class="keyword">call</span> daxpy<span class="sign">(</span>ncovs<span class="sign">,</span><span class="sign">-</span>1<span class="sign">.</span>d0<span class="sign">/</span>mrs<span class="sign">(</span>r<span class="sign">,</span>smax<span class="sign">)</span><span class="sign">,</span>mrsgr<span class="sign">(</span>r<span class="sign">,</span>smax<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>
+<span class="line_number">251 </span>     <span class="sign">$</span>                 nr<span class="sign">*</span>ns<span class="sign">,</span>gr<span class="sign">,</span>1<span class="sign">)</span>
+<span class="line_number">252 </span>        <span class="keyword">endif</span>
+<span class="line_number">253 </span> 100  <span class="keyword">continue</span>
+<span class="line_number">254 </span>      <span class="keyword">end</span>
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./blupsurv/src/bivrec.f with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.36 on Sun Jun 29 2008 13:34:50
+</p>
+</div> <!-- footer -->
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=3825293; 
+var sc_invisible=1; 
+var sc_partition=34; 
+var sc_click_stat=1; 
+var sc_security="2dd2334a"; 
+</script>
+
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div
+class="statcounter"><a href="http://www.statcounter.com/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/3825293/0/2dd2334a/1/" alt="free html hit
+counter" ></a></div></noscript>
+<!-- End of StatCounter Code -->
+</body>
+
+</html>

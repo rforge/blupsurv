@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./blupsurv/R/bivrec.r</title>
+<!-- Source: ./blupsurv/R/bivrec.r -->
+<!-- Generated with ROBODoc Version 4.99.36 (Jun 17 2008) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">blupsurv</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="../robo_modules.html#robo_top_of_doc">Modules</a></div> <!-- navigation -->
+<div id="content">
+<h3>TABLE OF CONTENTS</h3>
+<ul>
+<li>1. <a href="#robo1">/bivrecFit</a></li>
+<ul>
+<li>1.1. <a href="./bivrec_rbivrecFit2Festimation.html#robo6">bivrecFit/estimation</a></li>
+<ul>
+<li>1.1.1. <a href="./bivrec_restimation2Ffmakealphars2.html#robo12">estimation/fmakealphars2</a></li>
+<li>1.1.2. <a href="./bivrec_restimation2Ffupdatefrailties4.html#robo13">estimation/fupdatefrailties4</a></li>
+<li>1.1.3. <a href="./bivrec_restimation2Fgetdispmarg3.html#robo14">estimation/getdispmarg3</a></li>
+<li>1.1.4. <a href="./bivrec_restimation2Fsmoothalpha.html#robo15">estimation/smoothalpha</a></li>
+<li>1.1.5. <a href="./bivrec_restimation2Fupdatedispmarg2.html#robo16">estimation/updatedispmarg2</a></li>
+<li>1.1.6. <a href="./bivrec_restimation2Fupdatedispohls.html#robo17">estimation/updatedispohls</a></li>
+<li>1.1.7. <a href="./bivrec_restimation2Fupdatedisppears.html#robo18">estimation/updatedisppears</a></li>
+<li>1.1.8. <a href="./bivrec_restimation2Fupdateregprof.html#robo19">estimation/updateregprof</a></li>
+</ul>
+<li>1.2. <a href="./bivrec_rbivrecFit2Ffortranwrappers.html#robo7">bivrecFit/fortranwrappers</a></li>
+<ul>
+<li>1.2.1. <a href="./bivrec_rfortranwrappers2FfmakeSens2.html#robo32">fortranwrappers/fmakeSens2</a></li>
+<li>1.2.2. <a href="./bivrec_rfortranwrappers2Ffmkprofgr2.html#robo33">fortranwrappers/fmkprofgr2</a></li>
+<li>1.2.3. <a href="./bivrec_rfortranwrappers2Ffmkproflik2.html#robo34">fortranwrappers/fmkproflik2</a></li>
+<li>1.2.4. <a href="./bivrec_rfortranwrappers2Ffmkstderr.html#robo35">fortranwrappers/fmkstderr</a></li>
+</ul>
+<li>1.3. <a href="./bivrec_rbivrecFit2Finitialization.html#robo8">bivrecFit/initialization</a></li>
+<ul>
+<li>1.3.1. <a href="./bivrec_rinitialization2Fmakeas.html#robo36">initialization/makeas</a></li>
+<li>1.3.2. <a href="./bivrec_rinitialization2Fmakedatamat.html#robo37">initialization/makedatamat</a></li>
+</ul>
+<li>1.4. <a href="./bivrec_rbivrecFit2Futility.html#robo9">bivrecFit/utility</a></li>
+<ul>
+<li>1.4.1. <a href="./bivrec_rutility2FA.html#robo67">utility/A</a></li>
+<li>1.4.2. <a href="./bivrec_rutility2Fab2g.html#robo68">utility/ab2g</a></li>
+<li>1.4.3. <a href="./bivrec_rutility2Fg2ab.html#robo69">utility/g2ab</a></li>
+<li>1.4.4. <a href="./bivrec_rutility2FmakeUijframe.html#robo70">utility/makeUijframe</a></li>
+</ul>
+<li>1.5. <a href="./bivrec_rbivrecFit2FZZdebug.html#robo10">bivrecFit/ZZdebug</a></li>
+<ul>
+<li>1.5.1. <a href="./bivrec_rZZdebug2Ffmakemrs.html#robo71">ZZdebug/fmakemrs</a></li>
+<li>1.5.2. <a href="./bivrec_rZZdebug2Ffmkprofgr.html#robo72">ZZdebug/fmkprofgr</a></li>
+<li>1.5.3. <a href="./bivrec_rZZdebug2Ffmkproflik.html#robo73">ZZdebug/fmkproflik</a></li>
+<li>1.5.4. <a href="./bivrec_rZZdebug2Ffupdatefrailties3.html#robo74">ZZdebug/fupdatefrailties3</a></li>
+<li>1.5.5. <a href="./bivrec_rZZdebug2Fmakealphars2.html#robo75">ZZdebug/makealphars2</a></li>
+<li>1.5.6. <a href="./bivrec_rZZdebug2Fmakemrs.html#robo76">ZZdebug/makemrs</a></li>
+<li>1.5.7. <a href="./bivrec_rZZdebug2FmakeSens2.html#robo77">ZZdebug/makeSens2</a></li>
+<li>1.5.8. <a href="./bivrec_rZZdebug2Fmkprofgr.html#robo78">ZZdebug/mkprofgr</a></li>
+<li>1.5.9. <a href="./bivrec_rZZdebug2Fmkproflik.html#robo79">ZZdebug/mkproflik</a></li>
+<li>1.5.10. <a href="./bivrec_rZZdebug2FSmud2.html#robo80">ZZdebug/Smud2</a></li>
+<li>1.5.11. <a href="./bivrec_rZZdebug2FSmuij.html#robo81">ZZdebug/Smuij</a></li>
+</ul>
+</ul>
+</ul>
+<hr />
+<a name="2fbivrecFit"></a>
+<a name="robo1"></a><h2>/bivrecFit [ Modules ]</h2>
+
+<p class="item_name">NAME</p>
+<pre>    <strong>bivrecFit</strong> --- Fitter for bivariate recurrent events
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>   The <strong>bivrecFit</strong> module contains the workhorse functions to fit bivariate
+   event process models. Since univariate models are just a special
+   case, they can be fit by these functions as well.
+</p>
+   
+<p>   The main fitting routine is 
+</p>
+<pre>       <a href="./bivrec_r00main2Fbivrec2Eagdata.html#robo11">bivrec.agdata</a>
+</pre>
+<p>   and an overview of the algorithm implementation is given in the
+   documentation for that function.
+</p>
+ 
+<p>   This module is organized into several submodules. The
+   <a href="./bivrec_rbivrecFit2Finitialization.html#robo8">initialization</a> module contains the routines needed to
+   obtain initial values for the procedure. The <a href="./bivrec_rbivrecFit2Festimation.html#robo6">estimation</a>
+   module contains estimator functions for the frailty
+   BLUPs, dispersion parameters, and regression coefficients,
+   which are called in a loop. The <a href="./bivrec_rbivrecFit2Futility.html#robo9">utility</a>, <a href="./bivrec_rbivrecFit2Ffortranwrappers.html#robo7">fortranwrappers</a>
+   and <a href="./bivrec_rbivrecFit2FZZdebug.html#robo10">ZZdebug</a> modules are self-explanatory.
+</p>
+<p class="item_name">CONTENTS</p>
+<pre>    <a href="./bivrec_rbivrecFit2Festimation.html#robo6">estimation</a> --- Estimation functions
+    <a href="./bivrec_rbivrecFit2Ffortranwrappers.html#robo7">fortranwrappers</a> --- Wrapper functions
+    <a href="./bivrec_rbivrecFit2Finitialization.html#robo8">initialization</a> --- Initialization functions
+    <a href="./bivrec_rbivrecFit2Futility.html#robo9">utility</a> --- Utility functions
+    <a href="./bivrec_rbivrecFit2FZZdebug.html#robo10">ZZdebug</a> --- Debugging functions
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./blupsurv/R/bivrec.r with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.36 on Sun Jun 29 2008 13:34:50
+</p>
+</div> <!-- footer -->
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=3825293; 
+var sc_invisible=1; 
+var sc_partition=34; 
+var sc_click_stat=1; 
+var sc_security="2dd2334a"; 
+</script>
+
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div
+class="statcounter"><a href="http://www.statcounter.com/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/3825293/0/2dd2334a/1/" alt="free html hit
+counter" ></a></div></noscript>
+<!-- End of StatCounter Code -->
+</body>
+
+</html>

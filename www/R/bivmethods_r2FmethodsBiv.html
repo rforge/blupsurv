@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./blupsurv/R/bivmethods.r</title>
+<!-- Source: ./blupsurv/R/bivmethods.r -->
+<!-- Generated with ROBODoc Version 4.99.36 (Jun 17 2008) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">blupsurv</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="../robo_modules.html#robo_top_of_doc">Modules</a></div> <!-- navigation -->
+<div id="content">
+<h3>TABLE OF CONTENTS</h3>
+<ul>
+<li>1. <a href="#robo3">/methodsBiv</a></li>
+<ul>
+<li>1.1. <a href="./bivmethods_rmethodsBiv2Fbivrec.html#robo38">methodsBiv/bivrec</a></li>
+<li>1.2. <a href="./bivmethods_rmethodsBiv2Fbivrec2Edata2Eframe.html#robo39">methodsBiv/bivrec.data.frame</a></li>
+<li>1.3. <a href="./bivmethods_rmethodsBiv2Fbivrec2Eformula.html#robo40">methodsBiv/bivrec.formula</a></li>
+<li>1.4. <a href="./bivmethods_rmethodsBiv2Fcheckinput2Ebivrec.html#robo41">methodsBiv/checkinput.bivrec</a></li>
+<li>1.5. <a href="./bivmethods_rmethodsBiv2Fcleanbivrecoutput.html#robo42">methodsBiv/cleanbivrecoutput</a></li>
+<li>1.6. <a href="./bivmethods_rmethodsBiv2Fid.html#robo43">methodsBiv/id</a></li>
+<li>1.7. <a href="./bivmethods_rmethodsBiv2Fis2ESurv2.html#robo44">methodsBiv/is.Surv2</a></li>
+<li>1.8. <a href="./bivmethods_rmethodsBiv2Fplot2Ebivrec.html#robo45">methodsBiv/plot.bivrec</a></li>
+<li>1.9. <a href="./bivmethods_rmethodsBiv2Fplotsurvivor.html#robo46">methodsBiv/plotsurvivor</a></li>
+<li>1.10. <a href="./bivmethods_rmethodsBiv2Fprint2Ebivrec.html#robo47">methodsBiv/print.bivrec</a></li>
+<li>1.11. <a href="./bivmethods_rmethodsBiv2Fprint2Esummary2Ebivrec.html#robo48">methodsBiv/print.summary.bivrec</a></li>
+<li>1.12. <a href="./bivmethods_rmethodsBiv2Fsummary2Ebivrec.html#robo49">methodsBiv/summary.bivrec</a></li>
+<li>1.13. <a href="./bivmethods_rmethodsBiv2FSurv2.html#robo50">methodsBiv/Surv2</a></li>
+</ul>
+</ul>
+<hr />
+<a name="2fmethodsBiv"></a>
+<a name="robo3"></a><h2>/methodsBiv [ Modules ]</h2>
+
+<p class="item_name">NAME</p>
+<pre>    <strong>methodsBiv</strong> --- methods for bivariate recurrent event processes
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>    S3 methods for bivariate recurrent events. These are the main
+    user-facing functions. Their usage is descrbed in the
+    package documentation.
+</p>
+
+<p>    Users will generally call <a href="./bivmethods_rmethodsBiv2Fbivrec.html#robo38">bivrec</a>, which if given a formula,
+    dispatches to <a href="./bivmethods_rmethodsBiv2Fbivrec2Eformula.html#robo40">bivrec.formula</a>. This function mainly cleans the
+    input and constructs a data frame in the Anderson-Gill format
+    required by <a href="./bivrec_r00main2Fbivrec2Eagdata.html#robo11">bivrec.agdata</a>, the main fitting routine.
+</p>
+<p class="item_name">CONTENTS</p>
+<pre>    <a href="./bivmethods_rmethodsBiv2Fbivrec.html#robo38">bivrec</a> --- S3 generic
+    <a href="./bivmethods_rmethodsBiv2Fbivrec2Edata2Eframe.html#robo39">bivrec.data.frame</a> --- method for data frames 
+    <a href="./bivmethods_rmethodsBiv2Fbivrec2Eformula.html#robo40">bivrec.formula</a> --- method for formulas
+    <a href="./bivmethods_rmethodsBiv2Fcheckinput2Ebivrec.html#robo41">checkinput.bivrec</a> --- rudimentary input checking
+    <a href="./bivmethods_rmethodsBiv2Fcleanbivrecoutput.html#robo42">cleanbivrecoutput</a> --- clean output of <a href="./bivrec_r00main2Fbivrec2Eagdata.html#robo11">bivrec.agdata</a>
+    <a href="./bivmethods_rmethodsBiv2Fid.html#robo43">id</a>  --- needed for proper handling of the <a href="./bivmethods_rmethodsBiv2Fid.html#robo43">id</a> special
+    <a href="./bivmethods_rmethodsBiv2Fis2ESurv2.html#robo44">is.Surv2</a> --- check whether an object is <a href="./bivmethods_rmethodsBiv2FSurv2.html#robo50">Surv2</a>
+    <a href="./bivmethods_rmethodsBiv2Fplot2Ebivrec.html#robo45">plot.bivrec</a> --- S3 plot method for <a href="./bivmethods_rmethodsBiv2Fbivrec.html#robo38">bivrec</a> objects
+    <a href="./bivmethods_rmethodsBiv2Fplotsurvivor.html#robo46">plotsurvivor</a> --- plot a survivor curve
+    <a href="./bivmethods_rmethodsBiv2Fprint2Ebivrec.html#robo47">print.bivrec</a>  --- S3 print method
+    <a href="./bivmethods_rmethodsBiv2Fprint2Esummary2Ebivrec.html#robo48">print.summary.bivrec</a> --- S3 method to print <a href="./bivmethods_rmethodsBiv2Fsummary2Ebivrec.html#robo49">summary.bivrec</a> objects
+    <a href="./bivmethods_rmethodsBiv2Fsummary2Ebivrec.html#robo49">summary.bivrec</a> --- S3 summary method
+    <a href="./bivmethods_rmethodsBiv2FSurv2.html#robo50">Surv2</a> --- bivariate survival response object
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./blupsurv/R/bivmethods.r with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.36 on Sun Jun 29 2008 13:34:50
+</p>
+</div> <!-- footer -->
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=3825293; 
+var sc_invisible=1; 
+var sc_partition=34; 
+var sc_click_stat=1; 
+var sc_security="2dd2334a"; 
+</script>
+
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div
+class="statcounter"><a href="http://www.statcounter.com/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/3825293/0/2dd2334a/1/" alt="free html hit
+counter" ></a></div></noscript>
+<!-- End of StatCounter Code -->
+</body>
+
+</html>

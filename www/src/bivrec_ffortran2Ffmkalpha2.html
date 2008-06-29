@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./blupsurv/src/bivrec.f</title>
+<!-- Source: ./blupsurv/src/bivrec.f -->
+<!-- Generated with ROBODoc Version 4.99.36 (Jun 17 2008) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">blupsurv</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="./bivrec_f2Ffortran.html#robo2">fortran</a><a class="menuitem" href="../robo_methods.html#robo_top_of_doc">Methods</a></div> <!-- navigation -->
+<div id="content">
+<h3>TABLE OF CONTENTS</h3>
+<ul>
+<li>1. <a href="#robo22">fortran/fmkalpha2</a></li>
+</ul>
+<hr />
+<a name="fortran2ffmkalpha2"></a>
+<a name="robo22"></a><h2>fortran/fmkalpha2 [ Methods ]</h2>
+
+<p class="item_name">NAME</p>
+<pre>  <strong>fmkalpha2</strong> --- compute baseline hazard
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>   Compute the MLEs for the baseline hazard parameters alphars, 
+   given estimates of regression parameters andf frailties, for
+   a single recurrent event process.
+   See also the R function <a href="../R/bivrec_rZZdebug2Fmakealphars2.html#robo75">makealphars2</a>.
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">421 </span>      <span class="keyword">subroutine</span> <strong>fmkalpha2</strong><span class="sign">(</span>betahat<span class="sign">,</span>index<span class="sign">,</span>delta<span class="sign">,</span>times<span class="sign">,</span>Z<span class="sign">,</span>alphars<span class="sign">,</span>as<span class="sign">,</span>
+<span class="line_number">422 </span>     <span class="sign">$</span> Uijmat<span class="sign">,</span>d<span class="sign">,</span>ncovs<span class="sign">,</span>nr<span class="sign">,</span>ns<span class="sign">,</span>m<span class="sign">,</span>maxj<span class="sign">)</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>    betahat    regression parameters (length p)
+    index      d x 6 matrix of indices i,j,k,r,smin,smax 
+    delta      length d vector of event indicators (double)
+    times      length d vector of event times
+    Z          d x ncovs matrix of covariates (double row vector)
+    alphars    nr x ns matrix of baseline hazards (double) 
+    as         nr x ns matrix of discretization breakpoints (double) 
+    Uijmat     m x maxj matrix of frailty estimates (double row vector)
+    d          number of rows of Z
+    ncovs      number of covariates
+    nr         number of strata
+    ns         number of breakpoints
+    m          number of clusters
+    maxj       largest cluster size
+</pre>
+<p class="item_name">OUTPUTS</p>
+<pre>    alphars updated with baseline hazard MLEs
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">424 </span>      <span class="keyword">integer</span> d<span class="sign">,</span>ncovs<span class="sign">,</span>nr<span class="sign">,</span>ns<span class="sign">,</span>m<span class="sign">,</span>maxj
+<span class="line_number">425 </span>      <span class="keyword">integer</span> index<span class="sign">(</span>d<span class="sign">,</span>6<span class="sign">)</span>
+<span class="line_number">426 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> betahat<span class="sign">(</span>ncovs<span class="sign">)</span>
+<span class="line_number">427 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> delta<span class="sign">(</span>d<span class="sign">)</span><span class="sign">,</span>times<span class="sign">(</span>d<span class="sign">)</span>
+<span class="line_number">428 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> Z<span class="sign">(</span>d<span class="sign">,</span>ncovs<span class="sign">)</span>
+<span class="line_number">429 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> alphars<span class="sign">(</span>nr<span class="sign">,</span>ns<span class="sign">)</span>
+<span class="line_number">430 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> as<span class="sign">(</span>nr<span class="sign">,</span>ns<span class="sign">)</span>
+<span class="line_number">431 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> Uijmat<span class="sign">(</span>m<span class="sign">,</span>maxj<span class="sign">)</span>
+<span class="line_number">432 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> pred<span class="sign">,</span>thisA<span class="sign">,</span>time
+<span class="line_number">433 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> Srs<span class="sign">(</span>nr<span class="sign">,</span>ns<span class="sign">)</span><span class="sign">,</span> drs<span class="sign">(</span>nr<span class="sign">,</span>ns<span class="sign">)</span>
+<span class="line_number">434 </span>      <span class="keyword">integer</span> ind<span class="sign">,</span>i<span class="sign">,</span>j<span class="sign">,</span>k<span class="sign">,</span>r<span class="sign">,</span>s<span class="sign">,</span>smax<span class="sign">,</span>smin
+<span class="line_number">435 </span>      
+<span class="line_number">436 </span>      <span class="keyword">parameter</span><span class="sign">(</span>icol<span class="sign">=</span>1<span class="sign">,</span> jcol<span class="sign">=</span>2<span class="sign">,</span> kcol<span class="sign">=</span>3<span class="sign">,</span> ircol<span class="sign">=</span>4<span class="sign">,</span> ismincol<span class="sign">=</span>5<span class="sign">,</span> ismaxcol<span class="sign">=</span>6<span class="sign">)</span>
+<span class="line_number">437 </span>      
+<span class="line_number">438 </span>      <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>Srs<span class="sign">,</span>nr<span class="sign">*</span>ns<span class="sign">)</span>
+<span class="line_number">439 </span>      <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>drs<span class="sign">,</span>nr<span class="sign">*</span>ns<span class="sign">)</span>
+<span class="line_number">440 </span>
+<span class="line_number">441 </span>      <span class="keyword">do</span> 100 ind<span class="sign">=</span>1<span class="sign">,</span>d
+<span class="line_number">442 </span>        i<span class="sign">=</span>index<span class="sign">(</span>ind<span class="sign">,</span>icol<span class="sign">)</span>
+<span class="line_number">443 </span>        j<span class="sign">=</span>index<span class="sign">(</span>ind<span class="sign">,</span>jcol<span class="sign">)</span>
+<span class="line_number">444 </span>        k<span class="sign">=</span>index<span class="sign">(</span>ind<span class="sign">,</span>kcol<span class="sign">)</span>
+<span class="line_number">445 </span>        r<span class="sign">=</span>index<span class="sign">(</span>ind<span class="sign">,</span>ircol<span class="sign">)</span>
+<span class="line_number">446 </span>        smin<span class="sign">=</span>index<span class="sign">(</span>ind<span class="sign">,</span>ismincol<span class="sign">)</span>
+<span class="line_number">447 </span>        smax<span class="sign">=</span>index<span class="sign">(</span>ind<span class="sign">,</span>ismaxcol<span class="sign">)</span>
+<span class="line_number">448 </span>        deltat<span class="sign">=</span>delta<span class="sign">(</span>ind<span class="sign">)</span>
+<span class="line_number">449 </span>        time<span class="sign">=</span>times<span class="sign">(</span>ind<span class="sign">)</span>
+<span class="line_number">450 </span>        pred<span class="sign">=</span><span class="keyword">exp</span><span class="sign">(</span>ddot<span class="sign">(</span>ncovs<span class="sign">,</span>Z<span class="sign">(</span>ind<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>d<span class="sign">,</span>betahat<span class="sign">,</span>1<span class="sign">)</span><span class="sign">)</span><span class="sign">*</span>Uijmat<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span>
+<span class="line_number">451 </span>        drs<span class="sign">(</span>r<span class="sign">,</span>smax<span class="sign">)</span><span class="sign">=</span>drs<span class="sign">(</span>r<span class="sign">,</span>smax<span class="sign">)</span><span class="sign">+</span>deltat
+<span class="line_number">452 </span>        <span class="keyword">do</span> 110 s<span class="sign">=</span>smin<span class="sign">,</span>smax
+<span class="line_number">453 </span>            thisA<span class="sign">=</span>0<span class="sign">.</span>d0
+<span class="line_number">454 </span>            <span class="keyword">call</span> <a href="./bivrec_ffortran2FA.html#robo20">A</a><span class="sign">(</span>thisA<span class="sign">,</span>time<span class="sign">,</span>as<span class="sign">,</span>r<span class="sign">,</span>s<span class="sign">,</span>nr<span class="sign">,</span>ns<span class="sign">)</span>
+<span class="line_number">455 </span>            Srs<span class="sign">(</span>r<span class="sign">,</span>s<span class="sign">)</span><span class="sign">=</span>Srs<span class="sign">(</span>r<span class="sign">,</span>s<span class="sign">)</span><span class="sign">+</span>pred<span class="sign">*</span>thisA
+<span class="line_number">456 </span> 110    <span class="keyword">continue</span>
+<span class="line_number">457 </span> 100  <span class="keyword">continue</span>
+<span class="line_number">458 </span>
+<span class="line_number">459 </span>      <span class="keyword">do</span> 200 r<span class="sign">=</span>1<span class="sign">,</span>nr
+<span class="line_number">460 </span>        <span class="keyword">do</span> 210 s<span class="sign">=</span>1<span class="sign">,</span>ns
+<span class="line_number">461 </span>            <span class="keyword">if</span><span class="sign">(</span>Srs<span class="sign">(</span>r<span class="sign">,</span>s<span class="sign">)</span><span class="sign">.</span>EQ<span class="sign">.</span>0<span class="sign">.</span>d0<span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">462 </span>                alphars<span class="sign">(</span>r<span class="sign">,</span>s<span class="sign">)</span><span class="sign">=</span>100<span class="sign">.</span>d0
+<span class="line_number">463 </span>            <span class="keyword">else</span>
+<span class="line_number">464 </span>                alphars<span class="sign">(</span>r<span class="sign">,</span>s<span class="sign">)</span><span class="sign">=</span>drs<span class="sign">(</span>r<span class="sign">,</span>s<span class="sign">)</span><span class="sign">/</span>Srs<span class="sign">(</span>r<span class="sign">,</span>s<span class="sign">)</span>
+<span class="line_number">465 </span>            <span class="keyword">endif</span>
+<span class="line_number">466 </span> 210    <span class="keyword">continue</span>
+<span class="line_number">467 </span> 200  <span class="keyword">continue</span>
+<span class="line_number">468 </span>      <span class="keyword">end</span>
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./blupsurv/src/bivrec.f with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.36 on Sun Jun 29 2008 13:34:50
+</p>
+</div> <!-- footer -->
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=3825293; 
+var sc_invisible=1; 
+var sc_partition=34; 
+var sc_click_stat=1; 
+var sc_security="2dd2334a"; 
+</script>
+
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div
+class="statcounter"><a href="http://www.statcounter.com/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/3825293/0/2dd2334a/1/" alt="free html hit
+counter" ></a></div></noscript>
+<!-- End of StatCounter Code -->
+</body>
+
+</html>

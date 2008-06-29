@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./blupsurv/R/bivrec.r</title>
+<!-- Source: ./blupsurv/R/bivrec.r -->
+<!-- Generated with ROBODoc Version 4.99.36 (Jun 17 2008) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">blupsurv</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="./bivrec_r2F00main.html#robo0">00main</a><a class="menuitem" href="../robo_functions.html#robo_top_of_doc">Functions</a></div> <!-- navigation -->
+<div id="content">
+<h3>TABLE OF CONTENTS</h3>
+<ul>
+<li>1. <a href="#robo11">00main/bivrec.agdata</a></li>
+</ul>
+<hr />
+<a name="00main2fbivrec2eagdata"></a>
+<a name="robo11"></a><h2>00main/bivrec.agdata [ Functions ]</h2>
+
+<p class="item_name">NAME</p>
+<pre>    <strong>bivrec.agdata</strong> --- fitter for bivariate models
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>   The main fitting function. Fits the model, given an Anderson-Gill data set
+   and other parameters, iterating between updating frailty, dispersion and
+   regression parameters until convergence.  After initializing, fitting
+   consists of iteratively calling <a href="./bivrec_restimation2Ffupdatefrailties4.html#robo13">fupdatefrailties4</a> to update frailty
+   estimates, <a href="./bivrec_restimation2Fupdatedisppears.html#robo18">updatedisppears</a> to update dispersion parameter estimtes, and
+   <a href="./bivrec_restimation2Fupdateregprof.html#robo19">updateregprof</a> to update regression parameter estimates. The function
+   <a href="./bivrec_rfortranwrappers2Ffmkstderr.html#robo35">fmkstderr</a> computes standard errors at the end.
+</p>
+  
+<p>   See also the call graph linked from <a href="./bivrec_r2F00main.html#robo0">00main</a>.
+</p>
+   
+<p>   This function should not be called directly, rather, the interface
+   provided by the <a href="./bivmethods_rmethodsBiv2Fbivrec2Eformula.html#robo40">bivrec.formula</a> and <a href="./unimethods_rmethodsUni2Funirec2Eformula.html#robo58">unirec.formula</a> methods should be used.
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">2449 </span><strong>bivrec.agdata</strong> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">function</span><span class="sign">(</span>x<span class="sign">,</span> K1 <span class="sign">=</span> 10<span class="sign">,</span> K2 <span class="sign">=</span> 10<span class="sign">,</span> excludevars1 <span class="sign">=</span> NULL<span class="sign">,</span> 
+<span class="line_number">2450 </span>        excludevars2 <span class="sign">=</span> NULL<span class="sign">,</span> verbose <span class="sign">=</span> 1<span class="sign">,</span> alternating <span class="sign">=</span> FALSE<span class="sign">,</span>
+<span class="line_number">2451 </span>        dispest <span class="sign">=</span> <span class="quote">"pearson"</span><span class="sign">,</span> correction <span class="sign">=</span> <span class="quote">"none"</span><span class="sign">,</span> computesd <span class="sign">=</span> TRUE<span class="sign">,</span>
+<span class="line_number">2452 </span>        fullS <span class="sign">=</span> TRUE<span class="sign">,</span> fixzero <span class="sign">=</span> NULL<span class="sign">,</span> smooth <span class="sign">=</span> FALSE<span class="sign">,</span> maxiter <span class="sign">=</span> 200<span class="sign">,</span>
+<span class="line_number">2453 </span>        convergence <span class="sign">=</span> 1e<span class="sign">-</span>3<span class="sign">,</span> initial <span class="sign">=</span> NULL<span class="sign">)</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>       x           a data frame with the following columns:
+                   i       cluster index
+                   j       subject index
+                   k       event counter
+                   r       stratum index
+                   start   interval start time
+                   stop    interval stop time
+                   delta   indicator for event 1
+                   Delta   indicator for event 2
+                   ...     columns of all covariates used in the model
+       K1          if &gt; 1, number of discretization breakpoints for event 1
+                   if &lt; 1, proportion relative to maximum
+                   can be of length &gt; 1 for different strata
+       K2          analogous for event 2
+       excludevars1    vector of strings giving covariate names that should
+                       not be included for process 1
+       excludevars2    analogous for process 2
+       verbose     integer from 1-5 specifying the amount of output printed
+       alternating  boolean indicating whether the data are episodic
+       dispest     dispersion parameter estimators to use. Options are
+                   "pearson", "marginal" and "ohlsson"
+       correction  determines whether to use Ma's correction. Options are
+                   "none", "single" or "double"
+       computesd   boolean, determines whether to compute standard errors
+       fullS       boolean, determines whether to compute the full 
+                   sensitivity matrix
+       fixzero     list of parameters that should be fixed at 0. For
+                   univariate models, this should contain "sigma2dhat",
+                   "nu2dhat" and "thetahat"
+       smooth      boolean, whether to smooth the baseline hazards
+       maxiter     maximum number of iterations permitted before failing
+       convergence  convergence criterion, absolute change in all params
+       initial     optionally a list containing initial values for
+                   betahat, betadhat, Uihat, Vihat, Uijhat, Vijhat and dispparams
+</pre>
+<p class="item_name">OUTPUTS</p>
+<pre>       an object of class <a href="./bivmethods_rmethodsBiv2Fbivrec.html#robo38">bivrec</a>, see the package documentation for details
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">2456 </span><span class="sign">{</span>
+<span class="line_number">2457 </span>    <span class="comment"># Read in the input and make basic adjustments</span>
+<span class="line_number">2458 </span>    agdata <span class="sign">&lt;</span><span class="sign">-</span> x
+<span class="line_number">2459 </span>    K <span class="sign">&lt;</span><span class="sign">-</span> K1<span class="sign">;</span>Kd <span class="sign">&lt;</span><span class="sign">-</span> K2<span class="sign">;</span>
+<span class="line_number">2460 </span>    <span class="keyword">if</span><span class="sign">(</span>is<span class="sign">.</span>null<span class="sign">(</span>excludevars1<span class="sign">)</span><span class="sign">)</span> vars1 <span class="sign">&lt;</span><span class="sign">-</span> NULL <span class="keyword">else</span> 
+<span class="line_number">2461 </span>        vars1 <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">which</span><span class="sign">(</span><span class="comment">!colnames(x)[ - (1:8)]%in%excludevars1)</span>
+<span class="line_number">2462 </span>    <span class="keyword">if</span><span class="sign">(</span>is<span class="sign">.</span>null<span class="sign">(</span>excludevars2<span class="sign">)</span><span class="sign">)</span> vars2 <span class="sign">&lt;</span><span class="sign">-</span> NULL <span class="keyword">else</span> 
+<span class="line_number">2463 </span>        vars2 <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">which</span><span class="sign">(</span><span class="comment">!colnames(x)[ - (1:8)]%in%excludevars2)</span>
+<span class="line_number">2464 </span>    maxiter<span class="sign">.</span>outer <span class="sign">&lt;</span><span class="sign">-</span> maxiter<span class="sign">;</span> thresh<span class="sign">.</span>outer <span class="sign">&lt;</span><span class="sign">-</span> convergence<span class="sign">;</span>
+<span class="line_number">2465 </span>    fixzero <span class="sign">&lt;</span><span class="sign">-</span> fixzero<span class="sign">[</span>fixzero<span class="sign">%</span>in<span class="sign">%</span>c<span class="sign">(</span><span class="quote">"clust1"</span><span class="sign">,</span> <span class="quote">"clust2"</span><span class="sign">,</span> <span class="quote">"subj1"</span><span class="sign">,</span> <span class="quote">"subj2"</span><span class="sign">,</span> <span class="quote">"cov"</span><span class="sign">)</span><span class="sign">]</span>
+<span class="line_number">2466 </span>    fixzero<span class="sign">[</span>fixzero <span class="sign">=</span><span class="sign">=</span> <span class="quote">"clust1"</span><span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="quote">"sigma2hat"</span>
+<span class="line_number">2467 </span>    fixzero<span class="sign">[</span>fixzero <span class="sign">=</span><span class="sign">=</span> <span class="quote">"clust2"</span><span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="quote">"sigma2dhat"</span>
+<span class="line_number">2468 </span>    fixzero<span class="sign">[</span>fixzero <span class="sign">=</span><span class="sign">=</span> <span class="quote">"subj1"</span><span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="quote">"nu2hat"</span>
+<span class="line_number">2469 </span>    fixzero<span class="sign">[</span>fixzero <span class="sign">=</span><span class="sign">=</span> <span class="quote">"subj2"</span><span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="quote">"nu2dhat"</span>
+<span class="line_number">2470 </span>    fixzero<span class="sign">[</span>fixzero <span class="sign">=</span><span class="sign">=</span> <span class="quote">"cov"</span><span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="quote">"thetahat"</span>
+<span class="line_number">2471 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="keyword">length</span><span class="sign">(</span>fixzero<span class="sign">)</span> <span class="sign">=</span><span class="sign">=</span> 0<span class="sign">)</span> fixzero <span class="sign">&lt;</span><span class="sign">-</span> NULL
+<span class="line_number">2472 </span>    
+<span class="line_number">2473 </span>    <span class="comment"># Check whether a univariate model is being fit</span>
+<span class="line_number">2474 </span>    <span class="keyword">if</span><span class="sign">(</span>all<span class="sign">(</span>c<span class="sign">(</span><span class="quote">"sigma2dhat"</span><span class="sign">,</span> <span class="quote">"nu2dhat"</span><span class="sign">,</span> <span class="quote">"thetahat"</span><span class="sign">)</span><span class="sign">%</span>in<span class="sign">%</span>fixzero<span class="sign">)</span><span class="sign">)</span> 
+<span class="line_number">2475 </span>        univariate <span class="sign">&lt;</span><span class="sign">-</span> TRUE <span class="keyword">else</span> univariate <span class="sign">&lt;</span><span class="sign">-</span> FALSE
+<span class="line_number">2476 </span>        
+<span class="line_number">2477 </span>    <span class="keyword">call</span> <span class="sign">&lt;</span><span class="sign">-</span> match<span class="sign">.</span><span class="keyword">call</span><span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">2478 </span>    <span class="comment"># Get the values of m and Ji from the agdata matrix, and set </span>
+<span class="line_number">2479 </span>    <span class="comment"># global variables with those values.</span>
+<span class="line_number">2480 </span>    m <span class="sign">&lt;</span><span class="sign">-</span> max<span class="sign">(</span>agdata<span class="sign">$</span>i<span class="sign">)</span>
+<span class="line_number">2481 </span>    Jilocal <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">rep</span><span class="sign">(</span>0<span class="sign">,</span> m<span class="sign">)</span>
+<span class="line_number">2482 </span>    <span class="keyword">for</span><span class="sign">(</span>i in 1<span class="sign">:</span>m<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">2483 </span>        Jilocal<span class="sign">[</span>i<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> max<span class="sign">(</span>agdata<span class="sign">$</span>j<span class="sign">[</span>agdata<span class="sign">$</span>i <span class="sign">=</span><span class="sign">=</span> i<span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">2484 </span>    <span class="sign">}</span>
+<span class="line_number">2485 </span>    Ji <span class="sign">&lt;</span><span class="sign">-</span> Jilocal
+<span class="line_number">2486 </span>    <span class="comment"># If the provided K, Kd are of length 1, then assume all strata should </span>
+<span class="line_number">2487 </span>    <span class="comment"># have the same number of breakpoints</span>
+<span class="line_number">2488 </span>    nr <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">length</span><span class="sign">(</span><span class="keyword">unique</span><span class="sign">(</span>agdata<span class="sign">$</span>r<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">2489 </span>     
+<span class="line_number">2490 </span>    <span class="comment">###########################</span>
+<span class="line_number">2491 </span>    <span class="comment">#### Begin find initial values for frailties and coefficients</span>
+<span class="line_number">2492 </span>    
+<span class="line_number">2493 </span>    <span class="comment"># Initial values are computed using coxph. </span>
+<span class="line_number">2494 </span>    <span class="comment"># For recurrent events, the response time is the interevent time stop - start, </span>
+<span class="line_number">2495 </span>    <span class="comment"># and event indicator delta. </span>
+<span class="line_number">2496 </span>    <span class="keyword">if</span><span class="sign">(</span>verbose <span class="sign">&gt;</span><span class="sign">=</span> 2<span class="sign">)</span> <span class="keyword">cat</span><span class="sign">(</span><span class="quote">"Get initial values\n"</span><span class="sign">)</span>
+<span class="line_number">2497 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="keyword">dim</span><span class="sign">(</span>agdata<span class="sign">)</span><span class="sign">[</span>2<span class="sign">]</span> <span class="sign">&gt;</span> 9<span class="sign">)</span> <span class="keyword">if</span><span class="sign">(</span><span class="keyword">sum</span><span class="sign">(</span>agdata<span class="sign">[</span><span class="sign">,</span> 10<span class="sign">]</span> <span class="comment">!= 0) == 0) agdata &lt;- agdata[, -10]</span>
+<span class="line_number">2498 </span>    
+<span class="line_number">2499 </span>    <span class="comment"># create separate data frames for each process</span>
+<span class="line_number">2500 </span>    agdata1 <span class="sign">&lt;</span><span class="sign">-</span> agdata<span class="sign">[</span><span class="sign">,</span> <span class="sign">-</span>8<span class="sign">]</span>
+<span class="line_number">2501 </span>    agdata2 <span class="sign">&lt;</span><span class="sign">-</span> agdata<span class="sign">[</span><span class="sign">,</span> <span class="sign">-</span>7<span class="sign">]</span><span class="sign">;</span><span class="keyword">colnames</span><span class="sign">(</span>agdata2<span class="sign">)</span><span class="sign">[</span>7<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="quote">"delta"</span>
+<span class="line_number">2502 </span>    
+<span class="line_number">2503 </span>    <span class="comment"># remove duplicate rows in each of the two data frames, and adjust the</span>
+<span class="line_number">2504 </span>    <span class="comment"># times accordingly</span>
+<span class="line_number">2505 </span>    <span class="keyword">if</span><span class="sign">(</span>alternating<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">2506 </span>        atrisk1 <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span>TRUE<span class="sign">,</span><span class="comment">!duplicated(agdata[, 1:2])[ - 1]) | </span>
+<span class="line_number">2507 </span>                c<span class="sign">(</span>TRUE<span class="sign">,</span> agdata<span class="sign">$</span>Delta<span class="sign">[</span> <span class="sign">-</span> <span class="keyword">length</span><span class="sign">(</span>agdata<span class="sign">$</span>Delta<span class="sign">)</span><span class="sign">]</span> <span class="sign">=</span><span class="sign">=</span> 1<span class="sign">)</span>
+<span class="line_number">2508 </span>        agdata1 <span class="sign">&lt;</span><span class="sign">-</span> agdata<span class="sign">[</span>atrisk1<span class="sign">,</span> <span class="sign">]</span>
+<span class="line_number">2509 </span>        agdata2 <span class="sign">&lt;</span><span class="sign">-</span> agdata<span class="sign">[</span><span class="comment">!atrisk1, ]</span>
+<span class="line_number">2510 </span>        agdata1 <span class="sign">&lt;</span><span class="sign">-</span> agdata1<span class="sign">[</span><span class="sign">,</span> <span class="sign">-</span>8<span class="sign">]</span>
+<span class="line_number">2511 </span>        agdata2 <span class="sign">&lt;</span><span class="sign">-</span> agdata2<span class="sign">[</span><span class="sign">,</span> <span class="sign">-</span>7<span class="sign">]</span><span class="sign">;</span><span class="keyword">colnames</span><span class="sign">(</span>agdata2<span class="sign">)</span><span class="sign">[</span>7<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="quote">"delta"</span>
+<span class="line_number">2512 </span>    <span class="sign">}</span><span class="keyword">else</span><span class="sign">{</span>
+<span class="line_number">2513 </span>        <span class="comment"># new method</span>
+<span class="line_number">2514 </span>        dup <span class="sign">&lt;</span><span class="sign">-</span> duplicated<span class="sign">(</span>agdata1<span class="sign">[</span><span class="sign">,</span> <span class="sign">-</span>c<span class="sign">(</span>3<span class="sign">,</span> 5<span class="sign">,</span> 6<span class="sign">,</span> 7<span class="sign">)</span><span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">2515 </span>        dup <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span>dup<span class="sign">[</span> <span class="sign">-</span> 1<span class="sign">]</span><span class="sign">,</span> FALSE<span class="sign">)</span> <span class="sign">&amp;</span> agdata1<span class="sign">$</span>delta <span class="comment">!= 1</span>
+<span class="line_number">2516 </span>        agdata1 <span class="sign">&lt;</span><span class="sign">-</span> agdata1<span class="sign">[</span><span class="comment">!dup, ]</span>
+<span class="line_number">2517 </span>        agdata1<span class="sign">$</span>start<span class="sign">[</span> <span class="sign">-</span> 1<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> agdata1<span class="sign">$</span>stop<span class="sign">[</span> <span class="sign">-</span> <span class="keyword">length</span><span class="sign">(</span>agdata1<span class="sign">$</span>stop<span class="sign">)</span><span class="sign">]</span>
+<span class="line_number">2518 </span>        agdata1<span class="sign">$</span>start<span class="sign">[</span><span class="comment">!duplicated(agdata1[, 1:2])] &lt;- 0</span>
+<span class="line_number">2519 </span>    
+<span class="line_number">2520 </span>        dup <span class="sign">&lt;</span><span class="sign">-</span> duplicated<span class="sign">(</span>agdata2<span class="sign">[</span><span class="sign">,</span> <span class="sign">-</span>c<span class="sign">(</span>3<span class="sign">,</span> 5<span class="sign">,</span> 6<span class="sign">,</span> 7<span class="sign">)</span><span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">2521 </span>        dup <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span>dup<span class="sign">[</span> <span class="sign">-</span> 1<span class="sign">]</span><span class="sign">,</span> FALSE<span class="sign">)</span> <span class="sign">&amp;</span> agdata2<span class="sign">$</span>delta <span class="comment">!= 1</span>
+<span class="line_number">2522 </span>        agdata2 <span class="sign">&lt;</span><span class="sign">-</span> agdata2<span class="sign">[</span><span class="comment">!dup, ]</span>
+<span class="line_number">2523 </span>        agdata2<span class="sign">$</span>start<span class="sign">[</span> <span class="sign">-</span> 1<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> agdata2<span class="sign">$</span>stop<span class="sign">[</span> <span class="sign">-</span> <span class="keyword">length</span><span class="sign">(</span>agdata2<span class="sign">$</span>stop<span class="sign">)</span><span class="sign">]</span>
+<span class="line_number">2524 </span>        agdata2<span class="sign">$</span>start<span class="sign">[</span><span class="comment">!duplicated(agdata2[, 1:2])] &lt;- 0</span>
+<span class="line_number">2525 </span>    <span class="sign">}</span>
+<span class="line_number">2526 </span>    
+<span class="line_number">2527 </span>    <span class="comment"># Remove excluded covariates</span>
+<span class="line_number">2528 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="comment">!is.null(vars1)) agdata1 &lt;- agdata1[, c(1:7, 7 + vars1)]</span>
+<span class="line_number">2529 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="comment">!is.null(vars2)) agdata2 &lt;- agdata2[, c(1:7, 7 + vars2)]</span>
+<span class="line_number">2530 </span>
+<span class="line_number">2531 </span>    <span class="comment"># Compute the number of discretization breakpoints, if K or Kd were specified</span>
+<span class="line_number">2532 </span>    <span class="comment"># as a proportion of the maximum</span>
+<span class="line_number">2533 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="keyword">length</span><span class="sign">(</span>K<span class="sign">)</span> <span class="sign">=</span><span class="sign">=</span> 1 <span class="sign">&amp;</span> K <span class="sign">&lt;</span><span class="sign">=</span> 1<span class="sign">)</span> <span class="sign">{</span>
+<span class="line_number">2534 </span>        Kout <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">rep</span><span class="sign">(</span>0<span class="sign">,</span> nr<span class="sign">)</span>
+<span class="line_number">2535 </span>        <span class="keyword">for</span><span class="sign">(</span>r in 1<span class="sign">:</span>nr<span class="sign">)</span> Kout<span class="sign">[</span>r<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> round<span class="sign">(</span><span class="keyword">length</span><span class="sign">(</span><span class="keyword">unique</span><span class="sign">(</span><span class="sign">(</span>agdata1<span class="sign">$</span>stop <span class="sign">-</span>
+<span class="line_number">2536 </span>            agdata1<span class="sign">$</span>start<span class="sign">)</span><span class="sign">[</span>agdata1<span class="sign">$</span>delta <span class="sign">=</span><span class="sign">=</span> 1 <span class="sign">&amp;</span> agdata1<span class="sign">$</span>r <span class="sign">=</span><span class="sign">=</span> r<span class="sign">]</span><span class="sign">)</span><span class="sign">)</span> <span class="sign">*</span> K<span class="sign">)</span>
+<span class="line_number">2537 </span>        K <span class="sign">&lt;</span><span class="sign">-</span> Kout
+<span class="line_number">2538 </span>    <span class="sign">}</span>
+<span class="line_number">2539 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="keyword">length</span><span class="sign">(</span>Kd<span class="sign">)</span> <span class="sign">=</span><span class="sign">=</span> 1 <span class="sign">&amp;</span> Kd <span class="sign">&lt;</span><span class="sign">=</span> 1<span class="sign">)</span> <span class="sign">{</span>
+<span class="line_number">2540 </span>        Kout <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">rep</span><span class="sign">(</span>0<span class="sign">,</span> nr<span class="sign">)</span>
+<span class="line_number">2541 </span>        <span class="keyword">for</span><span class="sign">(</span>r in 1<span class="sign">:</span>nr<span class="sign">)</span> Kout<span class="sign">[</span>r<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> round<span class="sign">(</span><span class="keyword">length</span><span class="sign">(</span><span class="keyword">unique</span><span class="sign">(</span><span class="sign">(</span>agdata2<span class="sign">$</span>stop <span class="sign">-</span>
+<span class="line_number">2542 </span>            agdata2<span class="sign">$</span>start<span class="sign">)</span><span class="sign">[</span>agdata2<span class="sign">$</span>delta <span class="sign">=</span><span class="sign">=</span> 1 <span class="sign">&amp;</span> agdata2<span class="sign">$</span>r <span class="sign">=</span><span class="sign">=</span> r<span class="sign">]</span><span class="sign">)</span><span class="sign">)</span> <span class="sign">*</span> Kd<span class="sign">)</span>
+<span class="line_number">2543 </span>        Kd <span class="sign">&lt;</span><span class="sign">-</span> Kout
+<span class="line_number">2544 </span>    <span class="sign">}</span>
+<span class="line_number">2545 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="keyword">length</span><span class="sign">(</span>K<span class="sign">)</span> <span class="sign">=</span><span class="sign">=</span> 1<span class="sign">)</span> K <span class="sign">=</span> <span class="keyword">rep</span><span class="sign">(</span>K<span class="sign">,</span> nr<span class="sign">)</span>
+<span class="line_number">2546 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="keyword">length</span><span class="sign">(</span>Kd<span class="sign">)</span> <span class="sign">=</span><span class="sign">=</span> 1<span class="sign">)</span> Kd <span class="sign">=</span> <span class="keyword">rep</span><span class="sign">(</span>Kd<span class="sign">,</span> nr<span class="sign">)</span>
+<span class="line_number">2547 </span>    <span class="keyword">if</span><span class="sign">(</span><span class="keyword">length</span><span class="sign">(</span>Kd<span class="sign">)</span> <span class="comment">!= nr | length(K) != nr) stop("K needs to be as long as the number of strata")</span>
+<span class="line_number">2548 </span>    <span class="keyword">if</span><span class="sign">(</span>univariate<span class="sign">)</span> Kd <span class="sign">&lt;</span><span class="sign">-</span> 1
+<span class="line_number">2549 </span>    <span class="keyword">if</span><span class="sign">(</span>verbose <span class="sign">&gt;</span><span class="sign">=</span> 1<span class="sign">)</span>  <span class="keyword">cat</span><span class="sign">(</span><span class="quote">"K = "</span><span class="sign">,</span> K<span class="sign">,</span> <span class="quote">"\t Kd = "</span><span class="sign">,</span> Kd<span class="sign">,</span> <span class="quote">"\n"</span><span class="sign">)</span>
+<span class="line_number">2550 </span>
+<span class="line_number">2551 </span>    <span class="comment"># Covariate names are needed for Cox model fits and for output</span>
+<span class="line_number">2552 </span>    covariatenames1 <span class="sign">&lt;</span><span class="sign">-</span> paste<span class="sign">(</span><span class="keyword">colnames</span><span class="sign">(</span>agdata1<span class="sign">)</span><span class="sign">[</span> <span class="sign">-</span> <span class="sign">(</span>1<span class="sign">:</span>7<span class="sign">)</span><span class="sign">]</span><span class="sign">,</span> collapse <span class="sign">=</span> <span class="quote">" + "</span><span class="sign">)</span>
+<span class="line_number">2553 </span>    covariatenames2 <span class="sign">&lt;</span><span class="sign">-</span> paste<span class="sign">(</span><span class="keyword">colnames</span><span class="sign">(</span>agdata2<span class="sign">)</span><span class="sign">[</span> <span class="sign">-</span> <span class="sign">(</span>1<span class="sign">:</span>7<span class="sign">)</span><span class="sign">]</span><span class="sign">,</span> collapse <span class="sign">=</span> <span class="quote">" + "</span><span class="sign">)</span>
+<span class="line_number">2554 </span>
+<span class="line_number">2555 </span>    <span class="keyword">if</span><span class="sign">(</span>is<span class="sign">.</span>null<span class="sign">(</span>initial<span class="sign">)</span><span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">2556 </span>
+<span class="line_number">2557 </span>        <span class="comment"># gamma frailties</span>
+<span class="line_number">2558 </span>        ftype <span class="sign">&lt;</span><span class="sign">-</span> <span class="quote">"gamma"</span>
+<span class="line_number">2559 </span>        
+<span class="line_number">2560 </span>        <span class="comment"># Models need to be fit with both subject - level frailties, and </span>
+<span class="line_number">2561 </span>        <span class="comment"># cluster - level frailties, resulting in the four models fit below.</span>
+<span class="line_number">2562 </span>        <span class="comment"># Compute Cox fits with cluster frailties</span>
+<span class="line_number">2563 </span>        <span class="keyword">if</span><span class="sign">(</span>m <span class="sign">&gt;</span> 1<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">2564 </span>            cox<span class="sign">.</span>clust1 <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">try</span><span class="sign">(</span>coxph<span class="sign">(</span>as<span class="sign">.</span>formula<span class="sign">(</span>paste<span class="sign">(</span><span class="quote">"Surv(stop - start, delta) ~"</span><span class="sign">,</span>
+<span class="line_number">2565 </span>                covariatenames1<span class="sign">,</span> <span class="quote">"+ frailty(i, distribution='"</span><span class="sign">,</span> ftype<span class="sign">,</span> <span class="quote">"')"</span><span class="sign">,</span>
+<span class="line_number">2566 </span>                sep <span class="sign">=</span> <span class="quote">""</span><span class="sign">)</span><span class="sign">)</span><span class="sign">,</span> agdata1<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">2567 </span>            <span class="keyword">if</span><span class="sign">(</span><span class="comment">!univariate)</span>
+<span class="line_number">2568 </span>                cox<span class="sign">.</span>clust2 <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">try</span><span class="sign">(</span>coxph<span class="sign">(</span>as<span class="sign">.</span>formula<span class="sign">(</span>paste<span class="sign">(</span><span class="quote">"Surv(stop - start, delta) ~"</span><span class="sign">,</span>
+<span class="line_number">2569 </span>                    covariatenames2<span class="sign">,</span> <span class="quote">"+ frailty(i, distribution='"</span><span class="sign">,</span> ftype<span class="sign">,</span> <span class="quote">"')"</span><span class="sign">,</span>
+<span class="line_number">2570 </span>                    sep <span class="sign">=</span> <span class="quote">""</span><span class="sign">)</span><span class="sign">)</span><span class="sign">,</span> agdata2<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">2571 </span>            <span class="keyword">else</span>
+<span class="line_number">2572 </span>                cox<span class="sign">.</span>clust2 <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">list</span><span class="sign">(</span>frail <span class="sign">=</span> <span class="keyword">rep</span><span class="sign">(</span>0<span class="sign">,</span> m<span class="sign">)</span><span class="sign">,</span> fvar <span class="sign">=</span> 0<span class="sign">)</span>
+<span class="line_number">2573 </span>        <span class="sign">}</span><span class="keyword">else</span><span class="sign">{</span>
+<span class="line_number">2574 </span>            cox<span class="sign">.</span>clust1 <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">list</span><span class="sign">(</span>frail <span class="sign">=</span> 0<span class="sign">,</span> fvar <span class="sign">=</span> 0<span class="sign">)</span>
+<span class="line_number">2575 </span>            cox<span class="sign">.</span>clust2 <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">list</span><span class="sign">(</span>frail <span class="sign">=</span> 0<span class="sign">,</span> fvar <span class="sign">=</span> 0<span class="sign">)</span>
+<span class="line_number">2576 </span>        <span class="sign">}</span>
+<span class="line_number">2577 </span>        <span class="comment"># Compute Cox fits with subject - level frailties</span>
+<span class="line_number">2578 </span>        cox<span class="sign">.</span>ind1 <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">try</span><span class="sign">(</span>coxph<span class="sign">(</span>as<span class="sign">.</span>formula<span class="sign">(</span>paste<span class="sign">(</span><span class="quote">"Surv(stop - start, delta) ~"</span><span class="sign">,</span>
+<span class="line_number">2579 </span>            covariatenames1<span class="sign">,</span> <span class="quote">"+ frailty(i * 1000 + j, distribution='"</span><span class="sign">,</span> ftype<span class="sign">,</span> <span class="quote">"')"</span><span class="sign">,</span>
+<span class="line_number">2580 </span>            sep <span class="sign">=</span> <span class="quote">""</span><span class="sign">)</span><span class="sign">)</span><span class="sign">,</span> agdata1<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">2581 </span>        <span class="keyword">if</span><span class="sign">(</span><span class="comment">!univariate)</span>
+<span class="line_number">2582 </span>            cox<span class="sign">.</span>ind2 <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">try</span><span class="sign">(</span>coxph<span class="sign">(</span>as<span class="sign">.</span>formula<span class="sign">(</span>paste<span class="sign">(</span><span class="quote">"Surv(stop - start, delta) ~"</span><span class="sign">,</span>
+<span class="line_number">2583 </span>                covariatenames2<span class="sign">,</span> <span class="quote">"+ frailty(i * 1000 + j, distribution='"</span><span class="sign">,</span> ftype<span class="sign">,</span> <span class="quote">"')"</span><span class="sign">,</span>
+<span class="line_number">2584 </span>                sep <span class="sign">=</span> <span class="quote">""</span><span class="sign">)</span><span class="sign">)</span><span class="sign">,</span> agdata2<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">2585 </span>        <span class="keyword">else</span>
+<span class="line_number">2586 </span>            cox<span class="sign">.</span>ind2 <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">list</span><span class="sign">(</span>frail <span class="sign">=</span> <span class="keyword">rep</span><span class="sign">(</span>0<span class="sign">,</span> <span class="keyword">sum</span><span class="sign">(</span>Ji<span class="sign">)</span><span class="sign">)</span><span class="sign">,</span> fvar <span class="sign">=</span> 0<span class="sign">,</span>
+<span class="line_number">2587 </span>                coef <span class="sign">=</span> <span class="keyword">rep</span><span class="sign">(</span>0<span class="sign">,</span> <span class="keyword">dim</span><span class="sign">(</span>agdata2<span class="sign">)</span><span class="sign">[</span>2<span class="sign">]</span> <span class="sign">-</span> 7<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">2588 </span>
+<span class="line_number">2589 </span>        <span class="keyword">if</span><span class="sign">(</span>inherits<span class="sign">(</span>cox<span class="sign">.</span>clust1<span class="sign">,</span> <span class="quote">"try - error"</span><span class="sign">)</span> <span class="sign">|</span> inherits<span class="sign">(</span>cox<span class="sign">.</span>clust2<span class="sign">,</span> <span class="quote">"try - error"</span><span class="sign">)</span> <span class="sign">|</span>
+<span class="line_number">2590 </span>            inherits<span class="sign">(</span>cox<span class="sign">.</span>ind1<span class="sign">,</span> <span class="quote">"try - error"</span><span class="sign">)</span> <span class="sign">|</span> inherits<span class="sign">(</span>cox<span class="sign">.</span>ind2<span class="sign">,</span> <span class="quote">"try - error"</span><span class="sign">)</span> <span class="sign">)</span>  
+<span class="line_number">2591 </span>            browser<span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">2592 </span>       
+<span class="line_number">2593 </span>        <span class="comment">## Set initial values for frailties based on estimated values</span>
+<span class="line_number">2594 </span>        Uihat <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">exp</span><span class="sign">(</span>cox<span class="sign">.</span>clust1<span class="sign">$</span>frail<span class="sign">)</span>
+<span class="line_number">2595 </span>        Vihat <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">exp</span><span class="sign">(</span>cox<span class="sign">.</span>clust2<span class="sign">$</span>frail<span class="sign">)</span>
+<span class="line_number">2596 </span>        <span class="keyword">if</span><span class="sign">(</span><span class="comment">!alternating){</span>
+<span class="line_number">2597 </span>            Uijhat <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">exp</span><span class="sign">(</span>cox<span class="sign">.</span>ind1<span class="sign">$</span>frail<span class="sign">)</span>
+<span class="line_number">2598 </span>            Vijhat <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">exp</span><span class="sign">(</span>cox<span class="sign">.</span>ind2<span class="sign">$</span>frail<span class="sign">)</span>
+<span class="line_number">2599 </span>        <span class="sign">}</span><span class="keyword">else</span><span class="sign">{</span>
+<span class="line_number">2600 </span>            Uijhat <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">exp</span><span class="sign">(</span>cox<span class="sign">.</span>ind1<span class="sign">$</span>frail<span class="sign">)</span>
+<span class="line_number">2601 </span>            Vijhat <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">rep</span><span class="sign">(</span>1<span class="sign">,</span> <span class="keyword">length</span><span class="sign">(</span>Uijhat<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">2602 </span>            Vijhat<span class="sign">[</span><span class="keyword">unique</span><span class="sign">(</span>agdata1<span class="sign">$</span>i <span class="sign">*</span> 1000 <span class="sign">+</span> agdata1<span class="sign">$</span>j<span class="sign">)</span><span class="sign">%</span>in<span class="sign">%</span><span class="keyword">unique</span><span class="sign">(</span>agdata2<span class="sign">$</span>i <span class="sign">*</span> 1000 <span class="sign">+</span>
+<span class="line_number">2603 </span>                agdata2<span class="sign">$</span>j<span class="sign">)</span><span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">exp</span><span class="sign">(</span>cox<span class="sign">.</span>ind2<span class="sign">$</span>frail<span class="sign">)</span>
+<span class="line_number">2604 </span>        <span class="sign">}</span>
+<span class="line_number">2605 </span>        
+<span class="line_number">2606 </span>        <span class="comment">## Set initial values for dispersion parameters</span>
+<span class="line_number">2607 </span>        sigma2hat <span class="sign">&lt;</span><span class="sign">-</span> mean<span class="sign">(</span>cox<span class="sign">.</span>clust1<span class="sign">$</span>fvar<span class="sign">)</span>
+<span class="line_number">2608 </span>        sigma2dhat <span class="sign">&lt;</span><span class="sign">-</span> mean<span class="sign">(</span>cox<span class="sign">.</span>clust2<span class="sign">$</span>fvar<span class="sign">)</span>
+<span class="line_number">2609 </span>        nu2hat <span class="sign">&lt;</span><span class="sign">-</span> max<span class="sign">(</span>mean<span class="sign">(</span>cox<span class="sign">.</span>ind1<span class="sign">$</span>fvar<span class="sign">)</span> <span class="sign">-</span> sigma2hat<span class="sign">,</span> <span class="sign">.</span>1<span class="sign">)</span>
+<span class="line_number">2610 </span>        nu2dhat <span class="sign">&lt;</span><span class="sign">-</span> max<span class="sign">(</span>mean<span class="sign">(</span>cox<span class="sign">.</span>ind2<span class="sign">$</span>fvar<span class="sign">)</span> <span class="sign">-</span> sigma2hat<span class="sign">,</span> <span class="sign">.</span>1<span class="sign">)</span>
+<span class="line_number">2611 </span>        thetahat <span class="sign">&lt;</span><span class="sign">-</span> cov<span class="sign">(</span>Uijhat<span class="sign">,</span> Vijhat<span class="sign">)</span>
+<span class="line_number">2612 </span>        
+<span class="line_number">2613 </span>        <span class="comment">## Check that dispersion parameters are valid</span>
+<span class="line_number">2614 </span>        <span class="keyword">if</span><span class="sign">(</span>abs<span class="sign">(</span>thetahat<span class="sign">)</span><span class="sign">&lt;</span><span class="sign">.</span>001<span class="sign">)</span> thetahat <span class="sign">&lt;</span><span class="sign">-</span> sign<span class="sign">(</span>thetahat<span class="sign">)</span><span class="sign">*</span><span class="sign">.</span>01
+<span class="line_number">2615 </span>        <span class="keyword">if</span><span class="sign">(</span>abs<span class="sign">(</span>sigma2hat<span class="sign">)</span><span class="sign">&lt;</span><span class="sign">.</span>001<span class="sign">)</span> sigma2hat <span class="sign">&lt;</span><span class="sign">-</span> sign<span class="sign">(</span>sigma2hat<span class="sign">)</span><span class="sign">*</span><span class="sign">.</span>01
+<span class="line_number">2616 </span>        <span class="keyword">if</span><span class="sign">(</span>abs<span class="sign">(</span>sigma2dhat<span class="sign">)</span><span class="sign">&lt;</span><span class="sign">.</span>001<span class="sign">)</span> sigma2dhat <span class="sign">&lt;</span><span class="sign">-</span> sign<span class="sign">(</span>sigma2dhat<span class="sign">)</span><span class="sign">*</span><span class="sign">.</span>01
+<span class="line_number">2617 </span>        <span class="keyword">if</span><span class="sign">(</span>abs<span class="sign">(</span>nu2hat<span class="sign">)</span><span class="sign">&lt;</span><span class="sign">.</span>001<span class="sign">)</span> nu2hat <span class="sign">&lt;</span><span class="sign">-</span> sign<span class="sign">(</span>nu2hat<span class="sign">)</span><span class="sign">*</span><span class="sign">.</span>01
+<span class="line_number">2618 </span>        <span class="keyword">if</span><span class="sign">(</span>abs<span class="sign">(</span>nu2dhat<span class="sign">)</span><span class="sign">&lt;</span><span class="sign">.</span>001<span class="sign">)</span> nu2dhat <span class="sign">&lt;</span><span class="sign">-</span> sign<span class="sign">(</span>nu2dhat<span class="sign">)</span><span class="sign">*</span><span class="sign">.</span>01
+<span class="line_number">2619 </span>        
+<span class="line_number">2620 </span>        <span class="comment">## Extract initial regression parameters</span>
+<span class="line_number">2621 </span>        betahat <span class="sign">&lt;</span><span class="sign">-</span> cox<span class="sign">.</span>ind1<span class="sign">$</span>coef
+<span class="line_number">2622 </span>        betadhat <span class="sign">&lt;</span><span class="sign">-</span> cox<span class="sign">.</span>ind2<span class="sign">$</span>coef
+<span class="line_number">2623 </span>        
+<span class="line_number">2624 </span>        <span class="comment"># Save initial dispersion parameters</span>
+<span class="line_number">2625 </span>        dispparams <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">list</span><span class="sign">(</span>sigma2hat <span class="sign">=</span> sigma2hat<span class="sign">,</span> sigma2dhat <span class="sign">=</span> sigma2dhat<span class="sign">,</span>
+<span class="line_number">2626 </span>                nu2hat <span class="sign">=</span> nu2hat<span class="sign">,</span> nu2dhat <span class="sign">=</span> nu2dhat<span class="sign">,</span> thetahat <span class="sign">=</span> thetahat<span class="sign">)</span>
+<span class="line_number">2627 </span>        
+<span class="line_number">2628 </span>        <span class="comment"># Fix something at zero if desired</span>
+<span class="line_number">2629 </span>        dispparams<span class="sign">[</span>fixzero<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> 0
+<span class="line_number">2630 </span>            
+<span class="line_number">2631 </span>        <span class="keyword">if</span><span class="sign">(</span><span class="keyword">sum</span><span class="sign">(</span>is<span class="sign">.</span>na<span class="sign">(</span>betahat<span class="sign">)</span><span class="sign">)</span> <span class="sign">+</span> <span class="keyword">sum</span><span class="sign">(</span>is<span class="sign">.</span>na<span class="sign">(</span>betadhat<span class="sign">)</span><span class="sign">)</span> <span class="sign">&gt;</span> 0<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">2632 </span>            warning<span class="sign">(</span><span class="quote">"Unable to find good starting values"</span><span class="sign">)</span>
+<span class="line_number">2633 </span>            <span class="keyword">return</span><span class="sign">(</span>0<span class="sign">)</span>    
+<span class="line_number">2634 </span>        <span class="sign">}</span>
+<span class="line_number">2635 </span>        
+<span class="line_number">2636 </span>        <span class="comment">## Save all initial values for output</span>
+<span class="line_number">2637 </span>        initial <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">list</span><span class="sign">(</span>betahat <span class="sign">=</span> betahat<span class="sign">,</span> betadhat <span class="sign">=</span> betadhat<span class="sign">,</span> 
+<span class="line_number">2638 </span>                        dispparams <span class="sign">=</span> dispparams<span class="sign">)</span> 
+<span class="line_number">2639 </span>        <span class="keyword">if</span><span class="sign">(</span>verbose <span class="sign">&gt;</span><span class="sign">=</span> 1<span class="sign">)</span> <span class="keyword">cat</span><span class="sign">(</span><span class="quote">"\t betahat ="</span><span class="sign">,</span> betahat<span class="sign">,</span> <span class="quote">", betadhat = "</span><span class="sign">,</span> 
+<span class="line_number">2640 </span>                            betadhat<span class="sign">,</span> <span class="quote">"\n"</span><span class="sign">)</span>
+<span class="line_number">2641 </span>        <span class="keyword">if</span><span class="sign">(</span>verbose <span class="sign">&gt;</span><span class="sign">=</span> 1<span class="sign">)</span> <span class="keyword">cat</span><span class="sign">(</span><span class="quote">"\t dispparams = "</span><span class="sign">,</span> dispparams<span class="sign">$</span>sigma2hat<span class="sign">,</span>
+<span class="line_number">2642 </span>            dispparams<span class="sign">$</span>sigma2dhat<span class="sign">,</span> dispparams<span class="sign">$</span>nu2hat<span class="sign">,</span> dispparams<span class="sign">$</span>nu2dhat<span class="sign">,</span>
+<span class="line_number">2643 </span>            dispparams<span class="sign">$</span>thetahat<span class="sign">,</span> <span class="quote">"\n"</span><span class="sign">)</span>
+<span class="line_number">2644 </span>
+<span class="line_number">2645 </span>    <span class="sign">}</span><span class="keyword">else</span><span class="sign">{</span>  <span class="comment"># if initial values are provided, use those</span>
+<span class="line_number">2646 </span>        dispparams <span class="sign">&lt;</span><span class="sign">-</span> initial<span class="sign">$</span>dispparams
+<span class="line_number">2647 </span>        Uihat <span class="sign">&lt;</span><span class="sign">-</span> initial<span class="sign">$</span>Uihat
+<span class="line_number">2648 </span>        Uijhat <span class="sign">&lt;</span><span class="sign">-</span> initial<span class="sign">$</span>Uijhat
+<span class="line_number">2649 </span>        Vihat <span class="sign">&lt;</span><span class="sign">-</span> initial<span class="sign">$</span>Vihat
+<span class="line_number">2650 </span>        Vijhat <span class="sign">&lt;</span><span class="sign">-</span> initial<span class="sign">$</span>Vijhat
+<span class="line_number">2651 </span>        betahat <span class="sign">&lt;</span><span class="sign">-</span> initial<span class="sign">$</span>betahat
+<span class="line_number">2652 </span>        betadhat <span class="sign">&lt;</span><span class="sign">-</span> initial<span class="sign">$</span>betadhat
+<span class="line_number">2653 </span>    <span class="sign">}</span>
+<span class="line_number">2654 </span>
+<span class="line_number">2655 </span>    <span class="comment">##########################</span>
+<span class="line_number">2656 </span>    <span class="comment">### Convert Anderson - Gill data into matrix form and initialize matrices    </span>
+<span class="line_number">2657 </span>    <span class="keyword">if</span><span class="sign">(</span>verbose <span class="sign">&gt;</span><span class="sign">=</span> 2<span class="sign">)</span> <span class="keyword">cat</span><span class="sign">(</span><span class="quote">"Initialize matrices for <a href="./bivrec_rbivrecFit2Festimation.html#robo6">estimation</a>\n"</span><span class="sign">)</span>
+<span class="line_number">2658 </span>    
+<span class="line_number">2659 </span>    <span class="comment">## Compute breakpoints</span>
+<span class="line_number">2660 </span>    as <span class="sign">&lt;</span><span class="sign">-</span> <a href="./bivrec_rinitialization2Fmakeas.html#robo36">makeas</a><span class="sign">(</span>agdata1<span class="sign">,</span> K<span class="sign">,</span> alternating<span class="sign">)</span>
+<span class="line_number">2661 </span>    asd <span class="sign">&lt;</span><span class="sign">-</span> <a href="./bivrec_rinitialization2Fmakeas.html#robo36">makeas</a><span class="sign">(</span>agdata2<span class="sign">,</span> Kd<span class="sign">,</span> alternating<span class="sign">)</span>
+<span class="line_number">2662 </span>    
+<span class="line_number">2663 </span>    <span class="comment">## Write frailty estimates in the form of a matrix</span>
+<span class="line_number">2664 </span>    Uijhatframe <span class="sign">&lt;</span><span class="sign">-</span> <a href="./bivrec_rutility2FmakeUijframe.html#robo70">makeUijframe</a><span class="sign">(</span>m<span class="sign">,</span> Ji<span class="sign">,</span> Uijhat<span class="sign">,</span> Vijhat<span class="sign">)</span>
+<span class="line_number">2665 </span>        
+<span class="line_number">2666 </span>    <span class="comment">## Create data matrix</span>
+<span class="line_number">2667 </span>    datamat <span class="sign">&lt;</span><span class="sign">-</span> <a href="./bivrec_rinitialization2Fmakedatamat.html#robo37">makedatamat</a><span class="sign">(</span>agdata1<span class="sign">,</span> as<span class="sign">,</span> alternating<span class="sign">)</span>
+<span class="line_number">2668 </span>    datamatd <span class="sign">&lt;</span><span class="sign">-</span> <a href="./bivrec_rinitialization2Fmakedatamat.html#robo37">makedatamat</a><span class="sign">(</span>agdata2<span class="sign">,</span> asd<span class="sign">,</span> alternating<span class="sign">)</span>
+<span class="line_number">2669 </span>        
+<span class="line_number">2670 </span>    <span class="comment">## Compute initial estimates of baseline hazard parameters    </span>
+<span class="line_number">2671 </span>    alphars <span class="sign">&lt;</span><span class="sign">-</span> <a href="./bivrec_restimation2Ffmakealphars2.html#robo12">fmakealphars2</a><span class="sign">(</span>m<span class="sign">,</span> Ji<span class="sign">,</span> datamat<span class="sign">,</span> betahat<span class="sign">,</span> as<span class="sign">,</span> Uijhatframe<span class="sign">$</span>Uijmat<span class="sign">,</span> smooth<span class="sign">)</span>
+<span class="line_number">2672 </span>    alpharsd <span class="sign">&lt;</span><span class="sign">-</span> <a href="./bivrec_restimation2Ffmakealphars2.html#robo12">fmakealphars2</a><span class="sign">(</span>m<span class="sign">,</span> Ji<span class="sign">,</span> datamatd<span class="sign">,</span> betadhat<span class="sign">,</span> asd<span class="sign">,</span> 
+<span class="line_number">2673 </span>                                            Uijhatframe<span class="sign">$</span>Vijmat<span class="sign">,</span> smooth<span class="sign">)</span>
+<span class="line_number">2674 </span>    
+<span class="line_number">2675 </span>    <span class="comment">## Cleanup: Remove Anderson - Gill data</span>
+<span class="line_number">2676 </span>    varnames1 <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">colnames</span><span class="sign">(</span>agdata1<span class="sign">)</span><span class="sign">[</span> <span class="sign">-</span> <span class="sign">(</span>1<span class="sign">:</span>7<span class="sign">)</span><span class="sign">]</span>
+<span class="line_number">2677 </span>    varnames2 <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">colnames</span><span class="sign">(</span>agdata2<span class="sign">)</span><span class="sign">[</span> <span class="sign">-</span> <span class="sign">(</span>1<span class="sign">:</span>7<span class="sign">)</span><span class="sign">]</span>
+<span class="line_number">2678 </span>    rm<span class="sign">(</span>agdata<span class="sign">)</span>
+<span class="line_number">2679 </span>     
+<span class="line_number">2680 </span>    <span class="comment">##########################</span>
+<span class="line_number">2681 </span>    <span class="comment">### Begin iterative <a href="./bivrec_rbivrecFit2Festimation.html#robo6">estimation</a> procedure</span>
+<span class="line_number">2682 </span>    
+<span class="line_number">2683 </span>    <span class="keyword">if</span><span class="sign">(</span>verbose <span class="sign">&gt;</span><span class="sign">=</span> 2<span class="sign">)</span> <span class="keyword">cat</span><span class="sign">(</span><span class="quote">"Iterative <a href="./bivrec_rbivrecFit2Festimation.html#robo6">estimation</a> procedure\n"</span><span class="sign">)</span>
+<span class="line_number">2684 </span>    
+<span class="line_number">2685 </span>    <span class="comment">## Initialize convergence criterion</span>
+<span class="line_number">2686 </span>    convergence <span class="sign">&lt;</span><span class="sign">-</span> 1000
+<span class="line_number">2687 </span>    iter <span class="sign">&lt;</span><span class="sign">-</span> 0
+<span class="line_number">2688 </span>    
+<span class="line_number">2689 </span>    <span class="comment"># Compute ad - hoc correction value</span>
+<span class="line_number">2690 </span>    <span class="keyword">if</span><span class="sign">(</span>is<span class="sign">.</span>character<span class="sign">(</span>correction<span class="sign">)</span><span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">2691 </span>        <span class="keyword">if</span><span class="sign">(</span>correction <span class="sign">=</span><span class="sign">=</span> <span class="quote">"none"</span><span class="sign">)</span> corrval <span class="sign">&lt;</span><span class="sign">-</span> 1
+<span class="line_number">2692 </span>        <span class="keyword">if</span><span class="sign">(</span>correction <span class="sign">=</span><span class="sign">=</span> <span class="quote">"single"</span><span class="sign">)</span> corrval <span class="sign">&lt;</span><span class="sign">-</span> max<span class="sign">(</span>1<span class="sign">,</span> m <span class="sign">/</span> <span class="sign">(</span>m <span class="sign">-</span> <span class="keyword">length</span><span class="sign">(</span>varnames1<span class="sign">)</span><span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">2693 </span>        <span class="keyword">if</span><span class="sign">(</span>correction <span class="sign">=</span><span class="sign">=</span> <span class="quote">"double"</span><span class="sign">)</span> corrval <span class="sign">&lt;</span><span class="sign">-</span> max<span class="sign">(</span>1<span class="sign">,</span> m <span class="sign">/</span> <span class="sign">(</span>m <span class="sign">-</span> 2 <span class="sign">*</span> <span class="keyword">length</span><span class="sign">(</span>varnames1<span class="sign">)</span><span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">2694 </span>    <span class="sign">}</span> <span class="keyword">else</span> corrval <span class="sign">&lt;</span><span class="sign">-</span> correction    
+<span class="line_number">2695 </span>    
+<span class="line_number">2696 </span>    <span class="comment">## Loop until convergence</span>
+<span class="line_number">2697 </span>    <span class="keyword">while</span><span class="sign">(</span><span class="sign">(</span>convergence <span class="sign">&gt;</span> thresh<span class="sign">.</span>outer<span class="sign">)</span> <span class="sign">&amp;</span> <span class="sign">(</span>iter <span class="sign">&lt;</span><span class="sign">=</span> maxiter<span class="sign">.</span>outer<span class="sign">)</span><span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">2698 </span>        
+<span class="line_number">2699 </span>        <span class="comment"># Starting convergence criterion and iteration counter</span>
+<span class="line_number">2700 </span>        conv<span class="sign">.</span>inner <span class="sign">&lt;</span><span class="sign">-</span> 1000
+<span class="line_number">2701 </span>        iter<span class="sign">.</span>inner <span class="sign">&lt;</span><span class="sign">-</span> 0          
+<span class="line_number">2702 </span>    
+<span class="line_number">2703 </span>        <span class="comment">######## Step 1: Update Frailty estimates</span>
+<span class="line_number">2704 </span>        <span class="keyword">if</span><span class="sign">(</span>verbose <span class="sign">&gt;</span><span class="sign">=</span> 2<span class="sign">)</span> <span class="keyword">cat</span><span class="sign">(</span><span class="quote">"\tUpdating frailty estimates\n"</span><span class="sign">)</span>
+<span class="line_number">2705 </span>        frailtyoutput <span class="sign">&lt;</span><span class="sign">-</span> <a href="./bivrec_restimation2Ffupdatefrailties4.html#robo13">fupdatefrailties4</a><span class="sign">(</span>m<span class="sign">,</span> Ji<span class="sign">,</span> datamat<span class="sign">,</span> datamatd<span class="sign">,</span>
+<span class="line_number">2706 </span>                alphars<span class="sign">,</span> alpharsd<span class="sign">,</span> as<span class="sign">,</span> asd<span class="sign">,</span> betahat<span class="sign">,</span> betadhat<span class="sign">,</span> dispparams<span class="sign">)</span>
+<span class="line_number">2707 </span>
+<span class="line_number">2708 </span>         <span class="comment">######## Step 2: Update Dispersion coefficient estimates</span>
+<span class="line_number">2709 </span>        <span class="keyword">if</span><span class="sign">(</span>dispest <span class="sign">=</span><span class="sign">=</span> <span class="quote">"ohlsson"</span><span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">2710 </span>            <span class="keyword">if</span><span class="sign">(</span>verbose <span class="sign">&gt;</span><span class="sign">=</span> 2<span class="sign">)</span> <span class="keyword">cat</span><span class="sign">(</span><span class="quote">"\tUpdating dispersion parameters (Ohlsson)\n"</span><span class="sign">)</span>
+<span class="line_number">2711 </span>            <span class="comment"># Use Ohlsson estimators</span>
+<span class="line_number">2712 </span>            dispersionoutput <span class="sign">&lt;</span><span class="sign">-</span> <a href="./bivrec_restimation2Fupdatedispohls.html#robo17">updatedispohls</a><span class="sign">(</span>m<span class="sign">,</span> Ji<span class="sign">,</span> datamat<span class="sign">,</span> datamatd<span class="sign">,</span>
+<span class="line_number">2713 </span>                    alphars<span class="sign">,</span> alpharsd<span class="sign">,</span> as<span class="sign">,</span> asd<span class="sign">,</span> betahat<span class="sign">,</span> betadhat<span class="sign">,</span> fixzero<span class="sign">)</span>
+<span class="line_number">2714 </span>            <span class="keyword">if</span><span class="sign">(</span>is<span class="sign">.</span>null<span class="sign">(</span>names<span class="sign">(</span>dispersionoutput<span class="sign">)</span><span class="sign">)</span><span class="sign">)</span><span class="sign">{</span><span class="keyword">return</span><span class="sign">(</span>0<span class="sign">)</span><span class="sign">}</span> 
+<span class="line_number">2715 </span>        <span class="sign">}</span>
+<span class="line_number">2716 </span>        <span class="keyword">if</span><span class="sign">(</span>dispest <span class="sign">=</span><span class="sign">=</span> <span class="quote">"pearson"</span><span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">2717 </span>            <span class="keyword">if</span><span class="sign">(</span>verbose <span class="sign">&gt;</span><span class="sign">=</span> 2<span class="sign">)</span> <span class="keyword">cat</span><span class="sign">(</span><span class="quote">"\tUpdating dispersion parameters (Pearson)\n"</span><span class="sign">)</span>
+<span class="line_number">2718 </span>            <span class="comment"># Use Pearson <a href="./bivrec_rbivrecFit2Festimation.html#robo6">estimation</a> code</span>
+<span class="line_number">2719 </span>            dispersionoutput <span class="sign">&lt;</span><span class="sign">-</span> <a href="./bivrec_restimation2Fupdatedisppears.html#robo18">updatedisppears</a><span class="sign">(</span>m<span class="sign">,</span> Ji<span class="sign">,</span> frailtyoutput<span class="sign">,</span> 
+<span class="line_number">2720 </span>                    dispparams<span class="sign">,</span> corrval<span class="sign">)</span>
+<span class="line_number">2721 </span>            dispersionoutput<span class="sign">[</span>fixzero<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> 0
+<span class="line_number">2722 </span>        <span class="sign">}</span>
+<span class="line_number">2723 </span>        <span class="keyword">if</span><span class="sign">(</span>dispest <span class="sign">=</span><span class="sign">=</span> <span class="quote">"marginal"</span><span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">2724 </span>            <span class="keyword">if</span><span class="sign">(</span>verbose <span class="sign">&gt;</span><span class="sign">=</span> 2<span class="sign">)</span> <span class="keyword">cat</span><span class="sign">(</span><span class="quote">"\tUpdating dispersion parameters (Marginal)\n"</span><span class="sign">)</span>
+<span class="line_number">2725 </span>            <span class="comment"># Use marginal <a href="./bivrec_rbivrecFit2Festimation.html#robo6">estimation</a> code</span>
+<span class="line_number">2726 </span>            dispersionoutput <span class="sign">&lt;</span><span class="sign">-</span> <a href="./bivrec_restimation2Fupdatedispmarg2.html#robo16">updatedispmarg2</a><span class="sign">(</span>m<span class="sign">,</span> Ji<span class="sign">,</span> datamat<span class="sign">,</span> datamatd<span class="sign">,</span>
+<span class="line_number">2727 </span>                alphars<span class="sign">,</span> alpharsd<span class="sign">,</span> as<span class="sign">,</span> asd<span class="sign">,</span> betahat<span class="sign">,</span> betadhat<span class="sign">,</span> fixzero<span class="sign">,</span> univariate<span class="sign">)</span>
+<span class="line_number">2728 </span>        <span class="sign">}</span>
+<span class="line_number">2729 </span>        <span class="keyword">if</span><span class="sign">(</span><span class="keyword">length</span><span class="sign">(</span>dispest<span class="sign">)</span> <span class="sign">=</span><span class="sign">=</span> 5<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">2730 </span>            <span class="comment"># it's possible to compute some parameters via Pearson and others by</span>
+<span class="line_number">2731 </span>            <span class="comment"># marginal estimators. This was for testing only, there's no reason</span>
+<span class="line_number">2732 </span>            <span class="comment"># to ever do this!</span>
+<span class="line_number">2733 </span>            dispersionoutput<span class="sign">.</span>marg <span class="sign">&lt;</span><span class="sign">-</span> unlist<span class="sign">(</span><a href="./bivrec_restimation2Fupdatedispmarg2.html#robo16">updatedispmarg2</a><span class="sign">(</span>m<span class="sign">,</span> Ji<span class="sign">,</span> datamat<span class="sign">,</span> datamatd<span class="sign">,</span>
+<span class="line_number">2734 </span>                alphars<span class="sign">,</span> alpharsd<span class="sign">,</span> as<span class="sign">,</span> asd<span class="sign">,</span> betahat<span class="sign">,</span> betadhat<span class="sign">,</span> fixzero<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">2735 </span>            dispersionoutput<span class="sign">.</span>pears <span class="sign">&lt;</span><span class="sign">-</span> unlist<span class="sign">(</span><a href="./bivrec_restimation2Fupdatedisppears.html#robo18">updatedisppears</a><span class="sign">(</span>m<span class="sign">,</span> Ji<span class="sign">,</span> frailtyoutput<span class="sign">,</span>
+<span class="line_number">2736 </span>                dispparams<span class="sign">,</span> corrval<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">2737 </span>            dispersionoutput <span class="sign">&lt;</span><span class="sign">-</span> dispersionoutput<span class="sign">.</span>marg
+<span class="line_number">2738 </span>            dispersionoutput<span class="sign">[</span>dispest <span class="sign">=</span><span class="sign">=</span> <span class="quote">"p"</span><span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> dispersionoutput<span class="sign">.</span>pears<span class="sign">[</span>dispest <span class="sign">=</span><span class="sign">=</span> <span class="quote">"p"</span><span class="sign">]</span>
+<span class="line_number">2739 </span>            dispersionoutput <span class="sign">&lt;</span><span class="sign">-</span> as<span class="sign">.</span><span class="keyword">list</span><span class="sign">(</span>dispersionoutput<span class="sign">)</span>
+<span class="line_number">2740 </span>        <span class="sign">}</span>
+<span class="line_number">2741 </span>        
+<span class="line_number">2742 </span>        iter<span class="sign">.</span>inner <span class="sign">&lt;</span><span class="sign">-</span> iter<span class="sign">.</span>inner <span class="sign">+</span> 1
+<span class="line_number">2743 </span>             
+<span class="line_number">2744 </span>        <span class="comment">######## Step 3: Update Regression parameter estimates</span>
+<span class="line_number">2745 </span>            <span class="keyword">if</span><span class="sign">(</span>verbose <span class="sign">&gt;</span><span class="sign">=</span> 2<span class="sign">)</span> <span class="keyword">cat</span><span class="sign">(</span><span class="quote">"\tUpdating regression parameter estimates ...\n"</span><span class="sign">)</span>
+<span class="line_number">2746 </span>        regressionoutput <span class="sign">&lt;</span><span class="sign">-</span> <a href="./bivrec_restimation2Fupdateregprof.html#robo19">updateregprof</a><span class="sign">(</span>m<span class="sign">,</span> Ji<span class="sign">,</span> datamat<span class="sign">,</span> datamatd<span class="sign">,</span>
+<span class="line_number">2747 </span>                alphars<span class="sign">,</span> alpharsd<span class="sign">,</span> as<span class="sign">,</span> asd<span class="sign">,</span> betahat<span class="sign">,</span> betadhat<span class="sign">,</span> K<span class="sign">,</span> Kd<span class="sign">,</span>
+<span class="line_number">2748 </span>                frailtyoutput<span class="sign">,</span> dispersionoutput<span class="sign">,</span> smooth<span class="sign">)</span>
+<span class="line_number">2749 </span>        <span class="keyword">if</span><span class="sign">(</span>is<span class="sign">.</span>null<span class="sign">(</span>names<span class="sign">(</span>regressionoutput<span class="sign">)</span><span class="sign">)</span><span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">2750 </span>            <span class="keyword">return</span><span class="sign">(</span>0<span class="sign">)</span>
+<span class="line_number">2751 </span>        <span class="sign">}</span> 
+<span class="line_number">2752 </span>        alpharsnew <span class="sign">&lt;</span><span class="sign">-</span> regressionoutput<span class="sign">$</span>alphars<span class="sign">;</span>
+<span class="line_number">2753 </span>        alpharsdnew <span class="sign">&lt;</span><span class="sign">-</span> regressionoutput<span class="sign">$</span>alpharsd<span class="sign">;</span>
+<span class="line_number">2754 </span>        betahatnew <span class="sign">&lt;</span><span class="sign">-</span> regressionoutput<span class="sign">$</span>betahat<span class="sign">;</span>
+<span class="line_number">2755 </span>        betadhatnew <span class="sign">&lt;</span><span class="sign">-</span> regressionoutput<span class="sign">$</span>betadhat<span class="sign">;</span>
+<span class="line_number">2756 </span>
+<span class="line_number">2757 </span>        <span class="comment"># Compute new value of convergence criterion</span>
+<span class="line_number">2758 </span>        newconvergence <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">sum</span><span class="sign">(</span>abs<span class="sign">(</span>betahatnew <span class="sign">-</span> betahat<span class="sign">)</span><span class="sign">)</span> <span class="sign">+</span>
+<span class="line_number">2759 </span>                          <span class="keyword">sum</span><span class="sign">(</span>abs<span class="sign">(</span>betadhatnew <span class="sign">-</span> betadhat<span class="sign">)</span><span class="sign">)</span> <span class="sign">+</span>
+<span class="line_number">2760 </span>                          abs<span class="sign">(</span>dispparams<span class="sign">$</span>sigma2hat <span class="sign">-</span> dispersionoutput<span class="sign">$</span>sigma2hat<span class="sign">)</span> <span class="sign">+</span>
+<span class="line_number">2761 </span>                          abs<span class="sign">(</span>dispparams<span class="sign">$</span>sigma2dhat <span class="sign">-</span> dispersionoutput<span class="sign">$</span>sigma2dhat<span class="sign">)</span> <span class="sign">+</span>
+<span class="line_number">2762 </span>                          abs<span class="sign">(</span>dispparams<span class="sign">$</span>nu2hat <span class="sign">-</span> dispersionoutput<span class="sign">$</span>nu2hat<span class="sign">)</span> <span class="sign">+</span>
+<span class="line_number">2763 </span>                          abs<span class="sign">(</span>dispparams<span class="sign">$</span>nu2dhat <span class="sign">-</span> dispersionoutput<span class="sign">$</span>nu2dhat<span class="sign">)</span> <span class="sign">+</span>
+<span class="line_number">2764 </span>                          abs<span class="sign">(</span>dispparams<span class="sign">$</span>thetahat <span class="sign">-</span> dispersionoutput<span class="sign">$</span>thetahat<span class="sign">)</span>
+<span class="line_number">2765 </span>        <span class="keyword">if</span><span class="sign">(</span>verbose <span class="sign">&gt;</span><span class="sign">=</span> 1<span class="sign">)</span> <span class="keyword">cat</span><span class="sign">(</span><span class="quote">"\tConvergence criterion: "</span><span class="sign">,</span> newconvergence<span class="sign">,</span> <span class="quote">"\n"</span><span class="sign">)</span>
+<span class="line_number">2766 </span>
+<span class="line_number">2767 </span>        <span class="comment"># DEBUG: Output state at this iteration</span>
+<span class="line_number">2768 </span>        <span class="keyword">if</span><span class="sign">(</span>verbose <span class="sign">&gt;</span><span class="sign">=</span> 2<span class="sign">)</span> <span class="keyword">cat</span><span class="sign">(</span><span class="quote">"\t betahat ="</span><span class="sign">,</span> betahatnew<span class="sign">,</span> <span class="quote">", betadhat = "</span><span class="sign">,</span>
+<span class="line_number">2769 </span>                             betadhatnew<span class="sign">,</span> <span class="quote">"\n"</span><span class="sign">)</span>
+<span class="line_number">2770 </span>        <span class="keyword">if</span><span class="sign">(</span>verbose <span class="sign">&gt;</span><span class="sign">=</span> 2<span class="sign">)</span> <span class="keyword">cat</span><span class="sign">(</span><span class="quote">"\t dispparams = "</span><span class="sign">,</span> format<span class="sign">(</span>unlist<span class="sign">(</span>dispersionoutput<span class="sign">)</span><span class="sign">,</span>
+<span class="line_number">2771 </span>                             digits <span class="sign">=</span> 4<span class="sign">)</span><span class="sign">,</span> <span class="quote">"\n"</span><span class="sign">)</span>
+<span class="line_number">2772 </span>        
+<span class="line_number">2773 </span>        <span class="keyword">if</span><span class="sign">(</span>is<span class="sign">.</span>nan<span class="sign">(</span>newconvergence<span class="sign">)</span> <span class="sign">|</span> iter <span class="sign">=</span><span class="sign">=</span> maxiter<span class="sign">.</span>outer <span class="sign">|</span>
+<span class="line_number">2774 </span>                        <span class="sign">(</span>newconvergence <span class="sign">-</span> convergence<span class="sign">)</span> <span class="sign">&gt;</span> 10<span class="sign">)</span> <span class="sign">{</span>
+<span class="line_number">2775 </span>            warning<span class="sign">(</span><span class="quote">"Outer loop did not converge"</span><span class="sign">)</span>
+<span class="line_number">2776 </span>            <span class="keyword">return</span><span class="sign">(</span>0<span class="sign">)</span>
+<span class="line_number">2777 </span>        <span class="sign">}</span>
+<span class="line_number">2778 </span>        
+<span class="line_number">2779 </span>        <span class="comment"># Replace parameter values with new parameters</span>
+<span class="line_number">2780 </span>        alphars <span class="sign">&lt;</span><span class="sign">-</span> alpharsnew
+<span class="line_number">2781 </span>        alpharsd <span class="sign">&lt;</span><span class="sign">-</span> alpharsdnew
+<span class="line_number">2782 </span>        betahat <span class="sign">&lt;</span><span class="sign">-</span> betahatnew
+<span class="line_number">2783 </span>        betadhat <span class="sign">&lt;</span><span class="sign">-</span> betadhatnew
+<span class="line_number">2784 </span>        convergence <span class="sign">&lt;</span><span class="sign">-</span> newconvergence
+<span class="line_number">2785 </span>        dispparams <span class="sign">&lt;</span><span class="sign">-</span> dispersionoutput   
+<span class="line_number">2786 </span>        iter <span class="sign">&lt;</span><span class="sign">-</span> iter <span class="sign">+</span> 1
+<span class="line_number">2787 </span>    <span class="sign">}</span>
+<span class="line_number">2788 </span>    
+<span class="line_number">2789 </span>    <span class="comment">## Format for output, compute standard errors, etc</span>
+<span class="line_number">2790 </span>    betahat <span class="sign">&lt;</span><span class="sign">-</span> regressionoutput<span class="sign">$</span>betahat
+<span class="line_number">2791 </span>    betadhat <span class="sign">&lt;</span><span class="sign">-</span> regressionoutput<span class="sign">$</span>betadhat
+<span class="line_number">2792 </span>    alphars <span class="sign">&lt;</span><span class="sign">-</span> as<span class="sign">.</span>vector<span class="sign">(</span>regressionoutput<span class="sign">$</span>alphars<span class="sign">)</span>
+<span class="line_number">2793 </span>    alpharsd <span class="sign">&lt;</span><span class="sign">-</span> as<span class="sign">.</span>vector<span class="sign">(</span>regressionoutput<span class="sign">$</span>alpharsd<span class="sign">)</span>
+<span class="line_number">2794 </span>    <span class="keyword">if</span><span class="sign">(</span>computesd<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">2795 </span>        <span class="comment"># Compute standard errors either using full sensitivity matrix, or only</span>
+<span class="line_number">2796 </span>        <span class="comment"># the sensitivity of the regression coefficients</span>
+<span class="line_number">2797 </span>        <span class="keyword">if</span><span class="sign">(</span>fullS<span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">2798 </span>            np <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">length</span><span class="sign">(</span>betahat<span class="sign">)</span> <span class="sign">+</span> <span class="keyword">sum</span><span class="sign">(</span>K<span class="sign">)</span><span class="sign">;</span>npd <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">length</span><span class="sign">(</span>betadhat<span class="sign">)</span> <span class="sign">+</span> <span class="keyword">sum</span><span class="sign">(</span>Kd<span class="sign">)</span>
+<span class="line_number">2799 </span>            b <span class="sign">&lt;</span><span class="sign">-</span> matrix<span class="sign">(</span>0<span class="sign">,</span> np <span class="sign">+</span> npd<span class="sign">,</span> <span class="keyword">length</span><span class="sign">(</span>betahat<span class="sign">)</span> <span class="sign">+</span> <span class="keyword">length</span><span class="sign">(</span>betadhat<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">2800 </span>            b<span class="sign">[</span>c<span class="sign">(</span><span class="keyword">sum</span><span class="sign">(</span>K<span class="sign">)</span> <span class="sign">+</span> 1<span class="sign">:</span><span class="keyword">length</span><span class="sign">(</span>betahat<span class="sign">)</span><span class="sign">,</span> <span class="keyword">sum</span><span class="sign">(</span>K<span class="sign">)</span> <span class="sign">+</span> <span class="keyword">sum</span><span class="sign">(</span>Kd<span class="sign">)</span> <span class="sign">+</span> <span class="keyword">length</span><span class="sign">(</span>betahat<span class="sign">)</span> <span class="sign">+</span>
+<span class="line_number">2801 </span>                1<span class="sign">:</span><span class="keyword">length</span><span class="sign">(</span>betadhat<span class="sign">)</span><span class="sign">)</span><span class="sign">,</span> 1<span class="sign">:</span><span class="keyword">dim</span><span class="sign">(</span>b<span class="sign">)</span><span class="sign">[</span>2<span class="sign">]</span><span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> diag<span class="sign">(</span>1<span class="sign">,</span> <span class="keyword">dim</span><span class="sign">(</span>b<span class="sign">)</span><span class="sign">[</span>2<span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">2802 </span>            stderr <span class="sign">&lt;</span><span class="sign">-</span> <a href="./bivrec_rfortranwrappers2Ffmkstderr.html#robo35">fmkstderr</a><span class="sign">(</span>m<span class="sign">,</span> Ji<span class="sign">,</span> b<span class="sign">,</span> datamat<span class="sign">,</span> datamatd<span class="sign">,</span> regressionoutput<span class="sign">$</span>alphars<span class="sign">,</span>
+<span class="line_number">2803 </span>                    regressionoutput<span class="sign">$</span>alpharsd<span class="sign">,</span> betahat<span class="sign">,</span> betadhat<span class="sign">,</span> as<span class="sign">,</span> asd<span class="sign">,</span>
+<span class="line_number">2804 </span>                    frailtyoutput<span class="sign">,</span> dispersionoutput<span class="sign">,</span> K<span class="sign">,</span> Kd<span class="sign">,</span> univariate<span class="sign">)</span>            
+<span class="line_number">2805 </span>        <span class="sign">}</span><span class="keyword">else</span><span class="sign">{</span>
+<span class="line_number">2806 </span>            S <span class="sign">&lt;</span><span class="sign">-</span> <a href="./bivrec_rfortranwrappers2FfmakeSens2.html#robo32">fmakeSens2</a><span class="sign">(</span>m<span class="sign">,</span> Ji<span class="sign">,</span> datamat<span class="sign">,</span> datamatd<span class="sign">,</span> regressionoutput<span class="sign">$</span>alphars<span class="sign">,</span>
+<span class="line_number">2807 </span>                regressionoutput<span class="sign">$</span>alpharsd<span class="sign">,</span> betahat<span class="sign">,</span> betadhat<span class="sign">,</span> as<span class="sign">,</span> asd<span class="sign">,</span>
+<span class="line_number">2808 </span>                frailtyoutput<span class="sign">,</span> dispersionoutput<span class="sign">,</span> K<span class="sign">,</span> Kd<span class="sign">,</span> fullS<span class="sign">)</span>
+<span class="line_number">2809 </span>            <span class="keyword">if</span><span class="sign">(</span>univariate<span class="sign">)</span> S <span class="sign">&lt;</span><span class="sign">-</span> S<span class="sign">[</span>1<span class="sign">:</span><span class="keyword">length</span><span class="sign">(</span>betahat<span class="sign">)</span><span class="sign">,</span> 1<span class="sign">:</span><span class="keyword">length</span><span class="sign">(</span>betahat<span class="sign">)</span><span class="sign">]</span>
+<span class="line_number">2810 </span>            stderr <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">sqrt</span><span class="sign">(</span>diag<span class="sign">(</span><span class="sign">-</span>solve<span class="sign">(</span>S<span class="sign">)</span><span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">2811 </span>        <span class="sign">}</span>
+<span class="line_number">2812 </span>        std_betahat <span class="sign">&lt;</span><span class="sign">-</span> stderr<span class="sign">[</span>1<span class="sign">:</span><span class="keyword">length</span><span class="sign">(</span>betahat<span class="sign">)</span><span class="sign">]</span>
+<span class="line_number">2813 </span>        std_betadhat <span class="sign">&lt;</span><span class="sign">-</span> stderr<span class="sign">[</span><span class="keyword">length</span><span class="sign">(</span>betahat<span class="sign">)</span> <span class="sign">+</span> 1<span class="sign">:</span><span class="keyword">length</span><span class="sign">(</span>betadhat<span class="sign">)</span><span class="sign">]</span>
+<span class="line_number">2814 </span>    <span class="sign">}</span><span class="keyword">else</span><span class="sign">{</span>
+<span class="line_number">2815 </span>        stderr <span class="sign">&lt;</span><span class="sign">-</span> 0
+<span class="line_number">2816 </span>        std_betahat <span class="sign">&lt;</span><span class="sign">-</span> 0
+<span class="line_number">2817 </span>        std_betadhat <span class="sign">&lt;</span><span class="sign">-</span> 0
+<span class="line_number">2818 </span>    <span class="sign">}</span>
+<span class="line_number">2819 </span>
+<span class="line_number">2820 </span>    <span class="comment"># Compute p-values and summaries</span>
+<span class="line_number">2821 </span>    pval <span class="sign">=</span> pmin<span class="sign">(</span>pnorm<span class="sign">(</span>betahat <span class="sign">/</span> std_betahat<span class="sign">)</span><span class="sign">,</span> 1 <span class="sign">-</span> pnorm<span class="sign">(</span>betahat <span class="sign">/</span> std_betahat<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">2822 </span>    pval<span class="sign">.</span>d <span class="sign">=</span> pmin<span class="sign">(</span>pnorm<span class="sign">(</span>betadhat <span class="sign">/</span> std_betadhat<span class="sign">)</span><span class="sign">,</span> 1 <span class="sign">-</span> pnorm<span class="sign">(</span>betadhat <span class="sign">/</span> std_betadhat<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">2823 </span>    varnames <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">unique</span><span class="sign">(</span>c<span class="sign">(</span>varnames1<span class="sign">,</span> varnames2<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">2824 </span>    summary<span class="sign">.</span>reg <span class="sign">&lt;</span><span class="sign">-</span> as<span class="sign">.</span>data<span class="sign">.</span>frame<span class="sign">(</span>matrix<span class="sign">(</span>NA<span class="sign">,</span> <span class="keyword">length</span><span class="sign">(</span>varnames<span class="sign">)</span><span class="sign">,</span> 6<span class="sign">)</span><span class="sign">,</span> row<span class="sign">.</span>names <span class="sign">=</span> varnames<span class="sign">)</span>
+<span class="line_number">2825 </span>        <span class="keyword">colnames</span><span class="sign">(</span>summary<span class="sign">.</span>reg<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span><span class="quote">"coeff.1"</span><span class="sign">,</span> <span class="quote">"se.1"</span><span class="sign">,</span> <span class="quote">"pval.1"</span><span class="sign">,</span> <span class="quote">"coeff.2"</span><span class="sign">,</span> <span class="quote">"se.2"</span><span class="sign">,</span> <span class="quote">"pval.2"</span><span class="sign">)</span>
+<span class="line_number">2826 </span>        summary<span class="sign">.</span>reg<span class="sign">[</span>match<span class="sign">(</span>varnames1<span class="sign">,</span> varnames<span class="sign">)</span><span class="sign">,</span> 1<span class="sign">:</span>3<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">cbind</span><span class="sign">(</span>betahat<span class="sign">,</span> std_betahat<span class="sign">,</span> pval<span class="sign">)</span>
+<span class="line_number">2827 </span>        summary<span class="sign">.</span>reg<span class="sign">[</span>match<span class="sign">(</span>varnames2<span class="sign">,</span> varnames<span class="sign">)</span><span class="sign">,</span> 3 <span class="sign">+</span> 1<span class="sign">:</span>3<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> 
+<span class="line_number">2828 </span>                        <span class="keyword">cbind</span><span class="sign">(</span>betadhat<span class="sign">,</span> std_betadhat<span class="sign">,</span> pval<span class="sign">.</span>d<span class="sign">)</span>
+<span class="line_number">2829 </span>        
+<span class="line_number">2830 </span>    rhohat <span class="sign">&lt;</span><span class="sign">-</span> dispparams<span class="sign">$</span>thetahat <span class="sign">/</span> <span class="keyword">sqrt</span><span class="sign">(</span><span class="sign">(</span>dispparams<span class="sign">$</span>sigma2hat <span class="sign">+</span> dispparams<span class="sign">$</span>nu2hat<span class="sign">)</span> <span class="sign">*</span>
+<span class="line_number">2831 </span>            <span class="sign">(</span>dispparams<span class="sign">$</span>sigma2dhat <span class="sign">+</span> dispparams<span class="sign">$</span>nu2dhat<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">2832 </span>    
+<span class="line_number">2833 </span>    summary<span class="sign">.</span>disp <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span>dispparams<span class="sign">$</span>sigma2hat<span class="sign">,</span> dispparams<span class="sign">$</span>sigma2dhat<span class="sign">,</span> dispparams<span class="sign">$</span>nu2hat<span class="sign">,</span>
+<span class="line_number">2834 </span>            dispparams<span class="sign">$</span>nu2dhat<span class="sign">,</span> dispparams<span class="sign">$</span>thetahat<span class="sign">,</span> rhohat<span class="sign">)</span>
+<span class="line_number">2835 </span>    names<span class="sign">(</span>summary<span class="sign">.</span>disp<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span><span class="quote">"sigma2hat"</span><span class="sign">,</span> <span class="quote">"sigma2dhat"</span><span class="sign">,</span> <span class="quote">"nu2hat"</span><span class="sign">,</span>
+<span class="line_number">2836 </span>            <span class="quote">"nu2dhat"</span><span class="sign">,</span> <span class="quote">"thetahat"</span><span class="sign">,</span> <span class="quote">"rhohat"</span><span class="sign">)</span>
+<span class="line_number">2837 </span>            
+<span class="line_number">2838 </span>
+<span class="line_number">2839 </span>    <span class="keyword">return</span><span class="sign">(</span><span class="keyword">list</span><span class="sign">(</span><span class="keyword">call</span> <span class="sign">=</span> <span class="keyword">call</span><span class="sign">,</span>
+<span class="line_number">2840 </span>                summary<span class="sign">.</span>reg <span class="sign">=</span> summary<span class="sign">.</span>reg<span class="sign">,</span>
+<span class="line_number">2841 </span>                summary<span class="sign">.</span>disp <span class="sign">=</span> summary<span class="sign">.</span>disp<span class="sign">,</span>
+<span class="line_number">2842 </span>                regressionoutput <span class="sign">=</span> regressionoutput<span class="sign">,</span>
+<span class="line_number">2843 </span>                frailtyoutput <span class="sign">=</span> frailtyoutput<span class="sign">,</span>
+<span class="line_number">2844 </span>                dispparams <span class="sign">=</span> dispparams<span class="sign">,</span>
+<span class="line_number">2845 </span>                initial <span class="sign">=</span> initial<span class="sign">,</span>
+<span class="line_number">2846 </span>                stderr <span class="sign">=</span> stderr<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">2847 </span><span class="sign">}</span>
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./blupsurv/R/bivrec.r with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.36 on Sun Jun 29 2008 13:34:50
+</p>
+</div> <!-- footer -->
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=3825293; 
+var sc_invisible=1; 
+var sc_partition=34; 
+var sc_click_stat=1; 
+var sc_security="2dd2334a"; 
+</script>
+
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div
+class="statcounter"><a href="http://www.statcounter.com/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/3825293/0/2dd2334a/1/" alt="free html hit
+counter" ></a></div></noscript>
+<!-- End of StatCounter Code -->
+</body>
+
+</html>

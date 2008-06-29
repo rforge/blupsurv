@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./blupsurv/src/bivrec.f</title>
+<!-- Source: ./blupsurv/src/bivrec.f -->
+<!-- Generated with ROBODoc Version 4.99.36 (Jun 17 2008) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">blupsurv</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="./bivrec_f2Ffortran.html#robo2">fortran</a><a class="menuitem" href="../robo_methods.html#robo_top_of_doc">Methods</a></div> <!-- navigation -->
+<div id="content">
+<h3>TABLE OF CONTENTS</h3>
+<ul>
+<li>1. <a href="#robo23">fortran/fmkfrail</a></li>
+</ul>
+<hr />
+<a name="fortran2ffmkfrail"></a>
+<a name="robo23"></a><h2>fortran/fmkfrail [ Methods ]</h2>
+
+<p class="item_name">NAME</p>
+<pre>  <strong>fmkfrail</strong> --- compute BLUP frailty estimates
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>    Compute cluster- and subject-level frailty BLUPs under the
+    auxiliary Poisson model. 
+    See also the R function <a href="../R/bivrec_rZZdebug2Ffupdatefrailties3.html#robo74">fupdatefrailties3</a>.
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">490 </span>      <span class="keyword">subroutine</span> <strong>fmkfrail</strong><span class="sign">(</span>index<span class="sign">,</span>indexd<span class="sign">,</span>delta<span class="sign">,</span>deltad<span class="sign">,</span>Z<span class="sign">,</span>Zd<span class="sign">,</span>alphars<span class="sign">,</span>
+<span class="line_number">491 </span>     <span class="sign">$</span> alpharsd<span class="sign">,</span>as<span class="sign">,</span>asd<span class="sign">,</span>betahat<span class="sign">,</span>betadhat<span class="sign">,</span>m<span class="sign">,</span>Ji<span class="sign">,</span>jimax<span class="sign">,</span>Jicum<span class="sign">,</span>jisum<span class="sign">,</span>d1<span class="sign">,</span>
+<span class="line_number">492 </span>     <span class="sign">$</span> d2<span class="sign">,</span>ncovs1<span class="sign">,</span>ncovs2<span class="sign">,</span>nr<span class="sign">,</span>ns<span class="sign">,</span>nsd<span class="sign">,</span>sigma2<span class="sign">,</span>sigma2d<span class="sign">,</span>nu2<span class="sign">,</span>nu2d<span class="sign">,</span>theta<span class="sign">,</span>Uihat<span class="sign">,</span>
+<span class="line_number">493 </span>     <span class="sign">$</span> Vihat<span class="sign">,</span>Uijhat<span class="sign">,</span>Vijhat<span class="sign">,</span>pi<span class="sign">,</span>qi<span class="sign">,</span>ri<span class="sign">,</span>si<span class="sign">,</span>piprime<span class="sign">,</span>qiprime<span class="sign">,</span>riprime<span class="sign">,</span>siprime<span class="sign">,</span>
+<span class="line_number">494 </span>     <span class="sign">$</span> pij<span class="sign">,</span>qij<span class="sign">,</span>rij<span class="sign">,</span>sij<span class="sign">,</span>pijprime<span class="sign">,</span>qijprime<span class="sign">,</span>rijprime<span class="sign">,</span>sijprime<span class="sign">,</span>wi<span class="sign">,</span>wij<span class="sign">,</span>zij<span class="sign">)</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>   Too many to list, but analogous to those in other routines in
+   this file. Inputs appended with d refer to process 2.
+</pre>
+<p class="item_name">OUTPUTS</p>
+<pre>    Uihat      vector of cluster-level frailties for process 1
+    Vihat      vector of cluster-level frailties for process 2
+    Uijhat     vector of subject-level frailties for process 1
+    Vijhat     vector of subject-level frailties for process 2
+    p,q,r,s, etc   intermediate values
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">496 </span>      <span class="keyword">integer</span> d1<span class="sign">,</span>d2<span class="sign">,</span>ncovs1<span class="sign">,</span>ncovs2<span class="sign">,</span>nr<span class="sign">,</span>ns<span class="sign">,</span>nsd<span class="sign">,</span>m<span class="sign">,</span>jimax
+<span class="line_number">497 </span>      <span class="keyword">integer</span> Ji<span class="sign">(</span>m<span class="sign">)</span><span class="sign">,</span>Jicum<span class="sign">(</span>m<span class="sign">)</span>
+<span class="line_number">498 </span>      <span class="keyword">integer</span> index<span class="sign">(</span>d1<span class="sign">,</span>6<span class="sign">)</span><span class="sign">,</span> indexd<span class="sign">(</span>d2<span class="sign">,</span>6<span class="sign">)</span>
+<span class="line_number">499 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> delta<span class="sign">(</span>d1<span class="sign">)</span><span class="sign">,</span> deltad<span class="sign">(</span>d2<span class="sign">)</span>
+<span class="line_number">500 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> Z<span class="sign">(</span>d1<span class="sign">,</span>ncovs1<span class="sign">)</span><span class="sign">,</span> Zd<span class="sign">(</span>d2<span class="sign">,</span>ncovs2<span class="sign">)</span>
+<span class="line_number">501 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> alphars<span class="sign">(</span>nr<span class="sign">,</span>ns<span class="sign">)</span><span class="sign">,</span>alpharsd<span class="sign">(</span>nr<span class="sign">,</span>nsd<span class="sign">)</span>
+<span class="line_number">502 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> as<span class="sign">(</span>nr<span class="sign">,</span>ns<span class="sign">)</span><span class="sign">,</span> asd<span class="sign">(</span>nr<span class="sign">,</span>nsd<span class="sign">)</span>
+<span class="line_number">503 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> betahat<span class="sign">(</span>ncovs1<span class="sign">)</span><span class="sign">,</span> betadhat<span class="sign">(</span>ncovs2<span class="sign">)</span>
+<span class="line_number">504 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> sigma2<span class="sign">,</span>sigma2d<span class="sign">,</span>nu2<span class="sign">,</span>nu2d<span class="sign">,</span>theta
+<span class="line_number">505 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> Uihat<span class="sign">(</span>m<span class="sign">)</span><span class="sign">,</span>Vihat<span class="sign">(</span>m<span class="sign">)</span><span class="sign">,</span>Uijhat<span class="sign">(</span>jisum<span class="sign">)</span><span class="sign">,</span>Vijhat<span class="sign">(</span>jisum<span class="sign">)</span>
+<span class="line_number">506 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> pi<span class="sign">(</span>m<span class="sign">)</span><span class="sign">,</span>qi<span class="sign">(</span>m<span class="sign">)</span><span class="sign">,</span>ri<span class="sign">(</span>m<span class="sign">)</span><span class="sign">,</span>si<span class="sign">(</span>m<span class="sign">)</span><span class="sign">,</span>piprime<span class="sign">(</span>m<span class="sign">)</span><span class="sign">,</span>qiprime<span class="sign">(</span>m<span class="sign">)</span><span class="sign">,</span>
+<span class="line_number">507 </span>     <span class="sign">$</span> riprime<span class="sign">(</span>m<span class="sign">)</span><span class="sign">,</span>siprime<span class="sign">(</span>m<span class="sign">)</span><span class="sign">,</span>pij<span class="sign">(</span>m<span class="sign">,</span>jimax<span class="sign">)</span><span class="sign">,</span>qij<span class="sign">(</span>m<span class="sign">,</span>jimax<span class="sign">)</span><span class="sign">,</span>rij<span class="sign">(</span>m<span class="sign">,</span>jimax<span class="sign">)</span><span class="sign">,</span>
+<span class="line_number">508 </span>     <span class="sign">$</span> sij<span class="sign">(</span>m<span class="sign">,</span>jimax<span class="sign">)</span><span class="sign">,</span>pijprime<span class="sign">(</span>m<span class="sign">,</span>jimax<span class="sign">)</span><span class="sign">,</span>qijprime<span class="sign">(</span>m<span class="sign">,</span>jimax<span class="sign">)</span><span class="sign">,</span>
+<span class="line_number">509 </span>     <span class="sign">$</span> rijprime<span class="sign">(</span>m<span class="sign">,</span>jimax<span class="sign">)</span><span class="sign">,</span>sijprime<span class="sign">(</span>m<span class="sign">,</span>jimax<span class="sign">)</span>
+<span class="line_number">510 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> wi<span class="sign">(</span>m<span class="sign">)</span><span class="sign">,</span>wij<span class="sign">(</span>m<span class="sign">,</span>jimax<span class="sign">)</span><span class="sign">,</span>zij<span class="sign">(</span>m<span class="sign">,</span>jimax<span class="sign">)</span>
+<span class="line_number">511 </span>      
+<span class="line_number">512 </span>      <span class="keyword">integer</span> i<span class="sign">,</span>j
+<span class="line_number">513 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> Smu<span class="sign">(</span>m<span class="sign">,</span>jimax<span class="sign">)</span><span class="sign">,</span>Seta<span class="sign">(</span>m<span class="sign">,</span>jimax<span class="sign">)</span><span class="sign">,</span>Sdelta<span class="sign">(</span>m<span class="sign">,</span>jimax<span class="sign">)</span><span class="sign">,</span>
+<span class="line_number">514 </span>     <span class="sign">$</span> SDeltad<span class="sign">(</span>m<span class="sign">,</span>jimax<span class="sign">)</span>
+<span class="line_number">515 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> <a href="../R/bivrec_rZZdebug2FSmuij.html#robo81">Smuij</a><span class="sign">,</span>Setaij<span class="sign">,</span>Sdeltaij<span class="sign">,</span>Sdeltaijd
+<span class="line_number">516 </span>      
+<span class="line_number">517 </span>      <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>Smu<span class="sign">,</span>m<span class="sign">*</span>jimax<span class="sign">)</span>
+<span class="line_number">518 </span>      <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>Seta<span class="sign">,</span>m<span class="sign">*</span>jimax<span class="sign">)</span>
+<span class="line_number">519 </span>      <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>Sdelta<span class="sign">,</span>m<span class="sign">*</span>jimax<span class="sign">)</span>
+<span class="line_number">520 </span>      <span class="keyword">call</span> <a href="./bivrec_ffortran2Fdzero.html#robo21">dzero</a><span class="sign">(</span>SDeltad<span class="sign">,</span>m<span class="sign">*</span>jimax<span class="sign">)</span>
+<span class="line_number">521 </span>      
+<span class="line_number">522 </span><span class="comment">!     call dblepr("Smu",-1,Smu,m*jimax)</span>
+<span class="line_number">523 </span>
+<span class="line_number">524 </span>      <span class="keyword">call</span> <a href="./bivrec_ffortran2Ffsmuij.html#robo31">fsmuij</a><span class="sign">(</span>betahat<span class="sign">,</span>index<span class="sign">,</span>delta<span class="sign">,</span>Z<span class="sign">,</span>alphars<span class="sign">,</span>as<span class="sign">,</span>d1<span class="sign">,</span>ncovs1<span class="sign">,</span>nr<span class="sign">,</span>ns<span class="sign">,</span>
+<span class="line_number">525 </span>     <span class="sign">$</span> m<span class="sign">,</span>jimax<span class="sign">,</span>Smu<span class="sign">,</span>Sdelta<span class="sign">)</span>
+<span class="line_number">526 </span>      <span class="keyword">call</span> <a href="./bivrec_ffortran2Ffsmuij.html#robo31">fsmuij</a><span class="sign">(</span>betadhat<span class="sign">,</span>indexd<span class="sign">,</span>deltad<span class="sign">,</span>Zd<span class="sign">,</span>alpharsd<span class="sign">,</span>asd<span class="sign">,</span>d2<span class="sign">,</span>ncovs2<span class="sign">,</span>nr<span class="sign">,</span>
+<span class="line_number">527 </span>     <span class="sign">$</span> nsd<span class="sign">,</span>m<span class="sign">,</span>jimax<span class="sign">,</span>Seta<span class="sign">,</span>SDeltad<span class="sign">)</span>    
+<span class="line_number">528 </span>      
+<span class="line_number">529 </span>      <span class="keyword">do</span> 100 i<span class="sign">=</span>1<span class="sign">,</span>m
+<span class="line_number">530 </span><span class="comment">!    compute intermediate values</span>
+<span class="line_number">531 </span>        <span class="keyword">do</span> 110 j<span class="sign">=</span>1<span class="sign">,</span>Ji<span class="sign">(</span>i<span class="sign">)</span>
+<span class="line_number">532 </span>            <a href="../R/bivrec_rZZdebug2FSmuij.html#robo81">Smuij</a><span class="sign">=</span>Smu<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span>
+<span class="line_number">533 </span>            Setaij<span class="sign">=</span>Seta<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span>
+<span class="line_number">534 </span>            Sdeltaij<span class="sign">=</span>Sdelta<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span>
+<span class="line_number">535 </span>            SDeltaijd<span class="sign">=</span>SDeltad<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span>
+<span class="line_number">536 </span>            
+<span class="line_number">537 </span>            wij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">=</span>nu2<span class="sign">-</span>theta<span class="sign">*</span>theta<span class="sign">*</span>Setaij<span class="sign">/</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>nu2d<span class="sign">*</span>Setaij<span class="sign">)</span>
+<span class="line_number">538 </span>            zij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">=</span>nu2d<span class="sign">-</span>theta<span class="sign">*</span>theta<span class="sign">*</span><a href="../R/bivrec_rZZdebug2FSmuij.html#robo81">Smuij</a><span class="sign">/</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>nu2<span class="sign">*</span><a href="../R/bivrec_rZZdebug2FSmuij.html#robo81">Smuij</a><span class="sign">)</span>
+<span class="line_number">539 </span>            pij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">=</span><a href="../R/bivrec_rZZdebug2FSmuij.html#robo81">Smuij</a><span class="sign">/</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>wij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">*</span><a href="../R/bivrec_rZZdebug2FSmuij.html#robo81">Smuij</a><span class="sign">)</span>
+<span class="line_number">540 </span>            qij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">=</span><span class="sign">-</span>theta<span class="sign">*</span><a href="../R/bivrec_rZZdebug2FSmuij.html#robo81">Smuij</a><span class="sign">*</span>Setaij<span class="sign">/</span><span class="sign">(</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>nu2<span class="sign">*</span><a href="../R/bivrec_rZZdebug2FSmuij.html#robo81">Smuij</a><span class="sign">)</span><span class="sign">*</span>
+<span class="line_number">541 </span>     <span class="sign">$</span>          <span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>nu2d<span class="sign">*</span>Setaij<span class="sign">)</span><span class="sign">-</span>theta<span class="sign">*</span>theta<span class="sign">*</span><a href="../R/bivrec_rZZdebug2FSmuij.html#robo81">Smuij</a><span class="sign">*</span>Setaij<span class="sign">)</span>
+<span class="line_number">542 </span>            rij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">=</span>qij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span>
+<span class="line_number">543 </span>            sij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">=</span>Setaij<span class="sign">/</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>zij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">*</span>Setaij<span class="sign">)</span>
+<span class="line_number">544 </span>            pijprime<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">=</span>Sdeltaij<span class="sign">/</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>wij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">*</span><a href="../R/bivrec_rZZdebug2FSmuij.html#robo81">Smuij</a><span class="sign">)</span>
+<span class="line_number">545 </span>            qijprime<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">=</span><span class="sign">-</span>theta<span class="sign">*</span><a href="../R/bivrec_rZZdebug2FSmuij.html#robo81">Smuij</a><span class="sign">*</span>SDeltaijd<span class="sign">/</span><span class="sign">(</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>nu2<span class="sign">*</span><a href="../R/bivrec_rZZdebug2FSmuij.html#robo81">Smuij</a><span class="sign">)</span><span class="sign">*</span>
+<span class="line_number">546 </span>     <span class="sign">$</span>          <span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>nu2d<span class="sign">*</span>Setaij<span class="sign">)</span><span class="sign">-</span>theta<span class="sign">*</span>theta<span class="sign">*</span><a href="../R/bivrec_rZZdebug2FSmuij.html#robo81">Smuij</a><span class="sign">*</span>Setaij<span class="sign">)</span>
+<span class="line_number">547 </span>            rijprime<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">=</span><span class="sign">-</span>theta<span class="sign">*</span>Sdeltaij<span class="sign">*</span>Setaij<span class="sign">/</span><span class="sign">(</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>nu2<span class="sign">*</span><a href="../R/bivrec_rZZdebug2FSmuij.html#robo81">Smuij</a><span class="sign">)</span><span class="sign">*</span>
+<span class="line_number">548 </span>     <span class="sign">$</span>          <span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>nu2d<span class="sign">*</span>Setaij<span class="sign">)</span><span class="sign">-</span>theta<span class="sign">*</span>theta<span class="sign">*</span><a href="../R/bivrec_rZZdebug2FSmuij.html#robo81">Smuij</a><span class="sign">*</span>Setaij<span class="sign">)</span>   
+<span class="line_number">549 </span>            sijprime<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">=</span>SDeltaijd<span class="sign">/</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>zij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">*</span>Setaij<span class="sign">)</span>       
+<span class="line_number">550 </span>            
+<span class="line_number">551 </span>            piprime<span class="sign">(</span>i<span class="sign">)</span><span class="sign">=</span>piprime<span class="sign">(</span>i<span class="sign">)</span><span class="sign">+</span>pijprime<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span>
+<span class="line_number">552 </span>            qiprime<span class="sign">(</span>i<span class="sign">)</span><span class="sign">=</span>qiprime<span class="sign">(</span>i<span class="sign">)</span><span class="sign">+</span>qijprime<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span>
+<span class="line_number">553 </span>            riprime<span class="sign">(</span>i<span class="sign">)</span><span class="sign">=</span>riprime<span class="sign">(</span>i<span class="sign">)</span><span class="sign">+</span>rijprime<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span>
+<span class="line_number">554 </span>            siprime<span class="sign">(</span>i<span class="sign">)</span><span class="sign">=</span>siprime<span class="sign">(</span>i<span class="sign">)</span><span class="sign">+</span>sijprime<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span>
+<span class="line_number">555 </span>            pi<span class="sign">(</span>i<span class="sign">)</span><span class="sign">=</span>pi<span class="sign">(</span>i<span class="sign">)</span><span class="sign">+</span>pij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span>
+<span class="line_number">556 </span>            qi<span class="sign">(</span>i<span class="sign">)</span><span class="sign">=</span>qi<span class="sign">(</span>i<span class="sign">)</span><span class="sign">+</span>qij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span>
+<span class="line_number">557 </span>            ri<span class="sign">(</span>i<span class="sign">)</span><span class="sign">=</span>ri<span class="sign">(</span>i<span class="sign">)</span><span class="sign">+</span>rij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span>
+<span class="line_number">558 </span>            si<span class="sign">(</span>i<span class="sign">)</span><span class="sign">=</span>si<span class="sign">(</span>i<span class="sign">)</span><span class="sign">+</span>sij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span>            
+<span class="line_number">559 </span> 110    <span class="keyword">continue</span>     
+<span class="line_number">560 </span><span class="comment">!  compute cluster-level frailties</span>
+<span class="line_number">561 </span>        wi<span class="sign">(</span>i<span class="sign">)</span><span class="sign">=</span>1<span class="sign">.</span>0d0<span class="sign">/</span><span class="sign">(</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>sigma2<span class="sign">*</span>pi<span class="sign">(</span>i<span class="sign">)</span><span class="sign">)</span><span class="sign">*</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>sigma2d<span class="sign">*</span>si<span class="sign">(</span>i<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">562 </span>     <span class="sign">$</span>      <span class="sign">-</span>sigma2<span class="sign">*</span>sigma2d<span class="sign">*</span>ri<span class="sign">(</span>i<span class="sign">)</span><span class="sign">*</span>ri<span class="sign">(</span>i<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">563 </span>        Uihat<span class="sign">(</span>i<span class="sign">)</span><span class="sign">=</span>1<span class="sign">.</span>0d0<span class="sign">+</span>sigma2<span class="sign">*</span>wi<span class="sign">(</span>i<span class="sign">)</span><span class="sign">*</span><span class="sign">(</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>sigma2d<span class="sign">*</span>si<span class="sign">(</span>i<span class="sign">)</span><span class="sign">)</span><span class="sign">*</span>
+<span class="line_number">564 </span>     <span class="sign">$</span>      <span class="sign">(</span>piprime<span class="sign">(</span>i<span class="sign">)</span><span class="sign">-</span>pi<span class="sign">(</span>i<span class="sign">)</span><span class="sign">+</span>qiprime<span class="sign">(</span>i<span class="sign">)</span><span class="sign">-</span>qi<span class="sign">(</span>i<span class="sign">)</span><span class="sign">)</span><span class="sign">-</span>sigma2d<span class="sign">*</span>ri<span class="sign">(</span>i<span class="sign">)</span><span class="sign">*</span>
+<span class="line_number">565 </span>     <span class="sign">$</span>      <span class="sign">(</span>riprime<span class="sign">(</span>i<span class="sign">)</span><span class="sign">-</span>ri<span class="sign">(</span>i<span class="sign">)</span><span class="sign">+</span>siprime<span class="sign">(</span>i<span class="sign">)</span><span class="sign">-</span>si<span class="sign">(</span>i<span class="sign">)</span><span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">566 </span>        Vihat<span class="sign">(</span>i<span class="sign">)</span><span class="sign">=</span>1<span class="sign">.</span>0d0<span class="sign">+</span>sigma2d<span class="sign">*</span>wi<span class="sign">(</span>i<span class="sign">)</span><span class="sign">*</span><span class="sign">(</span><span class="sign">(</span>1<span class="sign">.</span>0d0<span class="sign">+</span>sigma2<span class="sign">*</span>pi<span class="sign">(</span>i<span class="sign">)</span><span class="sign">)</span><span class="sign">*</span>
+<span class="line_number">567 </span>     <span class="sign">$</span>      <span class="sign">(</span>riprime<span class="sign">(</span>i<span class="sign">)</span><span class="sign">-</span>ri<span class="sign">(</span>i<span class="sign">)</span><span class="sign">+</span>siprime<span class="sign">(</span>i<span class="sign">)</span><span class="sign">-</span>si<span class="sign">(</span>i<span class="sign">)</span><span class="sign">)</span><span class="sign">-</span>sigma2<span class="sign">*</span>ri<span class="sign">(</span>i<span class="sign">)</span><span class="sign">*</span>
+<span class="line_number">568 </span>     <span class="sign">$</span>      <span class="sign">(</span>piprime<span class="sign">(</span>i<span class="sign">)</span><span class="sign">-</span>pi<span class="sign">(</span>i<span class="sign">)</span><span class="sign">+</span>qiprime<span class="sign">(</span>i<span class="sign">)</span><span class="sign">-</span>qi<span class="sign">(</span>i<span class="sign">)</span><span class="sign">)</span><span class="sign">)</span> 
+<span class="line_number">569 </span>        
+<span class="line_number">570 </span>        <span class="keyword">if</span><span class="sign">(</span>Uihat<span class="sign">(</span>i<span class="sign">)</span><span class="sign">.</span>LE<span class="sign">.</span>0<span class="sign">.</span>01<span class="sign">)</span> <span class="keyword">then</span> 
+<span class="line_number">571 </span>            Uihat<span class="sign">(</span>i<span class="sign">)</span><span class="sign">=</span>0<span class="sign">.</span>01
+<span class="line_number">572 </span>        <span class="keyword">endif</span>
+<span class="line_number">573 </span>        <span class="keyword">if</span><span class="sign">(</span>Vihat<span class="sign">(</span>i<span class="sign">)</span><span class="sign">.</span>LE<span class="sign">.</span>0<span class="sign">.</span>01<span class="sign">)</span> <span class="keyword">then</span> 
+<span class="line_number">574 </span>            Vihat<span class="sign">(</span>i<span class="sign">)</span><span class="sign">=</span>0<span class="sign">.</span>01
+<span class="line_number">575 </span>        <span class="keyword">endif</span>
+<span class="line_number">576 </span><span class="comment">!  compute subject-level frailties</span>
+<span class="line_number">577 </span>        <span class="keyword">do</span> 120 j<span class="sign">=</span>1<span class="sign">,</span>Ji<span class="sign">(</span>i<span class="sign">)</span>
+<span class="line_number">578 </span>            Uijhat<span class="sign">(</span>Jicum<span class="sign">(</span>i<span class="sign">)</span><span class="sign">+</span>j<span class="sign">)</span><span class="sign">=</span>Uihat<span class="sign">(</span>i<span class="sign">)</span><span class="sign">-</span><span class="sign">(</span>nu2<span class="sign">*</span>pij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">+</span>theta<span class="sign">*</span>rij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">579 </span>     <span class="sign">$</span>           <span class="sign">*</span>Uihat<span class="sign">(</span>i<span class="sign">)</span><span class="sign">-</span><span class="sign">(</span>nu2<span class="sign">*</span>qij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">+</span>theta<span class="sign">*</span>sij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">)</span><span class="sign">*</span>Vihat<span class="sign">(</span>i<span class="sign">)</span>
+<span class="line_number">580 </span>     <span class="sign">$</span>          <span class="sign">+</span>nu2<span class="sign">*</span><span class="sign">(</span>pijprime<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">+</span>qijprime<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">581 </span>     <span class="sign">$</span>          <span class="sign">+</span>theta<span class="sign">*</span><span class="sign">(</span>rijprime<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">+</span>sijprime<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">582 </span>            Vijhat<span class="sign">(</span>Jicum<span class="sign">(</span>i<span class="sign">)</span><span class="sign">+</span>j<span class="sign">)</span><span class="sign">=</span>Vihat<span class="sign">(</span>i<span class="sign">)</span><span class="sign">-</span><span class="sign">(</span>theta<span class="sign">*</span>qij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">+</span>nu2d<span class="sign">*</span>sij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">583 </span>     <span class="sign">$</span>          <span class="sign">*</span>Vihat<span class="sign">(</span>i<span class="sign">)</span><span class="sign">-</span><span class="sign">(</span>theta<span class="sign">*</span>pij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">+</span>nu2d<span class="sign">*</span>rij<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">)</span><span class="sign">*</span>Uihat<span class="sign">(</span>i<span class="sign">)</span>
+<span class="line_number">584 </span>     <span class="sign">$</span>          <span class="sign">+</span>theta<span class="sign">*</span><span class="sign">(</span>pijprime<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">+</span>qijprime<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">585 </span>     <span class="sign">$</span>          <span class="sign">+</span>nu2d<span class="sign">*</span><span class="sign">(</span>rijprime<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">+</span>sijprime<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">)</span>           
+<span class="line_number">586 </span>            <span class="keyword">if</span><span class="sign">(</span>Uijhat<span class="sign">(</span>Jicum<span class="sign">(</span>i<span class="sign">)</span><span class="sign">+</span>j<span class="sign">)</span><span class="sign">.</span>LE<span class="sign">.</span>0<span class="sign">.</span>01<span class="sign">)</span> <span class="keyword">then</span> 
+<span class="line_number">587 </span>                Uijhat<span class="sign">(</span>Jicum<span class="sign">(</span>i<span class="sign">)</span><span class="sign">+</span>j<span class="sign">)</span><span class="sign">=</span>0<span class="sign">.</span>01
+<span class="line_number">588 </span>            <span class="keyword">endif</span>
+<span class="line_number">589 </span>            <span class="keyword">if</span><span class="sign">(</span>Vijhat<span class="sign">(</span>Jicum<span class="sign">(</span>i<span class="sign">)</span><span class="sign">+</span>j<span class="sign">)</span><span class="sign">.</span>LE<span class="sign">.</span>0<span class="sign">.</span>01<span class="sign">)</span> <span class="keyword">then</span> 
+<span class="line_number">590 </span>                Vijhat<span class="sign">(</span>Jicum<span class="sign">(</span>i<span class="sign">)</span><span class="sign">+</span>j<span class="sign">)</span><span class="sign">=</span>0<span class="sign">.</span>01
+<span class="line_number">591 </span>            <span class="keyword">endif</span>
+<span class="line_number">592 </span> 120    <span class="keyword">continue</span>
+<span class="line_number">593 </span> 100  <span class="keyword">continue</span>   
+<span class="line_number">594 </span>       
+<span class="line_number">595 </span>      <span class="keyword">end</span>
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./blupsurv/src/bivrec.f with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.36 on Sun Jun 29 2008 13:34:50
+</p>
+</div> <!-- footer -->
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=3825293; 
+var sc_invisible=1; 
+var sc_partition=34; 
+var sc_click_stat=1; 
+var sc_security="2dd2334a"; 
+</script>
+
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div
+class="statcounter"><a href="http://www.statcounter.com/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/3825293/0/2dd2334a/1/" alt="free html hit
+counter" ></a></div></noscript>
+<!-- End of StatCounter Code -->
+</body>
+
+</html>

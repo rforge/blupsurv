@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./blupsurv/R/bivmethods.r</title>
+<!-- Source: ./blupsurv/R/bivmethods.r -->
+<!-- Generated with ROBODoc Version 4.99.36 (Jun 17 2008) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">blupsurv</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="./bivmethods_r2FmethodsBiv.html#robo3">methodsBiv</a><a class="menuitem" href="../robo_functions.html#robo_top_of_doc">Functions</a></div> <!-- navigation -->
+<div id="content">
+<h3>TABLE OF CONTENTS</h3>
+<ul>
+<li>1. <a href="#robo42">methodsBiv/cleanbivrecoutput</a></li>
+</ul>
+<hr />
+<a name="methodsBiv2fcleanbivrecoutput"></a>
+<a name="robo42"></a><h2>methodsBiv/cleanbivrecoutput [ Functions ]</h2>
+
+<p class="item_name">NAME</p>
+<pre>    <strong>cleanbivrecoutput</strong> --- clean output of <a href="./bivrec_r00main2Fbivrec2Eagdata.html#robo11">bivrec.agdata</a>
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>    Construct the <a href="./bivmethods_rmethodsBiv2Fbivrec.html#robo38">bivrec</a> object and 
+    restore the original stratum, process, cluster and subject names that
+    were stripped by <a href="./bivmethods_rmethodsBiv2Fbivrec2Eformula.html#robo40">bivrec.formula</a>
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">280 </span><strong>cleanbivrecoutput</strong> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">function</span><span class="sign">(</span>fit<span class="sign">,</span> clusternames<span class="sign">,</span> subjnames<span class="sign">,</span> stratnames<span class="sign">,</span> processnames<span class="sign">)</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>    fit            a fit returned by <a href="./bivrec_r00main2Fbivrec2Eagdata.html#robo11">bivrec.agdata</a>
+    clusternames   vector of original cluster IDs
+    subjnames      vector of original subject IDs
+    stratnames     vector of original stratum IDs
+    processnames   vector of original process IDs
+</pre>
+<p class="item_name">OUTPUTS</p>
+<pre>    an object of class <a href="./bivmethods_rmethodsBiv2Fbivrec.html#robo38">bivrec</a>, with properly named components
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">283 </span><span class="sign">{</span>
+<span class="line_number">284 </span>    out <span class="sign">&lt;</span><span class="sign">-</span> NULL
+<span class="line_number">285 </span>    out<span class="sign">$</span><span class="keyword">call</span> <span class="sign">&lt;</span><span class="sign">-</span> fit<span class="sign">$</span><span class="keyword">call</span>
+<span class="line_number">286 </span>    <span class="comment"># regression</span>
+<span class="line_number">287 </span>    out<span class="sign">$</span>regression <span class="sign">=</span> <span class="keyword">list</span><span class="sign">(</span>coefficients1 <span class="sign">=</span> fit<span class="sign">$</span>regressionoutput<span class="sign">$</span>betahat<span class="sign">,</span>
+<span class="line_number">288 </span>                        coefficients2 <span class="sign">=</span> fit<span class="sign">$</span>regressionoutput<span class="sign">$</span>betadhat<span class="sign">,</span>
+<span class="line_number">289 </span>                        loglik1 <span class="sign">=</span> fit<span class="sign">$</span>regressionoutput<span class="sign">$</span>loglik1<span class="sign">,</span>
+<span class="line_number">290 </span>                        loglik2 <span class="sign">=</span> fit<span class="sign">$</span>regressionoutput<span class="sign">$</span>loglik2<span class="sign">)</span>
+<span class="line_number">291 </span>    <span class="comment"># frailties</span>
+<span class="line_number">292 </span>    clust1 <span class="sign">&lt;</span><span class="sign">-</span> fit<span class="sign">$</span>frailtyoutput<span class="sign">$</span>Uihat
+<span class="line_number">293 </span>    clust2 <span class="sign">&lt;</span><span class="sign">-</span> fit<span class="sign">$</span>frailtyoutput<span class="sign">$</span>Vihat
+<span class="line_number">294 </span>    subj1 <span class="sign">&lt;</span><span class="sign">-</span> fit<span class="sign">$</span>frailtyoutput<span class="sign">$</span>Uijhat
+<span class="line_number">295 </span>    subj2 <span class="sign">&lt;</span><span class="sign">-</span> fit<span class="sign">$</span>frailtyoutput<span class="sign">$</span>Vijhat
+<span class="line_number">296 </span>    names<span class="sign">(</span>clust1<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> names<span class="sign">(</span>clust2<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> clusternames
+<span class="line_number">297 </span>    names<span class="sign">(</span>subj1<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> names<span class="sign">(</span>subj2<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> subjnames
+<span class="line_number">298 </span>    out<span class="sign">$</span>frailty <span class="sign">=</span> <span class="keyword">list</span><span class="sign">(</span>clust1 <span class="sign">=</span> clust1<span class="sign">,</span> clust2 <span class="sign">=</span> clust2<span class="sign">,</span> subj1 <span class="sign">=</span> subj1<span class="sign">,</span> subj2 <span class="sign">=</span> subj2<span class="sign">)</span>
+<span class="line_number">299 </span>    <span class="comment"># dispersion</span>
+<span class="line_number">300 </span>    disp <span class="sign">&lt;</span><span class="sign">-</span> fit<span class="sign">$</span>dispparams
+<span class="line_number">301 </span>    names<span class="sign">(</span>disp<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span><span class="quote">"clust1"</span><span class="sign">,</span> <span class="quote">"clust2"</span><span class="sign">,</span> <span class="quote">"subj1"</span><span class="sign">,</span> <span class="quote">"subj2"</span><span class="sign">,</span> <span class="quote">"cov"</span><span class="sign">)</span>
+<span class="line_number">302 </span>    out<span class="sign">$</span>dispersion <span class="sign">&lt;</span><span class="sign">-</span> disp
+<span class="line_number">303 </span>    <span class="comment"># baseline</span>
+<span class="line_number">304 </span>    breaks1 <span class="sign">&lt;</span><span class="sign">-</span> fit<span class="sign">$</span>regressionoutput<span class="sign">$</span>as
+<span class="line_number">305 </span>    breaks2 <span class="sign">&lt;</span><span class="sign">-</span> fit<span class="sign">$</span>regressionoutput<span class="sign">$</span>asd
+<span class="line_number">306 </span>    basehaz1 <span class="sign">&lt;</span><span class="sign">-</span> fit<span class="sign">$</span>regressionoutput<span class="sign">$</span>alphars
+<span class="line_number">307 </span>    basehaz2 <span class="sign">&lt;</span><span class="sign">-</span> fit<span class="sign">$</span>regressionoutput<span class="sign">$</span>alpharsd
+<span class="line_number">308 </span>    <span class="keyword">rownames</span><span class="sign">(</span>breaks1<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">rownames</span><span class="sign">(</span>breaks2<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">rownames</span><span class="sign">(</span>basehaz1<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">rownames</span><span class="sign">(</span>basehaz2<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> stratnames
+<span class="line_number">309 </span>    out<span class="sign">$</span>hazard <span class="sign">=</span> <span class="keyword">list</span><span class="sign">(</span>breaks1 <span class="sign">=</span> breaks1<span class="sign">,</span> breaks2 <span class="sign">=</span> breaks2<span class="sign">,</span> 
+<span class="line_number">310 </span>                    hazard1 <span class="sign">=</span> basehaz1<span class="sign">,</span> hazard2 <span class="sign">=</span> basehaz2<span class="sign">)</span>
+<span class="line_number">311 </span>    <span class="comment"># summaries</span>
+<span class="line_number">312 </span>    summary<span class="sign">.</span>reg <span class="sign">&lt;</span><span class="sign">-</span> fit<span class="sign">$</span>summary<span class="sign">.</span>reg
+<span class="line_number">313 </span>    <span class="keyword">colnames</span><span class="sign">(</span>summary<span class="sign">.</span>reg<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span><span class="quote">"coef1"</span><span class="sign">,</span> <span class="quote">"sd1"</span><span class="sign">,</span> <span class="quote">"pval1"</span><span class="sign">,</span> <span class="quote">"coef2"</span><span class="sign">,</span> <span class="quote">"sd2"</span><span class="sign">,</span> <span class="quote">"pval2"</span><span class="sign">)</span>
+<span class="line_number">314 </span>    summary<span class="sign">.</span>disp <span class="sign">&lt;</span><span class="sign">-</span> fit<span class="sign">$</span>summary<span class="sign">.</span>disp
+<span class="line_number">315 </span>    names<span class="sign">(</span>summary<span class="sign">.</span>disp<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span><span class="quote">"clust1"</span><span class="sign">,</span> <span class="quote">"clust2"</span><span class="sign">,</span> <span class="quote">"subj1"</span><span class="sign">,</span> <span class="quote">"subj2"</span><span class="sign">,</span> <span class="quote">"cov"</span><span class="sign">,</span> <span class="quote">"corr"</span><span class="sign">)</span>
+<span class="line_number">316 </span>    out<span class="sign">$</span>summaries <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">list</span><span class="sign">(</span>regression <span class="sign">=</span> summary<span class="sign">.</span>reg<span class="sign">,</span> dispersion <span class="sign">=</span> summary<span class="sign">.</span>disp<span class="sign">)</span>
+<span class="line_number">317 </span>    attr<span class="sign">(</span>out<span class="sign">,</span> <span class="quote">"processnames"</span><span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> processnames
+<span class="line_number">318 </span>    class<span class="sign">(</span>out<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">-</span> <span class="quote">"<a href="./bivmethods_rmethodsBiv2Fbivrec.html#robo38">bivrec</a>"</span>
+<span class="line_number">319 </span>    <span class="keyword">return</span><span class="sign">(</span>out<span class="sign">)</span>
+<span class="line_number">320 </span><span class="sign">}</span>
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./blupsurv/R/bivmethods.r with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.36 on Sun Jun 29 2008 13:34:50
+</p>
+</div> <!-- footer -->
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=3825293; 
+var sc_invisible=1; 
+var sc_partition=34; 
+var sc_click_stat=1; 
+var sc_security="2dd2334a"; 
+</script>
+
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div
+class="statcounter"><a href="http://www.statcounter.com/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/3825293/0/2dd2334a/1/" alt="free html hit
+counter" ></a></div></noscript>
+<!-- End of StatCounter Code -->
+</body>
+
+</html>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./blupsurv/src/bivrec.f</title>
+<!-- Source: ./blupsurv/src/bivrec.f -->
+<!-- Generated with ROBODoc Version 4.99.36 (Jun 17 2008) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">blupsurv</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="./bivrec_f2Ffortran.html#robo2">fortran</a><a class="menuitem" href="../robo_methods.html#robo_top_of_doc">Methods</a></div> <!-- navigation -->
+<div id="content">
+<h3>TABLE OF CONTENTS</h3>
+<ul>
+<li>1. <a href="#robo31">fortran/fsmuij</a></li>
+</ul>
+<hr />
+<a name="fortran2ffsmuij"></a>
+<a name="robo31"></a><h2>fortran/fsmuij [ Methods ]</h2>
+
+<p class="item_name">NAME</p>
+<pre>  <strong>fsmuij</strong> --- compute sums of events and means
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>    Compute the sums of mu_rijks and delta_rijks for every (i,j). 
+    See also the R function <a href="../R/bivrec_rZZdebug2FSmuij.html#robo81">Smuij</a>.
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">281 </span>      <span class="keyword">subroutine</span> <strong>fsmuij</strong><span class="sign">(</span>betahat<span class="sign">,</span>index<span class="sign">,</span>delta<span class="sign">,</span>Z<span class="sign">,</span>alphars<span class="sign">,</span>as<span class="sign">,</span>
+<span class="line_number">282 </span>     <span class="sign">$</span> d<span class="sign">,</span>ncovs<span class="sign">,</span>nr<span class="sign">,</span>ns<span class="sign">,</span>m<span class="sign">,</span>maxj<span class="sign">,</span>Smu<span class="sign">,</span>Sdelta<span class="sign">)</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>    betahat    regression parameters (length p)
+    index      d x 6 matrix of indices i,j,k,r,smin,smax 
+    delta      length d vector of event indicators (double)
+    Z          d x ncovs matrix of covariates (double row vector)
+    alphars    nr x ns matrix of baseline hazards (double) 
+    d          number of rows of Z
+    ncovs      number of covariates
+    nr         number of strata
+    ns         number of breakpoints
+    m          number of clusters
+    maxj       largest cluster size
+</pre>
+<p class="item_name">OUTPUTS</p>
+<pre>    Smu        m x maxj matrix containg sum(mu_rijks) for all (i,j)
+    Sdelta     m x maxj matrix containg sum(delta_rijks) for all (i,j)
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">284 </span>      <span class="keyword">integer</span> d<span class="sign">,</span>ncovs<span class="sign">,</span>nr<span class="sign">,</span>ns<span class="sign">,</span>nk<span class="sign">,</span>m<span class="sign">,</span>maxj
+<span class="line_number">285 </span>      <span class="keyword">integer</span> index<span class="sign">(</span>d<span class="sign">,</span>6<span class="sign">)</span>
+<span class="line_number">286 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> betahat<span class="sign">(</span>ncovs<span class="sign">)</span>
+<span class="line_number">287 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> delta<span class="sign">(</span>d<span class="sign">)</span>
+<span class="line_number">288 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> Z<span class="sign">(</span>d<span class="sign">,</span>ncovs<span class="sign">)</span>
+<span class="line_number">289 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> alphars<span class="sign">(</span>nr<span class="sign">,</span>ns<span class="sign">)</span>
+<span class="line_number">290 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> as<span class="sign">(</span>nr<span class="sign">,</span>ns<span class="sign">)</span>
+<span class="line_number">291 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> lp<span class="sign">,</span> deltat<span class="sign">,</span>w<span class="sign">,</span>mu<span class="sign">,</span>power
+<span class="line_number">292 </span>      <span class="keyword">double</span> <span class="keyword">precision</span> Smu<span class="sign">(</span>m<span class="sign">,</span>maxj<span class="sign">)</span><span class="sign">,</span>Sdelta<span class="sign">(</span>m<span class="sign">,</span>maxj<span class="sign">)</span>
+<span class="line_number">293 </span>      <span class="keyword">integer</span> ind<span class="sign">,</span>i<span class="sign">,</span>j<span class="sign">,</span>k<span class="sign">,</span>r<span class="sign">,</span>s<span class="sign">,</span>smax<span class="sign">,</span>smin<span class="sign">,</span>maxs
+<span class="line_number">294 </span>      
+<span class="line_number">295 </span>      <span class="keyword">parameter</span><span class="sign">(</span>icol<span class="sign">=</span>1<span class="sign">,</span> jcol<span class="sign">=</span>2<span class="sign">,</span> kcol<span class="sign">=</span>3<span class="sign">,</span> ircol<span class="sign">=</span>4<span class="sign">,</span> ismincol<span class="sign">=</span>5<span class="sign">,</span> ismaxcol<span class="sign">=</span>6<span class="sign">)</span>
+<span class="line_number">296 </span>
+<span class="line_number">297 </span>      maxs<span class="sign">=</span><span class="sign">(</span>ns<span class="sign">-</span>1<span class="sign">)</span><span class="sign">*</span>95<span class="sign">/</span>100
+<span class="line_number">298 </span>      <span class="keyword">do</span> 100 ind<span class="sign">=</span>1<span class="sign">,</span>d
+<span class="line_number">299 </span><span class="comment">!       call intpr("ind",-1,ind,1)       </span>
+<span class="line_number">300 </span>       i<span class="sign">=</span>index<span class="sign">(</span>ind<span class="sign">,</span>icol<span class="sign">)</span>
+<span class="line_number">301 </span>        j<span class="sign">=</span>index<span class="sign">(</span>ind<span class="sign">,</span>jcol<span class="sign">)</span>
+<span class="line_number">302 </span>        k<span class="sign">=</span>index<span class="sign">(</span>ind<span class="sign">,</span>kcol<span class="sign">)</span>
+<span class="line_number">303 </span>        r<span class="sign">=</span>index<span class="sign">(</span>ind<span class="sign">,</span>ircol<span class="sign">)</span>
+<span class="line_number">304 </span>        smin<span class="sign">=</span>index<span class="sign">(</span>ind<span class="sign">,</span>ismincol<span class="sign">)</span>
+<span class="line_number">305 </span>        smax<span class="sign">=</span>index<span class="sign">(</span>ind<span class="sign">,</span>ismaxcol<span class="sign">)</span>
+<span class="line_number">306 </span>        deltat<span class="sign">=</span>delta<span class="sign">(</span>ind<span class="sign">)</span>
+<span class="line_number">307 </span>        lp<span class="sign">=</span>ddot<span class="sign">(</span>ncovs<span class="sign">,</span>Z<span class="sign">(</span>ind<span class="sign">,</span>1<span class="sign">)</span><span class="sign">,</span>d<span class="sign">,</span>betahat<span class="sign">,</span>1<span class="sign">)</span>
+<span class="line_number">308 </span><span class="comment">!       ignore the last 5% of intervals</span>
+<span class="line_number">309 </span><span class="comment">!        if(smax.GT.maxs) then</span>
+<span class="line_number">310 </span><span class="comment">!            smax=maxs</span>
+<span class="line_number">311 </span><span class="comment">!        endif  </span>
+<span class="line_number">312 </span>        Sdelta<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">=</span>Sdelta<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">+</span>deltat
+<span class="line_number">313 </span>        <span class="keyword">do</span> 110 s<span class="sign">=</span>smin<span class="sign">,</span>smax
+<span class="line_number">314 </span>           mu<span class="sign">=</span><span class="keyword">exp</span><span class="sign">(</span>lp<span class="sign">)</span><span class="sign">*</span>alphars<span class="sign">(</span>r<span class="sign">,</span>s<span class="sign">)</span><span class="sign">*</span><span class="sign">(</span>as<span class="sign">(</span>r<span class="sign">,</span>s<span class="sign">+</span>1<span class="sign">)</span><span class="sign">-</span>as<span class="sign">(</span>r<span class="sign">,</span>s<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">315 </span>           mu<span class="sign">=</span><span class="sign">(</span>1<span class="sign">.</span>d0<span class="sign">-</span><span class="keyword">exp</span><span class="sign">(</span><span class="sign">-</span>mu<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">316 </span>           Smu<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">=</span>Smu<span class="sign">(</span>i<span class="sign">,</span>j<span class="sign">)</span><span class="sign">+</span>mu
+<span class="line_number">317 </span> 110    <span class="keyword">continue</span>   
+<span class="line_number">318 </span> 100  <span class="keyword">continue</span>
+<span class="line_number">319 </span>      <span class="keyword">end</span>
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./blupsurv/src/bivrec.f with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.36 on Sun Jun 29 2008 13:34:50
+</p>
+</div> <!-- footer -->
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=3825293; 
+var sc_invisible=1; 
+var sc_partition=34; 
+var sc_click_stat=1; 
+var sc_security="2dd2334a"; 
+</script>
+
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div
+class="statcounter"><a href="http://www.statcounter.com/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/3825293/0/2dd2334a/1/" alt="free html hit
+counter" ></a></div></noscript>
+<!-- End of StatCounter Code -->
+</body>
+
+</html>

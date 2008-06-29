@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./blupsurv/R/bivrec.r</title>
+<!-- Source: ./blupsurv/R/bivrec.r -->
+<!-- Generated with ROBODoc Version 4.99.36 (Jun 17 2008) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">blupsurv</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="./bivrec_rbivrecFit2Festimation.html#robo6">estimation</a><a class="menuitem" href="../robo_functions.html#robo_top_of_doc">Functions</a></div> <!-- navigation -->
+<div id="content">
+<h3>TABLE OF CONTENTS</h3>
+<ul>
+<li>1. <a href="#robo15">estimation/smoothalpha</a></li>
+</ul>
+<hr />
+<a name="estimation2fsmoothalpha"></a>
+<a name="robo15"></a><h2>estimation/smoothalpha [ Functions ]</h2>
+
+<p class="item_name">NAME</p>
+<pre>    <strong>smoothalpha</strong> --- smooth hazard estimates
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>    Applies a spline smoother to the baseline hazard estimates. This was sometimes
+    found to improve stability.
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">381 </span><strong>smoothalpha</strong> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">function</span><span class="sign">(</span>alphars<span class="sign">,</span> as<span class="sign">)</span>
+</pre>
+<p class="item_name">INPUTS</p>
+<pre>    alphars    matrix of baseline hazard parameters 
+    as         matrix of discretization breakpoints for each stratum
+</pre>
+<p class="item_name">OUTPUTS</p>
+<pre>    alphars    matrix of baseline hazard parameters
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">384 </span><span class="sign">{</span>
+<span class="line_number">385 </span>     <span class="keyword">for</span><span class="sign">(</span>r in 1<span class="sign">:</span><span class="keyword">dim</span><span class="sign">(</span>as<span class="sign">)</span><span class="sign">[</span>1<span class="sign">]</span><span class="sign">)</span><span class="sign">{</span>
+<span class="line_number">386 </span>        idx <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">which</span><span class="sign">(</span>alphars<span class="sign">[</span>r<span class="sign">,</span> <span class="sign">]</span> <span class="comment">!= 100)</span>
+<span class="line_number">387 </span>        idx <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span>idx<span class="sign">,</span> idx<span class="sign">[</span><span class="keyword">length</span><span class="sign">(</span>idx<span class="sign">)</span><span class="sign">]</span> <span class="sign">+</span> 1<span class="sign">)</span>
+<span class="line_number">388 </span>        xs <span class="sign">&lt;</span><span class="sign">-</span> <span class="sign">(</span>as<span class="sign">[</span>r<span class="sign">,</span> idx<span class="sign">[</span> <span class="sign">-</span> 1<span class="sign">]</span><span class="sign">]</span> <span class="sign">+</span> as<span class="sign">[</span>r<span class="sign">,</span> idx<span class="sign">[</span> <span class="sign">-</span> <span class="keyword">length</span><span class="sign">(</span>idx<span class="sign">)</span><span class="sign">]</span><span class="sign">]</span><span class="sign">)</span> <span class="sign">/</span> 2
+<span class="line_number">389 </span>        <span class="keyword">if</span><span class="sign">(</span><span class="keyword">length</span><span class="sign">(</span>xs<span class="sign">)</span> <span class="sign">&gt;</span> 50<span class="sign">)</span> nk <span class="sign">&lt;</span><span class="sign">-</span> 50 <span class="keyword">else</span> nk <span class="sign">&lt;</span><span class="sign">-</span> NULL
+<span class="line_number">390 </span>        <span class="comment"># Apply a spline smoother to the hazards</span>
+<span class="line_number">391 </span>        out <span class="sign">&lt;</span><span class="sign">-</span> smooth<span class="sign">.</span>spline<span class="sign">(</span>xs<span class="sign">,</span> alphars<span class="sign">[</span>r<span class="sign">,</span> idx<span class="sign">[</span> <span class="sign">-</span> <span class="keyword">length</span><span class="sign">(</span>idx<span class="sign">)</span><span class="sign">]</span><span class="sign">]</span><span class="sign">,</span> 
+<span class="line_number">392 </span>            w <span class="sign">=</span> <span class="keyword">diff</span><span class="sign">(</span>as<span class="sign">[</span>r<span class="sign">,</span> idx<span class="sign">]</span><span class="sign">)</span><span class="sign">,</span> nknots <span class="sign">=</span> nk<span class="sign">)</span>
+<span class="line_number">393 </span>        alphars<span class="sign">[</span>r<span class="sign">,</span> idx<span class="sign">]</span> <span class="sign">&lt;</span><span class="sign">-</span> c<span class="sign">(</span>out<span class="sign">$</span>y<span class="sign">,</span> 100<span class="sign">)</span>
+<span class="line_number">394 </span>     <span class="sign">}</span>
+<span class="line_number">395 </span>     <span class="keyword">return</span><span class="sign">(</span>alphars<span class="sign">)</span>
+<span class="line_number">396 </span><span class="sign">}</span>
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./blupsurv/R/bivrec.r with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.36 on Sun Jun 29 2008 13:34:50
+</p>
+</div> <!-- footer -->
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=3825293; 
+var sc_invisible=1; 
+var sc_partition=34; 
+var sc_click_stat=1; 
+var sc_security="2dd2334a"; 
+</script>
+
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div
+class="statcounter"><a href="http://www.statcounter.com/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/3825293/0/2dd2334a/1/" alt="free html hit
+counter" ></a></div></noscript>
+<!-- End of StatCounter Code -->
+</body>
+
+</html>

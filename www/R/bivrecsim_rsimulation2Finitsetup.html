@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./blupsurv/R/bivrecsim.r</title>
+<!-- Source: ./blupsurv/R/bivrecsim.r -->
+<!-- Generated with ROBODoc Version 4.99.36 (Jun 17 2008) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">blupsurv</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="./bivrecsim_r2Fsimulation.html#robo5">simulation</a><a class="menuitem" href="../robo_functions.html#robo_top_of_doc">Functions</a></div> <!-- navigation -->
+<div id="content">
+<h3>TABLE OF CONTENTS</h3>
+<ul>
+<li>1. <a href="#robo65">simulation/initsetup</a></li>
+</ul>
+<hr />
+<a name="simulation2finitsetup"></a>
+<a name="robo65"></a><h2>simulation/initsetup [ Functions ]</h2>
+
+<p class="item_name">NAME</p>
+<pre>    <strong>initsetup</strong>  --- intial setup for <a href="./bivrecsim_r2Fsimulation.html#robo5">simulation</a>
+</pre>
+<p class="item_name">FUNCTION</p>
+<p>    Creates parameters for <a href="./bivrecsim_r2Fsimulation.html#robo5">simulation</a>
+</p>
+<p class="item_name">SYNOPSIS</p>
+<pre class="source"><span class="line_number">231 </span><strong>initsetup</strong> <span class="sign">&lt;</span><span class="sign">-</span> <span class="keyword">function</span><span class="sign">(</span>timedep<span class="sign">,</span> m<span class="sign">,</span> Ji<span class="sign">,</span> K<span class="sign">,</span> Kd<span class="sign">,</span> fixzero<span class="sign">,</span> alternating <span class="sign">=</span> F<span class="sign">)</span>
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">234 </span><span class="sign">{</span>
+<span class="line_number">235 </span>    m <span class="sign">&lt;</span><span class="sign">-</span> m
+<span class="line_number">236 </span>    Ji <span class="sign">&lt;</span><span class="sign">-</span> Ji
+<span class="line_number">237 </span>    <span class="keyword">if</span><span class="sign">(</span>is<span class="sign">.</span>null<span class="sign">(</span>fixzero<span class="sign">)</span><span class="sign">)</span> fixzero <span class="sign">&lt;</span><span class="sign">-</span> <span class="quote">""</span>
+<span class="line_number">238 </span>    <span class="comment"># Variance of cluster frailty (rec)</span>
+<span class="line_number">239 </span>    <span class="keyword">if</span><span class="sign">(</span>fixzero <span class="comment">!= "sigma2hat") sigma2 &lt;- .25  else sigma2 &lt;- 0 </span>
+<span class="line_number">240 </span>    <span class="comment"># Variance of cluster frailty (death)</span>
+<span class="line_number">241 </span>    <span class="keyword">if</span><span class="sign">(</span>fixzero <span class="comment">!= "sigma2dhat") sigma2d &lt;- .25 else sigma2d &lt;- 0 </span>
+<span class="line_number">242 </span>    <span class="comment"># Additional variance for individual frailty (rec)</span>
+<span class="line_number">243 </span>    <span class="keyword">if</span><span class="sign">(</span>fixzero <span class="comment">!= "nu2hat") nu2 &lt;- .25 else nu2 &lt;- 0 </span>
+<span class="line_number">244 </span>    <span class="comment"># Additional variance for individual frailty (death)</span>
+<span class="line_number">245 </span>    <span class="keyword">if</span><span class="sign">(</span>fixzero <span class="comment">!= "nu2dhat") nu2d &lt;- .25 else nu2d &lt;- 0 </span>
+<span class="line_number">246 </span>    <span class="comment"># Covariance</span>
+<span class="line_number">247 </span>    <span class="keyword">if</span><span class="sign">(</span>fixzero <span class="comment">!= "thetahat") theta &lt;- .125 else theta &lt;- 0 </span>
+<span class="line_number">248 </span>    beta1d <span class="sign">&lt;</span><span class="sign">-</span> 1 <span class="comment"># Coefficient for the death process</span>
+<span class="line_number">249 </span>    beta1 <span class="sign">&lt;</span><span class="sign">-</span> 1 <span class="comment"># Coefficient for the recurrent process</span>
+<span class="line_number">250 </span>    beta2d <span class="sign">&lt;</span><span class="sign">-</span> 1 <span class="comment"># Coefficient for the death process</span>
+<span class="line_number">251 </span>    beta2 <span class="sign">&lt;</span><span class="sign">-</span> 1 <span class="comment"># Coefficient for the recurrent process</span>
+<span class="line_number">252 </span>    lambda0 <span class="sign">&lt;</span><span class="sign">-</span> 10 <span class="comment"># Baseline hazard for recurrent events</span>
+<span class="line_number">253 </span>    lambda0d <span class="sign">&lt;</span><span class="sign">-</span> 10 <span class="comment"># Baseline hazard for death</span>
+<span class="line_number">254 </span>    lambda0c <span class="sign">&lt;</span><span class="sign">-</span> 1 <span class="comment"># Baseline hazard for censoring</span>
+<span class="line_number">255 </span>    <span class="keyword">if</span><span class="sign">(</span>alternating<span class="sign">)</span> lambda0c <span class="sign">&lt;</span><span class="sign">-</span> <span class="sign">.</span>25
+<span class="line_number">256 </span>    gamweib <span class="sign">&lt;</span><span class="sign">-</span> 1<span class="sign">.</span>8 <span class="comment"># Shape parameter for Weibull distribution (rec)</span>
+<span class="line_number">257 </span>    gamweibd <span class="sign">&lt;</span><span class="sign">-</span> 1<span class="sign">.</span>8 <span class="comment"># Shape parameter for Weibull distribution (death)</span>
+<span class="line_number">258 </span>    gamweibc <span class="sign">&lt;</span><span class="sign">-</span> 1<span class="sign">.</span>8 <span class="comment"># Shape parameter for Weibull distribution (censoring)</span>
+<span class="line_number">259 </span>    Z1mean <span class="sign">&lt;</span><span class="sign">-</span> 0 <span class="comment"># Mean of the Zij covariate (generation)</span>
+<span class="line_number">260 </span>    Z1var <span class="sign">&lt;</span><span class="sign">-</span> <span class="sign">.</span>5 <span class="comment"># Variance of the Zij covariate (for generation)</span>
+<span class="line_number">261 </span>    Z2mean <span class="sign">&lt;</span><span class="sign">-</span> 0 <span class="comment"># Mean of the Zij covariate (generation)</span>
+<span class="line_number">262 </span>    Z2var <span class="sign">&lt;</span><span class="sign">-</span> <span class="sign">.</span>5 <span class="comment"># Variance of the Zij covariate (for generation)</span>
+<span class="line_number">263 </span>    maxiter<span class="sign">.</span>outer <span class="sign">&lt;</span><span class="sign">-</span> 200
+<span class="line_number">264 </span>    maxiter<span class="sign">.</span>inner <span class="sign">&lt;</span><span class="sign">-</span> 50
+<span class="line_number">265 </span>    thresh<span class="sign">.</span>outer <span class="sign">&lt;</span><span class="sign">-</span> 1e<span class="sign">-</span>3
+<span class="line_number">266 </span>    thresh<span class="sign">.</span>inner <span class="sign">&lt;</span><span class="sign">-</span> 1e<span class="sign">-</span>5
+<span class="line_number">267 </span>    timedep <span class="sign">&lt;</span><span class="sign">-</span> timedep
+<span class="line_number">268 </span>    K <span class="sign">&lt;</span><span class="sign">-</span> K <span class="comment"># Number of breaks in the baseline hazard</span>
+<span class="line_number">269 </span>    Kd <span class="sign">&lt;</span><span class="sign">-</span> Kd <span class="comment"># Number of breaks in the baseline hazard for death</span>
+<span class="line_number">270 </span>    params <span class="sign">=</span> <span class="keyword">list</span><span class="sign">(</span>m <span class="sign">=</span> m<span class="sign">,</span> Ji <span class="sign">=</span> Ji<span class="sign">,</span> sigma2 <span class="sign">=</span> sigma2<span class="sign">,</span> sigma2d <span class="sign">=</span> sigma2d<span class="sign">,</span> 
+<span class="line_number">271 </span>            nu2 <span class="sign">=</span> nu2<span class="sign">,</span> nu2d <span class="sign">=</span> nu2d<span class="sign">,</span> theta <span class="sign">=</span> theta<span class="sign">,</span>
+<span class="line_number">272 </span>            beta1d <span class="sign">=</span> beta1d<span class="sign">,</span> beta2d <span class="sign">=</span> beta2d<span class="sign">,</span> beta1 <span class="sign">=</span> beta1<span class="sign">,</span> beta2 <span class="sign">=</span> beta2<span class="sign">,</span>
+<span class="line_number">273 </span>            lambda0 <span class="sign">=</span> lambda0<span class="sign">,</span> lambda0d <span class="sign">=</span> lambda0d<span class="sign">,</span> lambda0c <span class="sign">=</span> lambda0c<span class="sign">,</span>
+<span class="line_number">274 </span>            gamweib <span class="sign">=</span> gamweib<span class="sign">,</span> gamweibd <span class="sign">=</span> gamweibd<span class="sign">,</span> gamweibc <span class="sign">=</span> gamweibc<span class="sign">,</span>
+<span class="line_number">275 </span>            Z1mean <span class="sign">=</span> Z1mean<span class="sign">,</span> Z2mean <span class="sign">=</span> Z2mean<span class="sign">,</span> Z1var <span class="sign">=</span> Z1var<span class="sign">,</span> Z2var <span class="sign">=</span> Z2var<span class="sign">,</span>
+<span class="line_number">276 </span>            maxiter<span class="sign">.</span>outer <span class="sign">=</span> maxiter<span class="sign">.</span>outer<span class="sign">,</span> maxiter<span class="sign">.</span>inner <span class="sign">=</span> maxiter<span class="sign">.</span>inner<span class="sign">,</span>
+<span class="line_number">277 </span>            thresh<span class="sign">.</span>outer <span class="sign">=</span> thresh<span class="sign">.</span>outer<span class="sign">,</span> thresh<span class="sign">.</span>inner <span class="sign">=</span> thresh<span class="sign">.</span>inner<span class="sign">,</span>
+<span class="line_number">278 </span>            timedep <span class="sign">=</span> timedep<span class="sign">,</span> K <span class="sign">=</span> K<span class="sign">,</span> Kd <span class="sign">=</span> Kd<span class="sign">)</span>
+<span class="line_number">279 </span><span class="sign">}</span>
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./blupsurv/R/bivrecsim.r with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.36 on Sun Jun 29 2008 13:34:52
+</p>
+</div> <!-- footer -->
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=3825293; 
+var sc_invisible=1; 
+var sc_partition=34; 
+var sc_click_stat=1; 
+var sc_security="2dd2334a"; 
+</script>
+
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div
+class="statcounter"><a href="http://www.statcounter.com/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/3825293/0/2dd2334a/1/" alt="free html hit
+counter" ></a></div></noscript>
+<!-- End of StatCounter Code -->
+</body>
+
+</html>
