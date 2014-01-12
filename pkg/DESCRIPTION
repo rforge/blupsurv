@@ -1,5 +1,5 @@
 Package: blupsurv
-Version: 0.1-8
+Version: 0.1-9
 Title: Recurrent events with BLUPs
 Author: Emmanuel Sharef <ess28@cornell.edu> and Robert L. Strawderman <rls54@cornell.edu>
 Maintainer: Emmanuel Sharef <ess28@cornell.edu>

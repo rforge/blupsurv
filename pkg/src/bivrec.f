@@ -48,6 +48,7 @@
       double precision mrs(nr,ns)
       double precision mrsgr(nr,ns,ncovs)
       double precision as(nr,ns)
+      double precision ddot
       
       integer ind,i,j,k,r,s,smax,smin,maxs    
       parameter(icol=1, jcol=2, kcol=3, ircol=4, ismincol=5, ismaxcol=6)
@@ -156,6 +157,7 @@
       double precision mrs(nr,ns)
       double precision mrsgr(nr,ns,ncovs)
       double precision as(nr,ns)
+      double precision ddot
       integer ind,i,j,k,r,s,smax,smin
 
       parameter(icol=1, jcol=2, kcol=3, ircol=4, ismincol=5, ismaxcol=6)
@@ -278,6 +280,7 @@
       double precision lp, deltat,w,mu,power
       double precision Smu(m,maxj),Sdelta(m,maxj)
       integer ind,i,j,k,r,s,smax,smin,maxs
+      double precision ddot
       
       parameter(icol=1, jcol=2, kcol=3, ircol=4, ismincol=5, ismaxcol=6)
 
@@ -344,6 +347,7 @@
       double precision lp, deltat,deltatt,w,mu,power
       double precision Smud,Smu2
       integer ind,i,j,k,r,s,smax,smin,maxs
+      double precision ddot
       
       parameter(icol=1, jcol=2, kcol=3, ircol=4, ismincol=5, ismaxcol=6)
 
@@ -419,6 +423,7 @@
       double precision pred,thisA,time
       double precision Srs(nr,ns), drs(nr,ns)
       integer ind,i,j,k,r,s,smax,smin
+      double precision ddot
       
       parameter(icol=1, jcol=2, kcol=3, ircol=4, ismincol=5, ismaxcol=6)
       
@@ -495,6 +500,7 @@
      $ sij(m,jimax),pijprime(m,jimax),qijprime(m,jimax),
      $ rijprime(m,jimax),sijprime(m,jimax)
       double precision wi(m),wij(m,jimax),zij(m,jimax)
+      double precision ddot
       
       integer i,j
       double precision Smu(m,jimax),Seta(m,jimax),Sdelta(m,jimax),
@@ -649,6 +655,7 @@
       double precision Sex(maxj,ncovs2)
       
       double precision phi(maxj),Z2(ncovs1),Z2d(ncovs2)
+      double precision ddot
       
 ! indices for the start and end of the i portion of the data matrix      
       iind0=0
@@ -924,6 +931,7 @@
       double precision Sex(maxj,npd)
       
       double precision phi(maxj),Z2(np),Z2d(npd)
+      double precision ddot
       
 ! indices for the start and end of the i portion of the data matrix      
       iind0=0

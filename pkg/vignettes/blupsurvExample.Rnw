@@ -91,7 +91,8 @@ The data contains \Sexpr{sum(vigndata$pain)} pain events, and \Sexpr{sum(vigndat
 We can obtain a ``quick'' fit of the data by using a very coarse discretization, only allowing the baseline hazards to change 10 times during the study period\footnote{This vignette ``cheats'' a little: since these fits are quite computationally expensive, their results are already included in the package, so they don't need to be run at build-time.}:
 
 <<quickfit,eval=FALSE>>=
-vigndata.quickfit <- bivrec( Surv2(start,stop,pain,fever) ~ age + sex + cluster(state) + id(patientID), data=vigndata, K1=10, K2=10, verbose=0)
+vigndata.quickfit <- bivrec( Surv2(start,stop,pain,fever) ~ age + sex + 
+cluster(state) + id(patientID), data=vigndata, K1=10, K2=10, verbose=0)
 @
 
 Note the features of the above call. The response is a bivariate survival (\verb=Surv2=) object, with event indicators \verb=pain= and \verb=fever=. In addition to the covariates \verb=age= and \verb=sex=, we also have to specify the cluster and subject identifiers, with the \verb=cluster()= and \verb=id()= terms. The options \verb=K1= and \verb=K2= control the discretization for the pain and fever hazards.
@@ -125,7 +126,8 @@ Note the evident discretization in the baseline hazard.
 While the results using coarse discretizations may not be very precise, they are adequate for model selection. Based on the summary above, we conclude that excluding the age covariate for the fever process may be appropriate. We run another ``quick'' fit, applying the exclusion:
 
 <<quickfit2,eval=FALSE>>=
-vigndata.quickfit2 <- bivrec(Surv2(start,stop,pain,fever) ~ age + sex + cluster(state) + id(patientID), K1=10, K2=10, excludevars1="age", data=vigndata, verbose=0)
+vigndata.quickfit2 <- bivrec(Surv2(start,stop,pain,fever) ~ age + sex +  
+cluster(state) + id(patientID), K1=10, K2=10, excludevars1="age", data=vigndata, verbose=0)
 @
 <<quickfit2sum>>=
 summary(vigndata.quickfit2)
@@ -134,7 +136,8 @@ summary(vigndata.quickfit2)
 The fitted values are quite similar, unsurprisingly. Lastly, we fit a model using the finest possible discretization. Rather than explicitly giving the number of desired breakpoints in the baseline hazard, setting \verb@K1=1, K2=1@ signals that the maximum number of breakpoints is desired:
 
 <<finalfit,eval=FALSE>>=
-vigndata.fit <- bivrec(Surv2(start,stop,pain,fever) ~ age + sex + cluster(state) + id(patientID), K1=1, K2=1, excludevars1="age", data=vigndata, verbose=0)
+vigndata.fit <- bivrec(Surv2(start,stop,pain,fever) ~ age + sex + cluster(state) + 
+id(patientID), K1=1, K2=1, excludevars1="age", data=vigndata, verbose=0)
 @
 <<finalfitsum>>=
 summary(vigndata.fit)
@@ -190,12 +193,14 @@ Figure~\ref{fig:frailtycorr} shows the estimated subject frailties for pain and 
 
 
 <<frailplottoo, include=FALSE>>=
-plot(vigndata.fit$frailty$subj1,vigndata.fit$frailty$subj2,xlab="pain",ylab="fever",main="Subject-level frailties",pch=19, asp=1,xlim=c(0,3),ylim=c(0,3) )
+plot(vigndata.fit$frailty$subj1,vigndata.fit$frailty$subj2,xlab="pain",ylab="fever",
+main="Subject-level frailties",pch=19, asp=1,xlim=c(0,3),ylim=c(0,3) )
 @
 \begin{figure}
 \begin{center}
 <<frailplot, fig=TRUE, echo=FALSE>>=
-plot(vigndata.fit$frailty$subj1,vigndata.fit$frailty$subj2,xlab="pain",ylab="fever",main="Subject-level frailties",pch=19, asp=1,xlim=c(0,3),ylim=c(0,3) )
+plot(vigndata.fit$frailty$subj1,vigndata.fit$frailty$subj2,xlab="pain",ylab="fever",
+main="Subject-level frailties",pch=19, asp=1,xlim=c(0,3),ylim=c(0,3) )
 @
 \end{center}
 \caption{Subject-level frailties for the two processes, showing the correlation.}

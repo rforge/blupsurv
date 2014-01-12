@@ -2394,10 +2394,11 @@ bivrec.agdata <- function(x, K1 = 10, K2 = 10, excludevars1 = NULL,
     # Read in the input and make basic adjustments
     agdata <- x
     K <- K1;Kd <- K2;
+    if(dim(agdata)[2] > 9) if(sum(agdata[, 10] != 0) == 0) agdata <- agdata[, -10]
     if(is.null(excludevars1)) vars1 <- NULL else 
-        vars1 <- which(!colnames(x)[ - (1:8)]%in%excludevars1)
+        vars1 <- which(!colnames(agdata)[ - (1:8)]%in%excludevars1)
     if(is.null(excludevars2)) vars2 <- NULL else 
-        vars2 <- which(!colnames(x)[ - (1:8)]%in%excludevars2)
+        vars2 <- which(!colnames(agdata)[ - (1:8)]%in%excludevars2)
     maxiter.outer <- maxiter; thresh.outer <- convergence;
     fixzero <- fixzero[fixzero%in%c("clust1", "clust2", "subj1", "subj2", "cov")]
     fixzero[fixzero == "clust1"] <- "sigma2hat"
@@ -2431,7 +2432,6 @@ bivrec.agdata <- function(x, K1 = 10, K2 = 10, excludevars1 = NULL,
     # For recurrent events, the response time is the interevent time stop - start, 
     # and event indicator delta. 
     if(verbose >= 2) cat("Get initial values\n")
-    if(dim(agdata)[2] > 9) if(sum(agdata[, 10] != 0) == 0) agdata <- agdata[, -10]
     
     # create separate data frames for each process
     agdata1 <- agdata[, -8]
